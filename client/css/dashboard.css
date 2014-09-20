@@ -42,3 +42,23 @@ div.widget div.system-info {
 .red {
 	color:red;
 }
+
+div#content {
+	position:relative;
+}
+
+div#footer {
+	position:absolute;
+	bottom:0;
+}
+
+div#lasterror {
+	float:left;
+}
+
+div#refreshin {
+	margin:0;
+	padding:0;
+	font-size:11pt;
+	color:#555;
+}

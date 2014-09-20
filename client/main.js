@@ -1,5 +1,6 @@
 /* ===== SETUP GRID ===== */
 var g_id_counter = 1;
+var g_refresh_seconds_left = 0;
 var gridoptions = {
 	widget_selector : "div.widget",
 	widget_margins : [20, 20],
@@ -74,13 +75,30 @@ $(document).ready(function() {
 		g_id_counter++;
 	}
 
+	var updateRefreshSecondsLeft = function() {
+		if(g_refresh_seconds_left > 0) {
+			g_refresh_seconds_left -= 1;
+		}
+		UpdateRefreshValue();
+
+		setTimeout(function() {
+			updateRefreshSecondsLeft();
+		}, 1000);
+	}
+
 	var refresh = function() {
 		RefreshSystems();
+
+		g_refresh_seconds_left = g_configuration['refreshTimeout'] / 1000;
+		console.log("Setting new seconds left: " + g_refresh_seconds_left);
+
 		setTimeout(function() {
 			refresh();
 		}, g_configuration['refreshTimeout']);
 	};
+
 	refresh();
+	updateRefreshSecondsLeft();
 });
 
 function RefreshWidgets() {
@@ -95,9 +113,29 @@ function RefreshSystems() {
 		var su = new SystemUpdater(system);
 		su.updateComponents([], function(error) {
 			if(error) {
-				alert('An error occurred while updating: ' + error);
+				ReportError(error);
 			}
 			RefreshWidgets();
 		});
 	}
+}
+
+function ReportError(e) {
+    var error = "Error at " + new Date() + ": " + e;
+    console.error(error);
+
+    var div = $('<div/>');
+    div.text(error);
+    div.attr('class', 'alert alert-danger');
+    div.attr('role', 'alert');
+    $(lasterror).html(div.html());
+    $(lasterror).show();
+    setTimeout(function() {
+        $(lasterror).hide();
+    }, 10*1000);
+}
+
+function UpdateRefreshValue() {
+	var t = 'Refreshing in ' + g_refresh_seconds_left + ' seconds';
+	$(refreshin).text(t);
 }
