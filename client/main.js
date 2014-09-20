@@ -95,7 +95,7 @@ function RefreshSystems() {
 		var su = new SystemUpdater(system);
 		su.updateComponents([], function(error) {
 			if(error) {
-				alert('An error occurred while updating: ' + error);
+				//alert('An error occurred while updating: ' + error);
 			}
 			RefreshWidgets();
 		});
