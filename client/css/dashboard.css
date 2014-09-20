@@ -55,3 +55,10 @@ div#footer {
 div#lasterror {
 	float:left;
 }
+
+div#refreshin {
+	margin:0;
+	padding:0;
+	font-size:11pt;
+	color:#555;
+}
