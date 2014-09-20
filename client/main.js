@@ -95,9 +95,24 @@ function RefreshSystems() {
 		var su = new SystemUpdater(system);
 		su.updateComponents([], function(error) {
 			if(error) {
-				//alert('An error occurred while updating: ' + error);
+				ReportError(error);
 			}
 			RefreshWidgets();
 		});
 	}
+}
+
+function ReportError(e) {
+    var error = "Error at " + new Date() + ": " + e;
+    console.error(error);
+
+    var div = $('<div/>');
+    div.text(error);
+    div.attr('class', 'alert alert-danger');
+    div.attr('role', 'alert');
+    $(lasterror).html(div.html());
+    $(lasterror).show();
+    setTimeout(function() {
+        $(lasterror).hide();
+    }, 10*1000);
 }
