@@ -176,6 +176,26 @@ function CurrentTimeComponent(jsonObject) {
 	}
 }
 
+function ConnectionsComponent(jsonObject) {
+	this.key = 'connections';
+	this.connections = null;
+	this.ports = null;
+
+	this.loadJSON = function(jsonObject) {
+		if(!jsonObject[this.key]) {
+			throw new Error("Expected a member called '" + this.key + "'");
+		}
+
+		var info = jsonObject[this.key];
+		this.connections = parseInt(info.connections);
+		this.ports = parseInt(info.ports);
+	}
+
+	if(jsonObject) {
+		this.loadJSON(jsonObject);
+	}
+}
+
 /**
  * Create a class that handles network request to update system information
  **/
@@ -577,3 +597,48 @@ function CurrentTimeWidget(system) {
 	}
 }
 CurrentTimeWidget.prototype = new Widget();
+
+function ConnectionsWidget(system) {
+	Widget.call(this, system, new ConnectionsComponent());
+
+	this.isAvailable = function() {
+		var comp = this.component;
+		return (comp.content || comp.ports);
+	}
+
+	this.enableContent = function() {
+		var widgetSpan = this.widget.find('.connections');
+		if(!widgetSpan.length) {
+			this.widget.find('.content').append([
+				'<span class="connections">',
+				'<span class="ports"></span><br>',
+				'<span class="connections"></span>',
+				'</span>'
+			].join('\n'));
+			widgetSpan = this.widget.find('.connections');
+		}
+
+		var conString = "" + this.component.connections + " links";
+		var portsString = "" + this.component.ports + " open ports";
+
+		widgetSpan.first().find('.connections').text(conString);
+		widgetSpan.first().find('.ports').text(portsString);
+	}
+
+	this.disableContent = function() {
+		this.widget.find('.curtimeSpan').remove();
+	}
+
+	this.html = function() {
+		return [
+		'<div class="new widget currenttime" id="' + this.id + '">',
+		    '<div class="content">',
+			'</div>',
+			'<div class="system-info">',
+				this.system.name.toUpperCase() + " - TIME",
+			'</div>',
+		'</div>'
+		].join('\n');
+	}
+}
+ConnectionsWidget.prototype = new Widget();

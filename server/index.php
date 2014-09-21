@@ -76,7 +76,28 @@ class CurrentTime {
     }
 }
 
-$classes = ['Memory', 'Load', 'UpTime', 'CurrentTime'];
+class Connections {
+	public $key = 'connections';
+
+	function getData($args=array()) {
+		exec(
+			"ss -s | grep INET |awk '{print $2}'",
+			$connections
+		);
+		exec(
+			"ss -nl |egrep -o ':[0-9]+[ ]'|egrep -o '[0-9]+' |" .
+				"uniq |wc -l |awk '{print $1}'",
+			$ports
+		);
+
+		return array(
+			'connections' => $connections,
+			'ports' => $ports
+		);
+	}
+}
+
+$classes = ['Memory', 'Load', 'UpTime', 'CurrentTime', 'Connections'];
 $result = array();
 foreach($classes as $class) {
     $mod = new $class();
