@@ -63,7 +63,20 @@ class UpTime {
     }
 }
 
-$classes = ['Memory', 'Load', 'UpTime'];
+class CurrentTime {
+    public $key = 'currenttime';
+
+    function getData($args=array()) {
+        return array(
+            'hours' => date('G'),
+            'minutes' => date('i'),
+            'seconds' => date('s'),
+            'timezone' => date('T'),
+        );
+    }
+}
+
+$classes = ['Memory', 'Load', 'UpTime', 'CurrentTime'];
 $result = array();
 foreach($classes as $class) {
     $mod = new $class();
