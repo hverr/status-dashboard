@@ -63,7 +63,41 @@ class UpTime {
     }
 }
 
-$classes = ['Memory', 'Load', 'UpTime'];
+class CurrentTime {
+    public $key = 'currenttime';
+
+    function getData($args=array()) {
+        return array(
+            'hours' => date('G'),
+            'minutes' => date('i'),
+            'seconds' => date('s'),
+            'timezone' => date('T'),
+        );
+    }
+}
+
+class Connections {
+	public $key = 'connections';
+
+	function getData($args=array()) {
+		exec(
+			"ss -s | grep INET |awk '{print $2}'",
+			$connections
+		);
+		exec(
+			"ss -nl |egrep -o ':[0-9]+[ ]'|egrep -o '[0-9]+' |" .
+				"uniq |wc -l |awk '{print $1}'",
+			$ports
+		);
+
+		return array(
+			'connections' => $connections,
+			'ports' => $ports
+		);
+	}
+}
+
+$classes = ['Memory', 'Load', 'UpTime', 'CurrentTime', 'Connections'];
 $result = array();
 foreach($classes as $class) {
     $mod = new $class();

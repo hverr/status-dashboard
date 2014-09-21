@@ -1,3 +1,9 @@
+function pad(n, width, z) {
+  z = z || '0';
+  n = n + '';
+  return n.length >= width ? n : new Array(width - n.length + 1).join(z) + n;
+}
+
 /**
  * Create a system with a name and update url
  *
@@ -120,6 +126,69 @@ function UpTimeComponent(jsonObject) {
 		this.hours = uptimeObj.hours;
 		this.minutes = uptimeObj.minutes;
 		this.seconds = uptimeObj.seconds;
+	}
+
+	if(jsonObject) {
+		this.loadJSON(jsonObject);
+	}
+}
+
+function CurrentTimeComponent(jsonObject) {
+	this.key = 'currenttime';
+	this.hours = null;
+	this.minutes = null;
+	this.seconds = null;
+	this.timezone = null;
+
+	this.addOneSecond = function() {
+		if(this.seconds === null) {
+			return;
+		}
+
+		this.seconds += 1;
+		if(this.seconds == 60) {
+			this.seconds = 0;
+			this.minutes += 1;
+		}
+		if(this.minutes == 60) {
+			this.hours += 1;
+			this.minutes = 0;
+		}
+		if(this.hours == 24) {
+			this.hours = 0;
+		}
+	}
+
+	this.loadJSON = function(jsonObject) {
+		if(!jsonObject[this.key]) {
+			throw new Error("Expected a member called '" + this.key + "'");
+		}
+
+		var curtimeObj = jsonObject[this.key];
+		this.hours = parseInt(curtimeObj.hours);
+		this.minutes = parseInt(curtimeObj.minutes);
+		this.seconds = parseInt(curtimeObj.seconds);
+		this.timezone = curtimeObj.timezone
+	}
+
+	if(jsonObject) {
+		this.loadJSON(jsonObject);
+	}
+}
+
+function ConnectionsComponent(jsonObject) {
+	this.key = 'connections';
+	this.connections = null;
+	this.ports = null;
+
+	this.loadJSON = function(jsonObject) {
+		if(!jsonObject[this.key]) {
+			throw new Error("Expected a member called '" + this.key + "'");
+		}
+
+		var info = jsonObject[this.key];
+		this.connections = parseInt(info.connections);
+		this.ports = parseInt(info.ports);
 	}
 
 	if(jsonObject) {
@@ -449,3 +518,127 @@ function UpTimeWidget(system) {
 	}
 }
 UpTimeWidget.prototype = new Widget();
+
+function CurrentTimeWidget(system) {
+	Widget.call(this, system, new CurrentTimeComponent());
+
+	var that = this;
+	this.updateTime = function() {
+		that.component.addOneSecond();
+		that.refresh();
+		setTimeout(function() {
+			that.updateTime();
+		}, 1000);
+	}
+
+	this.attach = function(grid, widgetID) {
+		this.__proto__.attach.call(this, grid, widgetID);
+		this.updateTime();
+	}
+
+	this.isAvailable = function() {
+		var comp = this.component;
+		return (comp.hours || comp.minutes || comp.seconds);
+	}
+
+	this.enableContent = function() {
+		var curtimeSpan = this.widget.find('.currenttime');
+		if(!curtimeSpan.length) {
+			this.widget.find('.content').append([
+				'<span class="currenttime">',
+				'<span class="time"></span>',
+				'</span>'
+			].join('\n'));
+			curtimeSpan = this.widget.find('.currenttime');
+		}
+
+		var string = "";
+		if(this.component.hours) {
+			string += pad(this.component.hours, 2);
+		} else {
+			string += "00";
+		}
+		string += ":";
+
+		if(this.component.minutes) {
+			string += pad(this.component.minutes, 2);
+		} else {
+			string += "00";
+		}
+		string += ":";
+
+		if(this.component.seconds) {
+			string += pad(this.component.seconds, 2);
+		} else {
+			string += "00";
+		}
+
+		if(this.component.timezone) {
+			string += " " + this.component.timezone;
+		}
+
+		curtimeSpan.first().find('.time').text(string);
+	}
+
+	this.disableContent = function() {
+		this.widget.find('.curtimeSpan').remove();
+	}
+
+	this.html = function() {
+		return [
+		'<div class="new widget currenttime" id="' + this.id + '">',
+		    '<div class="content">',
+			'</div>',
+			'<div class="system-info">',
+				this.system.name.toUpperCase() + " - TIME",
+			'</div>',
+		'</div>'
+		].join('\n');
+	}
+}
+CurrentTimeWidget.prototype = new Widget();
+
+function ConnectionsWidget(system) {
+	Widget.call(this, system, new ConnectionsComponent());
+
+	this.isAvailable = function() {
+		var comp = this.component;
+		return (comp.content || comp.ports);
+	}
+
+	this.enableContent = function() {
+		var widgetSpan = this.widget.find('.connections');
+		if(!widgetSpan.length) {
+			this.widget.find('.content').append([
+				'<span class="connections">',
+				'<span class="ports"></span><br>',
+				'<span class="connections"></span>',
+				'</span>'
+			].join('\n'));
+			widgetSpan = this.widget.find('.connections');
+		}
+
+		var conString = "" + this.component.connections + " links";
+		var portsString = "" + this.component.ports + " open ports";
+
+		widgetSpan.first().find('.connections').text(conString);
+		widgetSpan.first().find('.ports').text(portsString);
+	}
+
+	this.disableContent = function() {
+		this.widget.find('.curtimeSpan').remove();
+	}
+
+	this.html = function() {
+		return [
+		'<div class="new widget currenttime" id="' + this.id + '">',
+		    '<div class="content">',
+			'</div>',
+			'<div class="system-info">',
+				this.system.name.toUpperCase() + " - TIME",
+			'</div>',
+		'</div>'
+		].join('\n');
+	}
+}
+ConnectionsWidget.prototype = new Widget();
