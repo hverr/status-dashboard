@@ -48,7 +48,7 @@ Don't forget to setup the `refreshTimeout` value to an appropriate value in mill
 	
 ## Develop
 
-Currently only widgets for **memory**, **loadavg** and **uptime** are implemented. Feel free to add your own widgets (and share them) to [`dashboard.js`](client/dashboard/dashboard.js).
+Currently only widgets for **memory**, **loadavg**, **uptime**, **current time** and **connections** are implemented. Feel free to add your own widgets (and share them) to [`dashboard.js`](client/dashboard/dashboard.js).
 
 First make a `Component` which manages the model object to load the JSON, then make `YourWidget`. Be sure that your widget inherits `Widget`.
 
