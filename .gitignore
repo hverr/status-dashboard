@@ -5,3 +5,5 @@
 # Vi
 .*.swp
 
+# Bower
+static/app/bower_components
