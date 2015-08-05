@@ -7,3 +7,6 @@
 
 # Bower
 static/app/bower_components
+
+# Node
+node_modules
