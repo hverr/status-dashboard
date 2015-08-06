@@ -3,7 +3,7 @@ package static
 import (
 	"os"
 
-	"github.com/hverr/status-dashboard/settings"
+	"github.com/hverr/status-dashboard/server/settings"
 
 	"github.com/gin-gonic/gin"
 )

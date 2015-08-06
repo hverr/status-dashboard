@@ -4,10 +4,9 @@ import (
 	"log"
 	"os"
 
-	"github.com/hverr/status-dashboard/settings"
-	"github.com/hverr/status-dashboard/static"
-
 	"github.com/gin-gonic/gin"
+	"github.com/hverr/status-dashboard/server/settings"
+	"github.com/hverr/status-dashboard/server/static"
 )
 
 func main() {
