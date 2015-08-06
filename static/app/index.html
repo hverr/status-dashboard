@@ -12,8 +12,9 @@
   <link rel="stylesheet" href="bower_components/html5-boilerplate/dist/css/normalize.css">
   <link rel="stylesheet" href="bower_components/html5-boilerplate/dist/css/main.css">
   <link rel="stylesheet" href="bower_components/angular-gridster/dist/angular-gridster.min.css">
-  <link rel="stylesheet" href="app.css">
+  <link rel="stylesheet/less" type="text/css" href="app.less">
   <script src="bower_components/html5-boilerplate/dist/js/vendor/modernizr-2.8.3.min.js"></script>
+  <script src="bower_components/less/dist/less.min.js"></script>
 </head>
 <body>
   <!--[if lt IE 7]>
@@ -22,7 +23,7 @@
 
   <div gridster ng-controller="gridController">
     <ul>
-      <li gridster-item="item" ng-repeat="item in standardItems">Tile</li>
+      <li class="widget" gridster-item="item" ng-repeat="item in standardItems">Tile</li>
     </ul>
   </div>
 
