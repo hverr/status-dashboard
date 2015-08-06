@@ -5,9 +5,6 @@ angular.module('dashboard', [
   'ngRoute',
   'gridster',
 ])
-.config(['$routeProvider', function($routeProvider) {
-  $routeProvider.otherwise({redirectTo: '/view1'});
-}])
 .controller('gridController', [
   '$scope',
   function($scope) {
