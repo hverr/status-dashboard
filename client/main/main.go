@@ -4,6 +4,8 @@ import (
 	"flag"
 	"fmt"
 	"os"
+
+	"github.com/hverr/status-dashboard/client"
 )
 
 func main() {
@@ -20,8 +22,15 @@ func main() {
 		fmt.Fprintln(os.Stderr, "fatal: flag: missing -c option")
 		fmt.Fprintln(os.Stderr, "")
 		printHelp()
-		return
+		os.Exit(1)
 	}
 
-	fmt.Println("Should parse ", configFile)
+	config := client.NewDefaultConfiguration()
+	if err := config.Parse(configFile); err != nil {
+		fmt.Fprintln(os.Stderr, "fatal: could not parse configuration file",
+			configFile+":", err)
+		os.Exit(1)
+	}
+
+	fmt.Println("Using config:", config)
 }

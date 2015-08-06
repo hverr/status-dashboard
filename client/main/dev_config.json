@@ -1,0 +1,6 @@
+{
+    "api" : "http://localhost:8050/api",
+    "widgets" : [
+        "hello_world"
+    ]
+}
