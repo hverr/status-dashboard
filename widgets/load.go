@@ -82,6 +82,7 @@ func GatherLoadAverage() (one, five, fifteen string, err error) {
 	if err != nil {
 		return
 	}
+	defer fh.Close()
 
 	reader := bufio.NewReader(fh)
 	line, err := reader.ReadString('\n')
