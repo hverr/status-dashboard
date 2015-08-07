@@ -2,10 +2,6 @@ package widgets
 
 // Widget defines the interface for a general widget.
 type Widget interface {
-	// System should return a human-readable name of the system to which this
-	// widget belongs.
-	System() string
-
 	// Name should return a human-readable name for this widget describing what
 	// it does.
 	Name() string
