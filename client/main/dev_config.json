@@ -1,5 +1,7 @@
 {
     "api" : "http://localhost:8050/api",
+    "identifier" : "webserver",
+    "name" : "Web Server",
     "widgets" : [
         "hello_world"
     ]

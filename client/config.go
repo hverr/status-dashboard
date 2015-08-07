@@ -8,8 +8,10 @@ import (
 
 // Configuration holds the client configuration.
 type Configuration struct {
-	API     string   `json:"api"`
-	Widgets []string `json:"widgets"`
+	API        string   `json:"api"`
+	Identifier string   `json:"identifier"`
+	Name       string   `json:"name"`
+	Widgets    []string `json:"widgets"`
 }
 
 // NewDefaultConfiguration creates a new configuration with default values. It

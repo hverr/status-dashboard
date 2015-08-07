@@ -14,6 +14,8 @@ CONFIGURATION FILE:
 
 	{
 		"api" : "http://dashboard.example.org/api",
+		"identifier": "webserver",
+		"name": "Web Server",
 		"widgets" : [
 			"uptime",
 			"load",
@@ -22,5 +24,7 @@ CONFIGURATION FILE:
 	}	
 
 	**api**: The dashboard server API end point.
+	**identifier**: Unique identifier for the client.
+	**name**: Human-readable name of the client.
 	**widgets**: Widgets for which to send information.
 `
