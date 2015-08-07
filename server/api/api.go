@@ -8,6 +8,7 @@ import "github.com/gin-gonic/gin"
 // others are used by clients to push widget information.
 func Install(engine *gin.Engine) error {
 	engine.POST("/api/clients/register", registerClient)
+	engine.POST("/api/clients/:client/widgets/:widget/update", updateClientWidget)
 
 	return nil
 }
