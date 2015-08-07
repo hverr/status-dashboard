@@ -8,6 +8,8 @@ import (
 	"regexp"
 )
 
+const LoadWidgetType = "load"
+
 type LoadWidget struct {
 	One     string `json:"one"`
 	Five    string `json:"five"`
@@ -15,19 +17,19 @@ type LoadWidget struct {
 	Cores   int    `json:"cores"`
 }
 
-func (widget LoadWidget) Name() string {
+func (widget *LoadWidget) Name() string {
 	return "Load"
 }
 
-func (widget LoadWidget) Type() string {
-	return "load"
+func (widget *LoadWidget) Type() string {
+	return LoadWidgetType
 }
 
-func (widget LoadWidget) HasData() bool {
+func (widget *LoadWidget) HasData() bool {
 	return true
 }
 
-func (widget *LoadWidget) GatherInformation() error {
+func (widget *LoadWidget) Update() error {
 	if widget.Cores == 0 {
 		i, err := GatherCores()
 		if err != nil {

@@ -15,3 +15,9 @@ type Widget interface {
 	// the client for the first time.
 	HasData() bool
 }
+
+type WidgetInitiator func() Widget
+
+var AllWidgets = map[string]WidgetInitiator{
+	LoadWidgetType: func() Widget { return &LoadWidget{} },
+}
