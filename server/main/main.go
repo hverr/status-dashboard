@@ -13,7 +13,7 @@ func main() {
 	router := gin.Default()
 
 	if err := static.Install(router); err != nil {
-		log.Println("fatal: could not serve static fiels:", err)
+		log.Println("fatal: could not serve static files:", err)
 		os.Exit(1)
 	}
 
