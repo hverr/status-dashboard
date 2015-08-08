@@ -22,5 +22,6 @@ type Widget interface {
 type WidgetInitiator func() Widget
 
 var AllWidgets = map[string]WidgetInitiator{
-	LoadWidgetType: func() Widget { return &LoadWidget{} },
+	LoadWidgetType:   func() Widget { return &LoadWidget{} },
+	UptimeWidgetType: func() Widget { return &UptimeWidget{} },
 }
