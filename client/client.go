@@ -3,12 +3,31 @@ package client
 import (
 	"errors"
 
+	"github.com/hverr/status-dashboard/server"
 	"github.com/hverr/status-dashboard/widgets"
 	"github.com/jmcvetta/napping"
 )
 
 type RequestedWidgets struct {
 	Widgets []string `json:"widgets"`
+}
+
+func Register() error {
+	payload := server.Client{
+		Name:             Configuration.Name,
+		Identifier:       Configuration.Identifier,
+		AvailableWidgets: Configuration.Widgets,
+	}
+
+	url := Configuration.API + "/clients/" + Configuration.Identifier + "/register"
+	resp, err := napping.Post(url, &payload, nil, nil)
+	if err != nil {
+		return err
+	} else if resp.HttpResponse().StatusCode != 200 {
+		return errors.New("Could not register client: " + resp.HttpResponse().Status)
+	}
+
+	return nil
 }
 
 func GetRequestedWidgets() (RequestedWidgets, error) {
