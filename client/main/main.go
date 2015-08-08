@@ -1,11 +1,15 @@
 package main
 
 import (
+	"errors"
 	"flag"
 	"fmt"
+	"log"
 	"os"
+	"time"
 
 	"github.com/hverr/status-dashboard/client"
+	"github.com/hverr/status-dashboard/widgets"
 )
 
 func main() {
@@ -31,5 +35,45 @@ func main() {
 		os.Exit(1)
 	}
 
-	fmt.Println("Using config:", client.Configuration)
+	ticker := time.NewTicker(10 * time.Second)
+	for {
+		if err := update(); err != nil {
+			log.Println("Could not send updates:", err)
+		} else {
+			log.Println("Sent widget information.")
+		}
+
+		<-ticker.C
+	}
+}
+
+func update() error {
+	requested, err := client.GetRequestedWidgets()
+	if err != nil {
+		return err
+	}
+
+	results := make([]widgets.Widget, 0, len(requested.Widgets))
+
+	for _, w := range requested.Widgets {
+		initiator := widgets.AllWidgets[w]
+		if initiator == nil {
+			return errors.New("Unknown requested widget type: " + w)
+		}
+
+		widget := initiator()
+		if err := widget.Update(); err != nil {
+			return err
+		}
+
+		results = append(results, widget)
+	}
+
+	for _, w := range results {
+		if err := client.PostWidgetUpdate(w); err != nil {
+			return err
+		}
+	}
+
+	return nil
 }
