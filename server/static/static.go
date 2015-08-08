@@ -5,6 +5,7 @@ import (
 
 	"github.com/hverr/status-dashboard/server/settings"
 
+	"github.com/gin-gonic/contrib/static"
 	"github.com/gin-gonic/gin"
 )
 
@@ -13,7 +14,7 @@ func Install(engine *gin.Engine) error {
 		return err
 	}
 
-	engine.Static("/", settings.StaticAppRoot)
+	engine.Use(static.Serve("/", static.LocalFile(settings.StaticAppRoot, true)))
 
 	return nil
 }

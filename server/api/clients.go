@@ -45,3 +45,9 @@ func updateClientWidget(c *gin.Context) {
 	client.SetWidget(widget)
 	c.JSON(200, gin.H{"status": "OK"})
 }
+
+func requestedClientWidgets(c *gin.Context) {
+	c.JSON(200, gin.H{
+		"widgets": server.Configuration.DefaultWidgets[c.Param("client")],
+	})
+}
