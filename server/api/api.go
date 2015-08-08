@@ -10,13 +10,8 @@ func Install(engine *gin.Engine) error {
 
 	// POST /api/clients/register -> registerClient
 	// POST /api/clients/:client/widgets/:widget/update -> updateClientWidget
-	engine.POST("/api/clients/:client/widgets/:widget/update", func(c *gin.Context) {
-		if c.Request.RequestURI == "/api/clients/register" {
-			registerClient(c)
-		} else {
-			updateClientWidget(c)
-		}
-	})
+	engine.POST("/api/clients/:client/register", registerClient)
+	engine.POST("/api/clients/:client/widgets/:widget/update", updateClientWidget)
 	engine.GET("/api/clients/:client/widgets/requested", requestedClientWidgets)
 
 	return nil
