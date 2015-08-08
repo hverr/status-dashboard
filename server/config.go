@@ -28,7 +28,7 @@ func ParseConfiguration(file string) error {
 	defer fh.Close()
 
 	decoder := json.NewDecoder(fh)
-	if err := decoder.Decode(Configuration); err != nil {
+	if err := decoder.Decode(&Configuration); err != nil {
 		return err
 	}
 
