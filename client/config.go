@@ -4,6 +4,8 @@ import (
 	"encoding/json"
 	"errors"
 	"os"
+
+	"github.com/hverr/status-dashboard/widgets"
 )
 
 // Configuration holds the client configuration.
@@ -21,6 +23,13 @@ func ValidateConfiguration() error {
 	} else if Configuration.Widgets == nil {
 		return errors.New("No widgets are specified.")
 	}
+
+	for _, w := range Configuration.Widgets {
+		if widgets.AllWidgets[w] == nil {
+			return errors.New("Unsupported widget " + w)
+		}
+	}
+
 	return nil
 }
 
