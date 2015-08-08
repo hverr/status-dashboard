@@ -25,12 +25,11 @@ func main() {
 		os.Exit(1)
 	}
 
-	config := client.NewDefaultConfiguration()
-	if err := config.Parse(configFile); err != nil {
+	if err := client.ParseConfiguration(configFile); err != nil {
 		fmt.Fprintln(os.Stderr, "fatal: could not parse configuration file",
 			configFile+":", err)
 		os.Exit(1)
 	}
 
-	fmt.Println("Using config:", config)
+	fmt.Println("Using config:", client.Configuration)
 }
