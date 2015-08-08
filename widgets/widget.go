@@ -14,6 +14,9 @@ type Widget interface {
 	// default to false and become true when the widget gets information from
 	// the client for the first time.
 	HasData() bool
+
+	// Update should update widget with the most recent information
+	Update() error
 }
 
 type WidgetInitiator func() Widget
