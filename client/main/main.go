@@ -35,6 +35,10 @@ func main() {
 		os.Exit(1)
 	}
 
+	if err := client.Register(); err != nil {
+		log.Fatal(err)
+	}
+
 	ticker := time.NewTicker(10 * time.Second)
 	for {
 		if err := update(); err != nil {
