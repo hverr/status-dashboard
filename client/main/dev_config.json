@@ -3,6 +3,7 @@
     "identifier" : "webserver",
     "name" : "Web Server",
     "widgets" : [
-        "hello_world"
+        "uptime",
+        "load"
     ]
 }
