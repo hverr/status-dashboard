@@ -29,8 +29,7 @@ func main() {
 		os.Exit(1)
 	}
 
-	config := server.NewDefaultConfiguration()
-	if err := config.Parse(configFile); err != nil {
+	if err := server.ParseConfiguration(configFile); err != nil {
 		fmt.Fprintln(os.Stderr, "fatal: could not parse configuration file ",
 			configFile+":", err)
 		os.Exit(1)
