@@ -51,7 +51,7 @@ func PostWidgetUpdate(widget widgets.Widget) error {
 	resp, err := napping.Post(url, &widget, nil, nil)
 	if err != nil {
 		return err
-	} else {
+	} else if resp.HttpResponse().StatusCode != 200 {
 		return errors.New("Could not post widget update " + resp.HttpResponse().Status)
 	}
 
