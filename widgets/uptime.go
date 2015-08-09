@@ -66,7 +66,7 @@ func GatherUptime() (days, hours, minutes, seconds int, err error) {
 	seconds -= days * (60 * 60 * 24)
 
 	hours = seconds / (60 * 60)
-	seconds -= minutes * (60 * 60)
+	seconds -= hours * (60 * 60)
 
 	minutes = seconds / 60
 	seconds -= minutes * 60
