@@ -1,4 +1,10 @@
-<div text-widget>
-  <span>4 cores</span><br />
-  <span>0.05 0.10 0.40</span>
+<div text-widget ng-controller="LoadWidgetController">
+  <div class="text">
+    <span>{{ cores }} cores</span><br />
+    <span>
+      <span>{{ one }}</span>
+      <span>{{ five }}</span>
+      <span>{{ fifteen }}</span>
+    </span>
+  </div>
 </div>

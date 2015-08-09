@@ -1,7 +1,12 @@
 'use strict';
 
 angular.module('dashboard').controller('LoadWidgetController', [
-  function() {
+  '$scope',
+  function($scope) {
+    $scope.cores = "0";
+    $scope.one = "3.4";
+    $scope.five = "1.5";
+    $scope.fifteen = "0.5";
   }
 ]);
 
