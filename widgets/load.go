@@ -75,7 +75,7 @@ func GatherCores() (int, error) {
 	return counter, nil
 }
 
-var LoadAverageRegexp = regexp.MustCompile("^(.*?)\\s+(.*?)\\s+(.*?)")
+var LoadAverageRegexp = regexp.MustCompile("^([^\\s]+)\\s+([^\\s]+)\\s+([^\\s]+)")
 
 func GatherLoadAverage() (one, five, fifteen string, err error) {
 	fh, err := os.Open("/proc/loadavg")
