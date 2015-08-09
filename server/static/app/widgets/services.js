@@ -1,9 +1,10 @@
 'use strict';
 
 angular.module('dashboard').factory('widgetsManager', [
-  '$timeout',
+  '$interval',
+  'api',
   '$log',
-  function($timeout, $log) {
+  function($interval, api, $log) {
     var widgets = [];
 
     return {
@@ -19,10 +20,45 @@ angular.module('dashboard').factory('widgetsManager', [
       start : function() {
         var f = function() {
           widgets.forEach(function(w) {
-            w.update();
+            api.widget(w).then(function(result) {
+              w.update(result);
+            });
           });
         };
-        $timeout(f, 3000);
+
+        $interval(f, 5*1000);
+      },
+    };
+  }
+]);
+
+angular.module('dashboard').factory('api', [
+  '$q',
+  '$http',
+  '$log',
+  function($q, $http, $log) {
+    var baseURL = '/api';
+
+    return {
+      resource: function(resource) {
+        return baseURL + resource;
+      },
+
+      widget: function(w) {
+        var deferred = $q.defer();
+
+        var r = this.resource('/clients/' + w.client + '/widgets/' + w.identifier);
+        $http
+          .get(r)
+          .then(function(result) {
+            $log.info('Updated', w.identifier, 'for', w.client, ':', result);
+            deferred.resolve(result.data);
+
+          }, function(reason) {
+            $log.error('error: api.widget:', reason);
+          });
+
+        return deferred.promise;
       },
     };
   }

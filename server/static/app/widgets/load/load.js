@@ -15,6 +15,7 @@ angular.module('dashboard').factory('LoadWidget', [
         col: col,
 
         client: client,
+        identifier : 'load',
         name: "Load",
 
         cores: 4,
@@ -22,9 +23,12 @@ angular.module('dashboard').factory('LoadWidget', [
         five : "4.02",
         fifteen : "1.02",
 
-        update : function() {
-          this.fifteen = "15.00";
-        }
+        update : function(object) {
+          this.cores = object.cores;
+          this.one = object.one;
+          this.five = object.five;
+          this.fifteen = object.fifteen;
+        },
       };
     };
   }
