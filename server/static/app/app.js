@@ -5,7 +5,7 @@ angular.module('dashboard', [
   'ngRoute',
   'gridster',
 ])
-.controller('gridController', [
+.controller('GridController', [
   '$scope',
   function($scope) {
     $scope.standardItems = [
