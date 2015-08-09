@@ -14,9 +14,9 @@ angular.module('dashboard').factory('LoadWidget', [
   function() {
     return function() {
       return {
-        'one' : null,
-        'five' : null,
-        'fifteen' : null,
+        one : null,
+        five : null,
+        fifteen : null,
       };
     };
   }
