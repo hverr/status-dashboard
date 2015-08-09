@@ -8,10 +8,10 @@ angular.module('dashboard').controller('GridController', [
     widgetsManager.register(new LoadWidget("webserver", 0, 0));
 
     $scope.widgetGridsterMap = {
-      sizeX: 'item.height',
-      sizeY: 'item.width',
-      row: 'item.row',
-      col: 'item.col',
+      sizeX: 'widget.height',
+      sizeY: 'widget.width',
+      row: 'widget.row',
+      col: 'widget.col',
     };
 
     $scope.gridsterOpts = {
