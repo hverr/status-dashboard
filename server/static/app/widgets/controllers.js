@@ -19,6 +19,8 @@ angular.module('dashboard').controller('GridController', [
     };
 
     $scope.widgets = widgetsManager.registeredWidgets();
+
+    widgetsManager.start();
   }
 ]);
 

@@ -26,6 +26,7 @@ angular.module('dashboard').factory('widgetsManager', [
           });
         };
 
+        f();
         $interval(f, 5*1000);
       },
     };
