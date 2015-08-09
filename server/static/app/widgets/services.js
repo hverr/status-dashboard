@@ -6,12 +6,12 @@ angular.module('dashboard').factory('widgetsManager', [
     var widgets = [];
 
     return {
-      'register' : function(widget) {
+      register : function(widget) {
         $log.info('Registering widget', widget.type, 'for', widget.client);
         widgets.push(widget);
       },
 
-      'registeredWidgets' : function() {
+      registeredWidgets : function() {
         return widgets;
       },
     };
