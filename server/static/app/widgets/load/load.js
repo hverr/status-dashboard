@@ -1,13 +1,7 @@
 'use strict';
 
 angular.module('dashboard').controller('LoadWidgetController', [
-  '$scope',
-  function($scope) {
-    $scope.cores = "0";
-    $scope.one = "3.4";
-    $scope.five = "1.5";
-    $scope.fifteen = "0.5";
-  }
+  function() {}
 ]);
 
 angular.module('dashboard').factory('LoadWidget', [
@@ -23,9 +17,10 @@ angular.module('dashboard').factory('LoadWidget', [
         client: client,
         name: "Load",
 
-        one : null,
-        five : null,
-        fifteen : null,
+        cores: 4,
+        one : "1.05",
+        five : "4.02",
+        fifteen : "1.02",
       };
     };
   }
