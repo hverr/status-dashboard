@@ -5,11 +5,20 @@ body {
   font-family: 'Open Sans', sans-serif;
 }
 
+@widget-padding: 20px;
 .widget {
   background: #111;
   border: 2px solid #666;
-  padding: 20px;
+  padding: 0;
   text-align: center;
+
+  .system-info {
+    position: absolute;
+    bottom: @widget-padding;
+    padding: 0;
+    color: #666;
+    width: 100%;
+  }
 }
 
 .red {
