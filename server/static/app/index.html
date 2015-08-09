@@ -21,14 +21,15 @@
       <p class="browsehappy">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
   <![endif]-->
 
-  <div gridster ng-controller="GridController">
-    <ul>
-      <li class="widget" gridster-item="widget" ng-repeat="widget in widgets">
-        <widget ng-controller="WidgetController"></widget>
-      </li>
-    </ul>
+  <div ng-controller="GridController">
+    <div gridster="gridsterOpts">
+      <ul>
+        <li class="widget" gridster-item="widget" ng-repeat="widget in widgets">
+          <widget ng-controller="WidgetController"></widget>
+        </li>
+      </ul>
+    </div>
   </div>
-
 
   <!-- In production use:
   <script src="//ajax.googleapis.com/ajax/libs/angularjs/x.x.x/angular.min.js"></script>
