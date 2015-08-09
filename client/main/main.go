@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"time"
 
 	"github.com/hverr/status-dashboard/client"
 	"github.com/hverr/status-dashboard/widgets"
@@ -34,13 +35,25 @@ func main() {
 		os.Exit(1)
 	}
 
+	for {
+		registerUpdateLoop()
+
+		t := 5 * time.Second
+		log.Println("Reregistering in", t)
+		<-time.After(t)
+	}
+}
+
+func registerUpdateLoop() {
 	if err := client.Register(); err != nil {
-		log.Fatal(err)
+		log.Println(err)
+		return
 	}
 
 	for {
 		if err := update(); err != nil {
 			log.Println("Could not send updates:", err)
+			return
 		} else {
 			log.Println("Sent widget information.")
 		}
