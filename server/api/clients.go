@@ -18,6 +18,7 @@ func registerClient(c *gin.Context) {
 	}
 
 	server.RegisterClient(&client)
+	scheduler.RegisterClient(&client)
 
 	c.JSON(200, gin.H{})
 }

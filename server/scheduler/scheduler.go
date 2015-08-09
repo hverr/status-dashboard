@@ -20,3 +20,7 @@ func UpdateIntervalForClient(client *server.Client) time.Duration {
 
 	return settings.ClientUpdateInterval
 }
+
+func RegisterClient(client *server.Client) {
+	scheduler.Delete(client.Identifier)
+}
