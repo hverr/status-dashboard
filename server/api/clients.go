@@ -2,9 +2,11 @@ package api
 
 import (
 	"errors"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/hverr/status-dashboard/server"
+	"github.com/hverr/status-dashboard/server/scheduler"
 	"github.com/hverr/status-dashboard/widgets"
 )
 
@@ -49,6 +51,9 @@ func requestedClientWidgets(c *gin.Context) {
 		c.AbortWithError(404, errors.New("Client not found."))
 		return
 	}
+
+	delay := scheduler.UpdateIntervalForClient(client)
+	<-time.After(delay)
 
 	c.JSON(200, gin.H{"widgets": client.RequestedWidgets()})
 }

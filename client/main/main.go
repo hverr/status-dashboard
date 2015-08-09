@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"log"
 	"os"
-	"time"
 
 	"github.com/hverr/status-dashboard/client"
 	"github.com/hverr/status-dashboard/widgets"
@@ -39,15 +38,12 @@ func main() {
 		log.Fatal(err)
 	}
 
-	ticker := time.NewTicker(10 * time.Second)
 	for {
 		if err := update(); err != nil {
 			log.Println("Could not send updates:", err)
 		} else {
 			log.Println("Sent widget information.")
 		}
-
-		<-ticker.C
 	}
 }
 
