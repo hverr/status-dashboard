@@ -3,7 +3,7 @@
 angular.module('dashboard').directive('widget', [
   function() {
     return {
-      'templateUrl' : 'widgets/widget.html',
+      templateUrl : 'widgets/widget.html',
     };
   }
 ]);
