@@ -57,3 +57,19 @@ func requestedClientWidgets(c *gin.Context) {
 
 	c.JSON(200, gin.H{"widgets": client.RequestedWidgets()})
 }
+
+func clientWidget(c *gin.Context) {
+	client, ok := server.GetClient(c.Param("client"))
+	if !ok {
+		c.AbortWithError(404, errors.New("Client not found."))
+		return
+	}
+
+	widget := client.GetWidget(c.Param("widget"))
+	if widget == nil {
+		c.AbortWithError(404, errors.New("Widget not found"))
+		return
+	}
+
+	c.JSON(200, widget)
+}

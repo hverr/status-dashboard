@@ -33,7 +33,7 @@ func Register() error {
 func GetRequestedWidgets() (RequestedWidgets, error) {
 	widgets := RequestedWidgets{}
 
-	url := Configuration.API + "/clients/" + Configuration.Identifier + "/widgets/requested"
+	url := Configuration.API + "/clients/" + Configuration.Identifier + "/requested_widgets"
 	resp, err := napping.Get(url, nil, &widgets, nil)
 	if err != nil {
 		return widgets, err

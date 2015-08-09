@@ -62,6 +62,15 @@ func (c *Client) SetWidget(w widgets.Widget) {
 	c.widgets.Set(w.Type(), w, cache.DefaultExpiration)
 }
 
+func (c *Client) GetWidget(widgetType string) widgets.Widget {
+	o, ok := c.widgets.Get(widgetType)
+	if !ok {
+		return nil
+	}
+
+	return o.(widgets.Widget)
+}
+
 func (c *Client) RequestedWidgets() []string {
 	return c.requestedWidgets
 }
