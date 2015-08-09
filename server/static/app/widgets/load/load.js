@@ -20,6 +20,7 @@ angular.module('dashboard').factory('LoadWidget', [
 angular.module('dashboard').directive('loadWidget', [
   function() {
     return {
+      replace: true,
       templateUrl : 'widgets/load/load.html',
     };
   }

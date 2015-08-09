@@ -24,8 +24,8 @@
   <div ng-controller="GridController">
     <div gridster="gridsterOpts">
       <ul>
-        <li class="widget" gridster-item="widget" ng-repeat="widget in widgets">
-          <widget ng-controller="WidgetController"></widget>
+        <li class="widget-grid-item" gridster-item="widget" ng-repeat="widget in widgets">
+          <div widget class="widget" ng-controller="WidgetController"></div>
         </li>
       </ul>
     </div>
@@ -43,6 +43,7 @@
   <script src="widgets/controllers.js"></script>
   <script src="widgets/services.js"></script>
   <script src="widgets/directives.js"></script>
+  <script src="widgets/text/text.js"></script>
   <script src="widgets/load/load.js"></script>
 </body>
 </html>

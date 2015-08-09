@@ -14,7 +14,7 @@ angular.module('dashboard').directive('widgetDynamicInfo', [
     return {
       link: function(scope, element) {
         var d = scope.widget.directive;
-        var template = '<' + d + '></' + d + '>';
+        var template = '<div ' + d + '></div>';
         element.replaceWith($compile(template)(scope));
       },
     };
