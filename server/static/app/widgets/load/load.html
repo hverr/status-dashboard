@@ -1,6 +1,6 @@
 <div text-widget ng-controller="LoadWidgetController">
   <div class="text">
-    <span>{{ widget.cores }} cores</span><br />
+    <span>{{ widget.cores }} {{ widget.cores | pluralize:"core" }}</span><br />
     <span>
       <span>{{ widget.one }}</span>
       <span>{{ widget.five }}</span>
