@@ -12,8 +12,17 @@ angular.module('dashboard').controller('LoadWidgetController', [
 
 angular.module('dashboard').factory('LoadWidget', [
   function() {
-    return function() {
+    return function(client, row, col) {
       return {
+        directive: "load-widget",
+        height: 1,
+        width: 1,
+        row: row,
+        col: col,
+
+        client: client,
+        name: "Load",
+
         one : null,
         five : null,
         fifteen : null,

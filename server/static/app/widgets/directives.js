@@ -10,9 +10,11 @@ angular.module('dashboard').directive('widget', [
 
 angular.module('dashboard').directive('widgetDynamicInfo', [
   '$compile',
-  function($compile) {
+  '$log',
+  function($compile, $log) {
     return {
       link: function(scope, element) {
+        $log.debug('scope.widget:', scope.widget);
         var d = scope.widget.directive;
         var template = '<div ' + d + '></div>';
         element.replaceWith($compile(template)(scope));
