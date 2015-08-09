@@ -5,3 +5,10 @@ angular.module('dashboard', [
   'ngRoute',
   'gridster',
 ]);
+
+angular.module('dashboard').run([
+  'widgetsManager',
+  function(widgetsManager) {
+    widgetsManager.start();
+  }
+]);

@@ -21,6 +21,10 @@ angular.module('dashboard').factory('LoadWidget', [
         one : "1.05",
         five : "4.02",
         fifteen : "1.02",
+
+        update : function() {
+          this.fifteen = "15.00";
+        }
       };
     };
   }

@@ -1,8 +1,9 @@
 'use strict';
 
 angular.module('dashboard').factory('widgetsManager', [
+  '$timeout',
   '$log',
-  function($log) {
+  function($timeout, $log) {
     var widgets = [];
 
     return {
@@ -13,6 +14,15 @@ angular.module('dashboard').factory('widgetsManager', [
 
       registeredWidgets : function() {
         return widgets;
+      },
+
+      start : function() {
+        var f = function() {
+          widgets.forEach(function(w) {
+            w.update();
+          });
+        };
+        $timeout(f, 3000);
       },
     };
   }
