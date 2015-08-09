@@ -16,3 +16,11 @@ angular.module('dashboard').factory('LoadWidget', [
     };
   }
 ]);
+
+angular.module('dashboard').directive('loadWidget', [
+  function() {
+    return {
+      templateUrl : 'widgets/load/load.html',
+    };
+  }
+]);

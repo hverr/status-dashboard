@@ -10,8 +10,8 @@ angular.module('dashboard').controller('GridController', [
     }));
 
     $scope.widgets = [
-      { sizeX: 1, sizeY: 1, row: 0, col: 0, data: { client : "Webserver", name : "Load" }},
-      { sizeX: 1, sizeY: 1, row: 0, col: 1, data: { client : "Webserver", name : "Uptime" }},
+      { sizeX: 1, sizeY: 1, row: 0, col: 0, data: { client : "Webserver", name : "Load", directive: "load-widget" }},
+      { sizeX: 1, sizeY: 1, row: 0, col: 1, data: { client : "Webserver", name : "Uptime", directive: "uptime-widget" }},
     ];
   }
 ]);
