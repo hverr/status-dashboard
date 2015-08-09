@@ -23,7 +23,10 @@
 
   <div gridster ng-controller="GridController">
     <ul>
-      <li class="widget" gridster-item="item" ng-repeat="item in standardItems">Tile</li>
+      <li class="widget" gridster-item="widget" ng-repeat="widget in widgets">
+        <widget ng-controller="WidgetController">
+        </widget>
+      </li>
     </ul>
   </div>
 
@@ -39,6 +42,7 @@
   <script src="app.js"></script>
   <script src="widgets/controllers.js"></script>
   <script src="widgets/services.js"></script>
+  <script src="widgets/directives.js"></script>
   <script src="widgets/load/load.js"></script>
 </body>
 </html>
