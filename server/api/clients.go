@@ -44,6 +44,9 @@ func updateClientWidget(c *gin.Context) {
 	}
 
 	client.SetWidget(widget)
+
+	scheduler.NotifyUpdateListeners()
+
 	c.JSON(200, gin.H{"status": "OK"})
 }
 
@@ -84,6 +87,8 @@ func bulkUpdateClient(c *gin.Context) {
 	for _, w := range result {
 		client.SetWidget(w)
 	}
+
+	scheduler.NotifyUpdateListeners()
 
 	c.JSON(200, gin.H{"status": "OK"})
 }
