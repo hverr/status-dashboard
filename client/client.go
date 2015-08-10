@@ -57,3 +57,16 @@ func PostWidgetUpdate(widget widgets.Widget) error {
 
 	return nil
 }
+
+func PostWidgetBulkUpdate(updates []widgets.BulkElement) error {
+	url := Configuration.API + "/clients/" + Configuration.Identifier + "/bulk_update"
+
+	resp, err := napping.Post(url, updates, nil, nil)
+	if err != nil {
+		return err
+	} else if resp.HttpResponse().StatusCode != 200 {
+		return errors.New("Could not post bulk update " + resp.HttpResponse().Status)
+	}
+
+	return nil
+}

@@ -66,7 +66,7 @@ func update() error {
 		return err
 	}
 
-	results := make([]widgets.Widget, 0, len(requested.Widgets))
+	results := make([]widgets.BulkElement, 0, len(requested.Widgets))
 
 	for _, w := range requested.Widgets {
 		initiator := widgets.AllWidgets[w]
@@ -79,13 +79,16 @@ func update() error {
 			return err
 		}
 
-		results = append(results, widget)
+		e := widgets.BulkElement{
+			Type:   w,
+			Widget: widget,
+		}
+
+		results = append(results, e)
 	}
 
-	for _, w := range results {
-		if err := client.PostWidgetUpdate(w); err != nil {
-			return err
-		}
+	if err := client.PostWidgetBulkUpdate(results); err != nil {
+		return err
 	}
 
 	return nil

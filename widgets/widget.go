@@ -25,3 +25,8 @@ var AllWidgets = map[string]WidgetInitiator{
 	LoadWidgetType:   func() Widget { return &LoadWidget{} },
 	UptimeWidgetType: func() Widget { return &UptimeWidget{} },
 }
+
+type BulkElement struct {
+	Type   string      `json:"type"`
+	Widget interface{} `json:"widget"`
+}

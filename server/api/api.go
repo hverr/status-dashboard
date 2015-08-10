@@ -10,6 +10,7 @@ func Install(engine *gin.Engine) error {
 	// Client API
 	engine.POST("/api/clients/:client/register", registerClient)
 	engine.POST("/api/clients/:client/widgets/:widget/update", updateClientWidget)
+	engine.POST("/api/clients/:client/bulk_update", bulkUpdateClient)
 	engine.GET("/api/clients/:client/requested_widgets", requestedClientWidgets)
 
 	// Angular API

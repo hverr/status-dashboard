@@ -1,6 +1,7 @@
 package api
 
 import (
+	"encoding/json"
 	"errors"
 	"time"
 
@@ -43,6 +44,47 @@ func updateClientWidget(c *gin.Context) {
 	}
 
 	client.SetWidget(widget)
+	c.JSON(200, gin.H{"status": "OK"})
+}
+
+func bulkUpdateClient(c *gin.Context) {
+	client, ok := server.GetClient(c.Param("client"))
+	if !ok {
+		c.AbortWithError(404, errors.New("Client not found."))
+		return
+	}
+
+	updates := make([]widgets.BulkElement, 0)
+	if err := c.BindJSON(&updates); err != nil {
+		c.AbortWithError(400, err)
+	}
+
+	result := make([]widgets.Widget, 0, len(updates))
+	for _, u := range updates {
+		initiator := widgets.AllWidgets[u.Type]
+		if initiator == nil {
+			c.AbortWithError(404, errors.New("Widget not found: "+u.Type))
+			return
+		}
+
+		widget := initiator()
+		encoded, err := json.Marshal(u.Widget)
+		if err != nil {
+			c.AbortWithError(500, err)
+		}
+
+		if err := json.Unmarshal(encoded, &widget); err != nil {
+			c.AbortWithError(400, err)
+			return
+		}
+
+		result = append(result, widget)
+	}
+
+	for _, w := range result {
+		client.SetWidget(w)
+	}
+
 	c.JSON(200, gin.H{"status": "OK"})
 }
 
