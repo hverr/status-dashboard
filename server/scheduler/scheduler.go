@@ -32,7 +32,7 @@ func RegisterClient(client *server.Client) {
 }
 
 func RegisterUpdateListener() chan bool {
-	c := make(chan bool)
+	c := make(chan bool, 1)
 
 	updateListenersLock.Lock()
 	updateListeners = append(updateListeners, c)
