@@ -15,6 +15,7 @@ func Install(engine *gin.Engine) error {
 
 	// Angular API
 	engine.GET("/api/clients/:client/widgets/:widget", clientWidget)
+	engine.POST("/api/all_widgets", allWidgets)
 
 	return nil
 }
