@@ -4,8 +4,10 @@ angular.module('dashboard').controller('GridController', [
   '$scope',
   'widgetsManager',
   'LoadWidget',
-  function($scope, widgetsManager, LoadWidget) {
+  'UptimeWidget',
+  function($scope, widgetsManager, LoadWidget, UptimeWidget) {
     widgetsManager.register(new LoadWidget("webserver", 0, 0));
+    widgetsManager.register(new UptimeWidget("webserver", 0, 1));
 
     $scope.widgetGridsterMap = {
       sizeX: 'widget.height',
