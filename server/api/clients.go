@@ -130,11 +130,13 @@ func allWidgets(c *gin.Context) {
 		return
 	}
 
-	select {
-	case <-scheduler.RegisterUpdateListener():
-	case <-time.After(1 * time.Minute):
-		c.JSON(202, gin.H{"reason": "No updates."})
-		return
+	if c.Query("force") != "true" {
+		select {
+		case <-scheduler.RegisterUpdateListener():
+		case <-time.After(1 * time.Minute):
+			c.JSON(202, gin.H{"reason": "No updates."})
+			return
+		}
 	}
 
 	result := make(map[string]map[string]widgets.Widget)
