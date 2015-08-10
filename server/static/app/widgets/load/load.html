@@ -1,6 +1,6 @@
 <div text-widget ng-controller="LoadWidgetController">
   <div class="text">
-    <span>{{ widget.cores }} {{ widget.cores | pluralize:"core" }}</span><br />
+    <span>{{ widget.cores }} {{ widget.cores | pluralize:"core" }}</span><br>
     <span>
       <span ng-class="{ red : isLargeLoad(widget.one), green : !isLargeLoad(widget.one) }">{{ widget.one }}</span>
       <span ng-class="{ red : isLargeLoad(widget.five), green : !isLargeLoad(widget.five) }">{{ widget.five }}</span>
