@@ -10,10 +10,10 @@ import (
 const UptimeWidgetType = "uptime"
 
 type UptimeWidget struct {
-	Days    int
-	Hours   int
-	Minutes int
-	Seconds int
+	Days    int `json:"days"`
+	Hours   int `json:"hours"`
+	Minutes int `json:"minutes"`
+	Seconds int `json:"seconds"`
 }
 
 func (widget *UptimeWidget) Name() string {
