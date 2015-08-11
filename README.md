@@ -1,4 +1,6 @@
 # Status Dashboard
+[![Build Status](https://travis-ci.org/hverr/status-dashboard.svg?branch=master)](https://travis-ci.org/hverr/status-dashboard)
+
 **Status Dashboard** is a highly configurable **AngularJS** application backed by a **Go** API to show information about **multiple servers** in a dasboard style way.
 
  - [Development](#development)
