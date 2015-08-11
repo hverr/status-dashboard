@@ -1,0 +1,12 @@
+language: go
+go:
+  - 1.4
+
+script:
+  - go build -race -o /tmp/dashboard-server server/main/*.go
+  - go build -race -o /tmp/dashboard-server client/main/*.go
+  - go test ./...
+  - cd server
+  - npm install
+  - gulp lint
+
