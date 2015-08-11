@@ -1,68 +1,41 @@
 # Status Dashboard
+**Status Dashboard** is a highly configurable **AngularJS** application backed by a **Go** API to show information about **multiple servers** in a dasboard style way.
 
-**Status Dashboard** is a highly configurable JavaScript app to show information about **multiple servers** in a dasboard style way.
+ - [Development](#development)
+ - [Screenshot](#screenshot)
 
-![Screenshot](Screenshot.png)
+## Development
+The following dependencies are needed to build and run the application.
 
-## Install
+  - Node and NPM
+  - Bower
+  - Go with a working `GOPATH`
 
-### Server Side
+Get the project: `go get https://github.com/hverr/status-dashboard`
 
-To get information about a system, the JavaScript queries the system for data formatted as JSON.
+### Server
 
-The [server PHP script](server/index.php) is a script that provides basic information about the system on which it is installed. Place it in your public HTTP directory and configure the JavaScript accordingly.
+Build and run the server
 
-### Application
+```sh
+cd $GOPATH/src/github.com/hverr/status-dashboard/server
+npm install
+npm install -g bower
+bower install
+cd $GOPATH/src/github.com/hverr/status-dashboard/server/main
+go run *.go -c dev_config.json
+```
 
-You can either open the `index.html` file directly in your browser, or server it through a webserver.
+Point your browser to [http://localhost:8050/](http://localhost:8050)
 
-### Configuration
+### Client
 
-To setup the application edit the `g_configuration` variable in `main.js`. Give each system a `name`, an `updateURL` and some `widgets`.
+Build and run the client(s)
 
-Don't forget to setup the `refreshTimeout` value to an appropriate value in milliseconds. Don't DOS your servers!
+```sh
+cd $GOPATH/src/github.com/hverr/status-dashboard/client/main
+go run *.go -c dev_config.json
+```
 
-    var g_configuration = {
-    	refreshTimeout : 1000*60, /* one minute */
-		systems : [
-			{
-				name : 'webserver',
-				updateURL : 'http://status.web.example.org',
-				widgets : [
-					MemoryWidget,
-					LoadWidget,
-					UpTimeWidget
-				]
-			},
-	        {
-	            name : 'ftpserver',
-	            updateURL : 'http://status.ftp.example.org',
-	            widgets : [
-	                MemoryWidget,
-	                LoadWidget,
-	                UpTimeWidget
-	            ]
-	        }
-		]
-	};
-	
-## Develop
-
-Currently only widgets for **memory**, **loadavg**, **uptime**, **current time** and **connections** are implemented. Feel free to add your own widgets (and share them) to [`dashboard.js`](client/dashboard/dashboard.js).
-
-First make a `Component` which manages the model object to load the JSON, then make `YourWidget`. Be sure that your widget inherits `Widget`.
-
-Style your widget in `dashboard.css`.
-
-Don't forget to create something that serves the JSON data!
-
-## Credits
-
-- [Gridster](http://gridster.net) for the grid
-- [jQuery](http://jquery.com) for jQuery
-- [Mockjax](https://github.com/appendto/jquery-mockjax) for mocking HTTP data when testing
-- [normalize](git.io/normalize) for CSS normalization
-
-## Warning
-
-I had little to no experience with JavaScript when making this. And my design CSS/design skills are not really what you'd call extraordinary.
+## Screenshot
+![Screenshot](screenshot.png)
