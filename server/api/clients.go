@@ -100,13 +100,15 @@ func requestedClientWidgets(c *gin.Context) {
 		return
 	}
 
-	delay := scheduler.UpdateIntervalForClient(client)
-	<-time.After(delay)
+	<-scheduler.RegisterClientUpdateListener(client)
 
 	c.JSON(200, gin.H{"widgets": client.RequestedWidgets()})
 }
 
 func clientWidget(c *gin.Context) {
+	scheduler.RegisterWidgetRequest()
+	defer scheduler.DeregisterWidgetRequest()
+
 	client, ok := server.GetClient(c.Param("client"))
 	if !ok {
 		c.AbortWithError(404, errors.New("Client not found."))
@@ -124,6 +126,9 @@ func clientWidget(c *gin.Context) {
 
 func allWidgets(c *gin.Context) {
 	var request map[string][]string
+
+	scheduler.RegisterWidgetRequest()
+	defer scheduler.DeregisterWidgetRequest()
 
 	if err := c.BindJSON(&request); err != nil {
 		c.AbortWithError(400, err)

@@ -17,18 +17,66 @@ var updateListenerIncoming = make(chan bool)
 var updateListenersLock = sync.RWMutex{}
 var updateListeners = make([]chan bool, 0)
 
-func UpdateIntervalForClient(client *server.Client) time.Duration {
+var widgetRequestDispatcher = sync.Once{}
+var widgetRequestIncoming = make(chan int)
+var widgetRequestCounter = 0
+var widgetRequestListenersLock = sync.RWMutex{}
+var widgetRequestListeners = make([]chan bool, 0)
+
+func RegisterClientUpdateListener(client *server.Client) chan bool {
+	c := make(chan bool, 1)
+
 	err := scheduler.Add(client.Identifier, client, cache.DefaultExpiration)
 	if err == nil {
 		// Item was not yet in cache
-		return 0
+		c <- true
+		return c
 	}
 
-	return settings.ClientUpdateInterval
+	<-time.After(settings.MinimumClientUpdateInterval)
+
+	go func() {
+		select {
+		case <-RegisterWidgetRequestListener():
+			c <- true
+		case <-time.After(settings.MaximumClientUpdateInterval):
+			c <- true
+		}
+	}()
+
+	return c
 }
 
 func RegisterClient(client *server.Client) {
 	scheduler.Delete(client.Identifier)
+}
+
+func RegisterWidgetRequest() {
+	widgetRequestDispatcher.Do(func() {
+		go widgetRequestBroadcaster()
+	})
+
+	widgetRequestIncoming <- 1
+}
+
+func DeregisterWidgetRequest() {
+	widgetRequestDispatcher.Do(func() {
+		go widgetRequestBroadcaster()
+	})
+
+	widgetRequestIncoming <- -1
+}
+
+func RegisterWidgetRequestListener() chan bool {
+	c := make(chan bool, 1)
+
+	widgetRequestListenersLock.Lock()
+	widgetRequestListeners = append(widgetRequestListeners, c)
+	widgetRequestListenersLock.Unlock()
+
+	widgetRequestIncoming <- 0
+
+	return c
 }
 
 func RegisterUpdateListener() chan bool {
@@ -47,6 +95,22 @@ func NotifyUpdateListeners() {
 	})
 
 	updateListenerIncoming <- true
+}
+
+func widgetRequestBroadcaster() {
+	for {
+		update := <-widgetRequestIncoming
+		widgetRequestCounter += update
+
+		if widgetRequestCounter > 0 {
+			widgetRequestListenersLock.Lock()
+			for _, listener := range widgetRequestListeners {
+				listener <- true
+			}
+			widgetRequestListeners = make([]chan bool, 0)
+			widgetRequestListenersLock.Unlock()
+		}
+	}
 }
 
 func updateListenerBroadcaster() {
