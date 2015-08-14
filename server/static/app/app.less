@@ -1,14 +1,18 @@
+@general-background-color: #000;
+@general-color: #fff;
+@general-border-color: #666;
+@general-padding: 16px;
+
 body {
-  background: #000;
-  color: #FFF;
-  padding: 30px;
+  background: @general-background-color;
+  color: @general-color;
   font-family: 'Open Sans', sans-serif;
 }
 
 @widget-padding: 20px;
 .widget-grid-item {
   background: #111;
-  border: 2px solid #666;
+  border: 2px solid @general-border-color;
   padding: 0;
   border-radius: 5px;
   text-align: center;
@@ -45,10 +49,20 @@ body {
   }
 }
 
+.btn-dark {
+  background-color: @general-background-color;
+  color: @general-color;
+  border-color: @general-border-color;
+}
+
 .red {
   color: red;
 }
 
 .green {
   color: green;
+}
+
+.default-padding {
+  padding: @general-padding;
 }

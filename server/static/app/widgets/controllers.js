@@ -18,6 +18,7 @@ angular.module('dashboard').controller('GridController', [
 
     $scope.gridsterOpts = {
       columns: 4,
+      margins: [16, 16],
     };
 
     $scope.widgets = widgetsManager.registeredWidgets();
