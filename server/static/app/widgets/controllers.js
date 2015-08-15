@@ -53,5 +53,8 @@ angular.module('dashboard').controller('WidgetDataController', [
   '$scope',
   function($scope) {
     $scope.data = $scope.widget.data;
+    $scope.$watch('widget.data', function(newValue) {
+      $scope.data = newValue;
+    });
   }
 ]);
