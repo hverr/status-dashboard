@@ -69,7 +69,7 @@ angular.module('dashboard').factory('widgetsManager', [
         $log.debug('Updating');
         update(force).then(function() {
           force = false;
-          $timeout(f, 1000);
+          $timeout(f, 100);
         });
       }
 
