@@ -16,22 +16,23 @@ angular.module('dashboard').controller('LoadWidgetController', [
 
 angular.module('dashboard').factory('LoadWidget', [
   function() {
-    return function(client, row, col) {
+    return function() {
       return {
         directive: "load-widget",
         height: 1,
         width: 1,
-        row: row,
-        col: col,
+        row: 0,
+        col: 0,
 
-        client: client,
-        identifier : 'load',
+        client: null,
         name: "Load",
 
-        cores: 4,
-        one : "1.05",
-        five : "4.02",
-        fifteen : "1.02",
+        data : {
+          cores: 4,
+          one : "1.05",
+          five : "4.02",
+          fifteen : "1.02",
+        },
 
         update : function(object) {
           this.cores = object.cores;

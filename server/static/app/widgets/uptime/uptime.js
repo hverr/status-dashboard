@@ -7,16 +7,15 @@ angular.module('dashboard').controller('UptimeWidgetController', [
 
 angular.module('dashboard').factory('UptimeWidget', [
   function() {
-    return function(client, row, col) {
+    return function() {
       return {
         directive: "uptime-widget",
         height: 1,
         width: 1,
-        row: row,
-        col: col,
+        row: 1,
+        col: 1,
 
-        client: client,
-        identifier : 'uptime',
+        client: null,
         name : "Uptime",
 
         days : 0,

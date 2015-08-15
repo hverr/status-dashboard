@@ -38,10 +38,18 @@ angular.module('dashboard').controller('GridController', [
     };
 
     widgetsManager.start();
+
+    var w = widgetsManager.add('webserver', 'load');
+    w.client = 'Web Server';
+
+    $log.debug('Widget:', w);
+    $scope.widgets = [w];
   }
 ]);
 
-angular.module('dashboard').controller('WidgetController', [
-  function() {
+angular.module('dashboard').controller('WidgetDataController', [
+  '$scope',
+  function($scope) {
+    $scope.widget = $scope.widget.data;
   }
 ]);
