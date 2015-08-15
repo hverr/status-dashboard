@@ -5,6 +5,6 @@ import (
 	"github.com/hverr/status-dashboard/server"
 )
 
-func availableWidgets(c *gin.Context) {
+func availableClients(c *gin.Context) {
 	c.JSON(200, server.AllRegisteredClients())
 }

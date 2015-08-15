@@ -19,17 +19,17 @@ angular.module('dashboard').factory('api', [
 
       error: defaultError,
 
-      availableWidgets: availableWidgets,
+      availableClients: availableClients,
     };
 
     function resource(path) {
       return self.baseURL + path;
     }
 
-    function availableWidgets() {
+    function availableClients() {
       var d = $q.defer();
 
-      $http.get(resource('/available_widgets')).then(function(result) {
+      $http.get(resource('/available_clients')).then(function(result) {
         d.resolve(result.data);
       }, function(reason) {
         self.error(reason);
