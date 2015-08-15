@@ -5,7 +5,20 @@ angular.module('dashboard').factory('widgetsManager', [
   'api',
   '$log',
   function($timeout, api, $log) {
-    var clients = {};
+    var self = {
+      start: start,
+    };
+
+    var availableClients;
+
+    function start() {
+      api.availableClients().then(function(clients) {
+        $log.debug('Got available clients:', clients);
+        availableClients = clients;
+      });
+    }
+
+    return self;
   }
 ]);
 
