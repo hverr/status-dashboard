@@ -33,15 +33,10 @@ angular.module('dashboard').factory('UptimeWidget', [
 ]);
 
 angular.module('dashboard').directive('uptimeWidget', [
-  '$interval',
-  function($interval) {
-    var timer;
+  'oneSecondService',
+  function(oneSecondService) {
 
     function link(scope, element) {
-      element.on('$destroy', function() {
-        $interval.cancel(timer);
-      });
-
       var increase = function() {
         if(!scope.data) {
           return;
@@ -65,7 +60,11 @@ angular.module('dashboard').directive('uptimeWidget', [
         }
       };
 
-      timer = $interval(increase, 1000);
+      var handle = oneSecondService.add(increase);
+
+      element.on('$destroy', function() {
+        oneSecondService.remove(handle);
+      });
     }
 
     return {

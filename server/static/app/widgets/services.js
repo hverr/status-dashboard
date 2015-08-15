@@ -47,8 +47,9 @@ angular.module('dashboard').factory('widgetsManager', [
   '$rootScope',
   'api',
   'widgetFactory',
+  'oneSecondService',
   '$log',
-  function($timeout, $q, $rootScope, api, widgetFactory, $log) {
+  function($timeout, $q, $rootScope, api, widgetFactory, oneSecondService, $log) {
     var self = {
       start: start,
       update: update,
@@ -64,6 +65,8 @@ angular.module('dashboard').factory('widgetsManager', [
     var lastUpdateCall = new Date();
 
     function start() {
+      oneSecondService.start();
+
       api.availableClients().then(function(clients) {
         self.availableClients = clients;
         $rootScope.$emit(self.availableClientsChangedEvent);
@@ -197,6 +200,41 @@ angular.module('dashboard').factory('api', [
 
     function defaultError(reason) {
       $log.error('HTTP error:', reason);
+    }
+
+    return self;
+  }
+]);
+
+angular.module('dashboard').factory('oneSecondService', [
+  '$interval',
+  function($interval) {
+    var self = {
+      add: add,
+      remove: remove,
+      start: start,
+    };
+
+    var counter = 0;
+    var functions = {};
+
+    function add(f) {
+      var handle = counter;
+      functions[handle] = f;
+      counter += 1;
+      return handle;
+    }
+
+    function remove(handle) {
+      delete functions[handle];
+    }
+
+    function start() {
+      $interval(function() {
+        for(var handle in functions) {
+          functions[handle]();
+        }
+      }, 1000);
     }
 
     return self;
