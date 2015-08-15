@@ -6,65 +6,65 @@ angular.module('dashboard').controller('UptimeWidgetController', [
 ]);
 
 angular.module('dashboard').factory('UptimeWidget', [
-  function() {
-    return function(client, row, col) {
-      return {
-        directive: "uptime-widget",
-        height: 1,
-        width: 1,
-        row: row,
-        col: col,
+  'Widget',
+  function(Widget) {
+    return function() {
+      var self = new Widget('uptime-widget', 'Uptime');
 
-        client: client,
-        identifier : 'uptime',
-        name : "Uptime",
-
-        days : 0,
-        hours : 0,
-        minutes : 0,
-        seconds : 0,
-
-        update : function(object) {
-          this.days = object.days;
-          this.hours = object.hours;
-          this.minutes = object.minutes;
-          this.seconds = object.seconds;
-        },
+      self.data = {
+        days: 0,
+        hours: 0,
+        minutes: 0,
+        seconds: 0,
       };
+
+      // We clone the data, because otherwise multiple directives sharing
+      // the data would increase the time more than once per second.
+      self.update = function(data) {
+        self.data.days = data.days;
+        self.data.hours = data.hours;
+        self.data.minutes = data.minutes;
+        self.data.seconds = data.seconds;
+      };
+
+      return self;
     };
   }
 ]);
 
 angular.module('dashboard').directive('uptimeWidget', [
-  '$interval',
-  function($interval) {
-    var timer;
+  'oneSecondService',
+  function(oneSecondService) {
 
     function link(scope, element) {
-      element.on('$destroy', function() {
-        $interval.cancel(timer);
-      });
-
       var increase = function() {
-        scope.widget.seconds += 1;
-
-        if(scope.widget.seconds >= 60) {
-          scope.widget.seconds = 0;
-          scope.widget.minutes += 1;
+        if(!scope.data) {
+          return;
         }
 
-        if(scope.widget.minutes >= 60) {
-          scope.widget.minutes = 0;
-          scope.widget.hours += 1;
+        scope.data.seconds += 1;
+
+        if(scope.data.seconds >= 60) {
+          scope.data.seconds = 0;
+          scope.data.minutes += 1;
         }
 
-        if(scope.widget.hours >= 24) {
-          scope.widget.hours = 0;
-          scope.widget.days += 1;
+        if(scope.data.minutes >= 60) {
+          scope.data.minutes = 0;
+          scope.data.hours += 1;
+        }
+
+        if(scope.data.hours >= 24) {
+          scope.data.hours = 0;
+          scope.data.days += 1;
         }
       };
 
-      timer = $interval(increase, 1000);
+      var handle = oneSecondService.add(increase);
+
+      element.on('$destroy', function() {
+        oneSecondService.remove(handle);
+      });
     }
 
     return {

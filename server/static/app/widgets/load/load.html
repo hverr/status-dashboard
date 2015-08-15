@@ -1,10 +1,10 @@
 <div text-widget ng-controller="LoadWidgetController">
   <div class="text">
-    <span>{{ widget.cores }} {{ widget.cores | pluralize:"core" }}</span><br>
+    <span>{{ data.cores }} {{ data.cores | pluralize:"core" }}</span><br>
     <span>
-      <span ng-class="{ red : isLargeLoad(widget.one), green : !isLargeLoad(widget.one) }">{{ widget.one }}</span>
-      <span ng-class="{ red : isLargeLoad(widget.five), green : !isLargeLoad(widget.five) }">{{ widget.five }}</span>
-      <span ng-class="{ red : isLargeLoad(widget.fifteen), green : !isLargeLoad(widget.fifteen) }">{{ widget.fifteen }}</span>
+      <span ng-class="{ red : isLargeLoad(data.one), green : !isLargeLoad(data.one) }">{{ data.one }}</span>
+      <span ng-class="{ red : isLargeLoad(data.five), green : !isLargeLoad(data.five) }">{{ data.five }}</span>
+      <span ng-class="{ red : isLargeLoad(data.fifteen), green : !isLargeLoad(data.fifteen) }">{{ data.fifteen }}</span>
     </span>
   </div>
 </div>

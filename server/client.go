@@ -1,53 +1,61 @@
 package server
 
 import (
+	"errors"
 	"log"
+	"time"
 
+	"github.com/hverr/status-dashboard/server/settings"
 	"github.com/hverr/status-dashboard/widgets"
 	"github.com/pmylund/go-cache"
 )
 
-type Client struct {
-	Name             string   `json:"name" binding:"required"`
-	Identifier       string   `json:"identifier" binding:"required"`
-	AvailableWidgets []string `json:"availableWidgets" binding:"required"`
+var UnknownClientError = errors.New("Client unknown to the server.")
 
-	widgets          *cache.Cache `json:"-"`
-	requestedWidgets []string     `json:"-"`
+type Client struct {
+	Name             string    `json:"name" binding:"required"`
+	Identifier       string    `json:"identifier" binding:"required"`
+	AvailableWidgets []string  `json:"availableWidgets" binding:"required"`
+	LastSeen         time.Time `json:"-"`
+
+	widgets *cache.Cache `json:"-"`
 }
 
 var RegisteredClients = cache.New(cache.NoExpiration, cache.NoExpiration)
 
-func RegisterClient(client *Client) {
-	log.Printf("Registering client %v (%v)\n", client.Name, client.Identifier)
-
+func RegisterClient(client *Client) error {
 	client.widgets = cache.New(cache.NoExpiration, cache.NoExpiration)
-	client.requestedWidgets = []string{}
 
-	defaultWidgets := Configuration.DefaultWidgets[client.Identifier]
-	if len(defaultWidgets) == 0 {
-		log.Print("Warning: client %v (%v) has no default widgets\n", client.Name, client.Identifier)
-	}
+	log.Printf("Client registration request %v (%v)", client.Name, client.Identifier)
 
-	for _, w := range defaultWidgets {
-		found := false
-		for _, a := range client.AvailableWidgets {
-			if w == a {
-				found = true
-				break
-			}
-		}
-
-		if found {
-			log.Printf("Registering widget %v for %v (%v)\n", w, client.Name, client.Identifier)
-			client.requestedWidgets = append(client.requestedWidgets, w)
-
-		} else {
-			log.Printf("Warning: widget %v for %v (%v) is not available\n", w, client.Name, client.Identifier)
+	// Make sure the client is allowed to connect.
+	found := false
+	for _, c := range Configuration.Clients {
+		if c == client.Identifier {
+			found = true
+			break
 		}
 	}
 
+	if !found {
+		return UnknownClientError
+	}
+
+	// Actually register the client.
+	client.LastSeen = time.Now()
 	RegisteredClients.Set(client.Identifier, client, cache.DefaultExpiration)
+
+	return nil
+}
+
+func AllRegisteredClients() []*Client {
+	items := RegisteredClients.Items()
+	result := make([]*Client, 0, len(items))
+	for _, item := range items {
+		result = append(result, item.Object.(*Client))
+	}
+
+	return result
 }
 
 func GetClient(identifier string) (*Client, bool) {
@@ -55,10 +63,17 @@ func GetClient(identifier string) (*Client, bool) {
 	if !ok {
 		return nil, false
 	}
-	return o.(*Client), true
+
+	c := o.(*Client)
+	if time.Since(c.LastSeen) > settings.MaximumWidgetAge {
+		return c, false
+	}
+
+	return c, true
 }
 
 func (c *Client) SetWidget(w widgets.Widget) {
+	c.LastSeen = time.Now()
 	c.widgets.Set(w.Type(), w, cache.DefaultExpiration)
 }
 
@@ -72,5 +87,5 @@ func (c *Client) GetWidget(widgetType string) widgets.Widget {
 }
 
 func (c *Client) RequestedWidgets() []string {
-	return c.requestedWidgets
+	return c.AvailableWidgets
 }

@@ -1,2 +1,16 @@
-<widget-dynamic-info></widget-dynamic-info><!-- Will by replaced by directive -->
+<div class="widget-data" ng-if="!widget.available">
+  <div text-widget>
+    <div class="text">
+      <span class="red">N/A</span>
+    </div>
+  </div>
+</div>
+<div class="widget-data" ng-if="widget.available" ng-controller="WidgetDataController">
+  <widget-dynamic-info><!-- Will be replaced by widget.directive --></widget-dynamic-info>
+</div>
 <div class="system-info">{{ widget.client | uppercase}} - {{ widget.name | uppercase }}</div>
+<div ng-show="widget.hover" class="remove-button">
+  <a href="#" ng-click="removeWidget($index)">
+    <span class="glyphicon glyphicon-remove"></span>
+  </a>
+</div>

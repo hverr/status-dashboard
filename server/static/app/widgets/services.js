@@ -1,77 +1,205 @@
 'use strict';
 
+angular.module('dashboard').factory('Widget', [
+  function() {
+    return function(directive, name) {
+      var self = {
+        directive: directive,
+        height: 1,
+        width: 1,
+        row: 0,
+        col: 0,
+
+        type: null,
+        clientIdentifier: null,
+        client: null,
+        name: name,
+
+        data: null,
+        update: function(data) {
+          self.data = data;
+        },
+      };
+
+      return self;
+    };
+  }
+]);
+
+angular.module('dashboard').factory('widgetFactory', [
+  'LoadWidget',
+  'UptimeWidget',
+  function(LoadWidget, UptimeWidget) {
+    return function(widgetType) {
+      switch(widgetType) {
+        case 'load':
+          return new LoadWidget();
+        case 'uptime':
+          return new UptimeWidget();
+        default:
+          return null;
+      }
+    };
+  }
+]);
+
 angular.module('dashboard').factory('widgetsManager', [
   '$timeout',
+  '$q',
+  '$rootScope',
   'api',
+  'widgetFactory',
+  'oneSecondService',
   '$log',
-  function($timeout, api, $log) {
-    var clients = {};
+  function($timeout, $q, $rootScope, api, widgetFactory, oneSecondService, $log) {
+    var self = {
+      start: start,
+      update: update,
 
-    function registeredWidgets() {
-      var widgets = [];
-      for(var clientIdentifier in clients) {
-        var client = clients[clientIdentifier];
-        for(var widgetType in client) {
-          widgets.push(client[widgetType]);
-        }
+      add: add,
+      remove: remove,
+      availableClients: null,
+
+      serialize: serialize,
+      deserialize: deserialize,
+
+      availableClientsChangedEvent: 'AvailableClientsChangedEvent',
+      addWidgetRequestEvent: 'AddWidgetRequestEvent',
+    };
+
+    var widgets = [];
+    var lastUpdateCall = new Date();
+
+    function start() {
+      oneSecondService.start();
+
+      api.availableClients().then(function(clients) {
+        self.availableClients = clients;
+        $rootScope.$emit(self.availableClientsChangedEvent);
+      });
+
+      var force = true;
+      function f() {
+        $log.debug('Updating');
+        update(force).then(function() {
+          force = false;
+          $timeout(f, 100);
+        }, function() {
+          force = false;
+          $timeout(f, 10*1000);
+        });
       }
 
-      return widgets;
+      f();
     }
 
-    return {
-      register : function(widget) {
-        $log.info('Registering', widget);
-        if(clients[widget.client] === undefined) {
-          clients[widget.client] = {};
+    function add(clientIdentifier, widgetType) {
+      var w = widgetFactory(widgetType);
+      if(w === null) {
+        throw 'Unknown widget type: ' + widgetType;
+      }
+
+      w.clientIdentifier = clientIdentifier;
+      w.type = widgetType;
+      w.available = false;
+
+      w.widgetsManagerHandle = widgets.length;
+      widgets.push(w);
+      return w;
+    }
+
+    function remove(widget) {
+      var handle = widget.widgetsManagerHandle;
+
+      widgets.splice(handle, 1);
+      if(widgets.length > 0 && widgets.length !== handle) {
+        widgets.slice(handle, widgets.length).forEach(function(w) {
+          w.widgetsManagerHandle -= 1;
+        });
+      }
+    }
+
+    function update(force) {
+      var done = $q.defer();
+
+      var thisUpdateCall = new Date();
+      lastUpdateCall = thisUpdateCall;
+
+      var request = {};
+      widgets.forEach(function(w) {
+        if(!(w.clientIdentifier in request)) {
+          request[w.clientIdentifier] = [];
         }
-        clients[widget.client][widget.identifier] = widget;
-      },
 
-      registeredWidgets : registeredWidgets,
+        if(!(w.type in request[w.clientIdentifier])) {
+          request[w.clientIdentifier].push(w.type);
+        }
+      });
 
-      start : function() {
-        var update = function(force) {
-          var request = {};
+      api.updateRequest(force, request).then(function(result) {
+        if(lastUpdateCall === thisUpdateCall) {
+          widgets.forEach(function(widget) {
+            var clientIdentifier = widget.clientIdentifier;
+            var widgetType = widget.type;
 
-          for(var clientIdentifier in clients) {
-            request[clientIdentifier] = [];
-            for(var widgetType in clients[clientIdentifier]) {
-              request[clientIdentifier].push(widgetType);
+            if(!(clientIdentifier in result)) {
+              widget.available = false;
+            } else if(!(widgetType in result[clientIdentifier])) {
+              widget.available = false;
+            } else if(!result[clientIdentifier][widgetType]) {
+              widget.available = false;
+            } else {
+              widget.update(result[clientIdentifier][widgetType]);
+              widget.available = true;
             }
-          }
-
-          api.bulk(request, force).then(function(result) {
-            if(!result) {
-              // A timeout occurred.
-              $timeout(update, 100);
-              return;
-            }
-
-            for(var clientIdentifier in result) {
-              if(!clients[clientIdentifier]) {
-                continue;
-              }
-
-              var client = clients[clientIdentifier];
-              for(var widgetType in result[clientIdentifier]) {
-                if(!client[widgetType]) {
-                  continue;
-                }
-
-                client[widgetType].update(result[clientIdentifier][widgetType]);
-              }
-            }
-
-            $timeout(update, 100);
-          }, function() {
-            $timeout(update, 10*1000);
           });
-        };
+        }
 
-        update(true);
-      },
-    };
+        done.resolve();
+      }, function(reason) {
+        done.reject(reason);
+      });
+
+      return done.promise;
+    }
+
+    function serialize() {
+      var json = [];
+      widgets.forEach(function(w) {
+        json.push({
+          client: w.clientIdentifier,
+          type: w.type,
+
+          height: w.height,
+          width: w.width,
+          row: w.row,
+          col: w.col,
+        });
+      });
+      return json;
+    }
+
+    function deserialize(json) {
+      var result = [];
+
+      $log.debug('Loading widgets:', json);
+
+      json.forEach(function(data) {
+        var w = add(data.client, data.type);
+        w.client = data.client;
+
+        w.width = data.width;
+        w.height = data.height;
+        w.row = data.row;
+        w.col = data.col;
+
+        result.push(w);
+      });
+
+      return result;
+    }
+
+    return self;
   }
 ]);
 
@@ -80,57 +208,89 @@ angular.module('dashboard').factory('api', [
   '$http',
   '$log',
   function($q, $http, $log) {
-    var baseURL = '/api';
+    var self = {
+      baseURL : '/api',
 
-    return {
-      resource: function(resource) {
-        return baseURL + resource;
-      },
+      error: defaultError,
 
-      widget: function(w) {
-        var deferred = $q.defer();
-
-        var r = this.resource('/clients/' + w.client + '/widgets/' + w.identifier);
-        $http
-          .get(r)
-          .then(function(result) {
-            deferred.resolve(result.data);
-
-          }, function(reason) {
-            $log.error('error: api.widget:', reason);
-            deferred.reject(reason);
-          });
-
-        return deferred.promise;
-      },
-
-      bulk: function(widgets, force) {
-        var deferred = $q.defer();
-
-        var r = this.resource('/all_widgets');
-        if(force) {
-          r += '?force=true';
-        }
-
-        $http
-          .post(r, widgets)
-          .then(function(result) {
-            $log.debug('Updated widgets:', result);
-            if(result.status === 202) {
-              // Long poll timout
-              deferred.resolve({});
-
-            } else {
-              deferred.resolve(result.data);
-            }
-
-          }, function(reason) {
-            $log.error('error: api.bulk:', reason);
-            deferred.reject(reason);
-          });
-
-        return deferred.promise;
-      },
+      availableClients: availableClients,
+      updateRequest: updateRequest,
     };
+
+    function resource(path) {
+      return self.baseURL + path;
+    }
+
+    function availableClients() {
+      var d = $q.defer();
+
+      $http.get(resource('/available_clients')).then(function(result) {
+        d.resolve(result.data);
+      }, function(reason) {
+        self.error(reason);
+        d.reject(reason);
+      });
+
+      return d.promise;
+    }
+
+    function updateRequest(force, widgets) {
+      var d = $q.defer();
+
+      var r = resource('/update_request');
+      if(force === true) {
+        r += '?force=true';
+      }
+
+      $http.post(r, widgets).then(function(result) {
+        d.resolve(result.data);
+      }, function(reason) {
+        self.error(reason);
+        d.reject(reason);
+      });
+
+      return d.promise;
+    }
+
+    function defaultError(reason) {
+      $log.error('HTTP error:', reason);
+    }
+
+    return self;
+  }
+]);
+
+angular.module('dashboard').factory('oneSecondService', [
+  '$interval',
+  function($interval) {
+    var self = {
+      add: add,
+      remove: remove,
+      start: start,
+    };
+
+    var counter = 0;
+    var functions = {};
+
+    function add(f) {
+      var handle = counter;
+      functions[handle] = f;
+      counter += 1;
+      return handle;
+    }
+
+    function remove(handle) {
+      delete functions[handle];
+    }
+
+    function start() {
+      $interval(function() {
+        for(var handle in functions) {
+          functions[handle]();
+        }
+      }, 1000);
+    }
+
+    return self;
   }
 ]);

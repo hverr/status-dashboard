@@ -1,14 +1,18 @@
+@general-background-color: #000;
+@general-color: #fff;
+@general-border-color: #666;
+@general-padding: 16px;
+
 body {
-  background: #000;
-  color: #FFF;
-  padding: 30px;
+  background: @general-background-color;
+  color: @general-color;
   font-family: 'Open Sans', sans-serif;
 }
 
 @widget-padding: 20px;
 .widget-grid-item {
   background: #111;
-  border: 2px solid #666;
+  border: 2px solid @general-border-color;
   padding: 0;
   border-radius: 5px;
   text-align: center;
@@ -26,23 +30,77 @@ body {
       font-size: 1.2em;
     }
 
-    .text-content {
-      display: table;
-      width: 100%;
+    .remove-button {
+      position: absolute;
+      top: 5px;
+      left: 5px;
+
+      a {
+        text-decoration: none;
+        color: #fff;
+      }
+    }
+
+    .widget-data {
       height: 100%;
+      width: 100%;
 
-      .text {
-        display: table-cell;
-        text-align: center;
-        vertical-align: middle;
-        font-size: 2.5em;
-        font-weight: bold;
+      .text-content {
+        display: table;
+        width: 100%;
+        height: 100%;
 
-        height: inherit;
-        width: inherit;
+        .text {
+          display: table-cell;
+          text-align: center;
+          vertical-align: middle;
+          font-size: 2.5em;
+          font-weight: bold;
+
+          height: inherit;
+          width: inherit;
+        }
       }
     }
   }
+}
+
+.action-menu {
+  position: absolute;
+  right: @general-padding;
+  bottom: @general-padding;
+  z-index: 100;
+}
+
+.modal-content {
+  color: #000;
+
+  .client-name {
+    padding-left: 5px;
+    font-weight: bold;
+    font-size: 1.15em;
+  }
+}
+
+.save-layout-dialog {
+  .input-label {
+    margin-bottom: 8px;
+  }
+
+  .input-field {
+    margin-bottom: 16px;
+  }
+
+  .raw-field {
+    .input-field;
+    height: 200px;
+  }
+}
+
+.btn-dark {
+  background-color: @general-background-color;
+  color: @general-color;
+  border-color: @general-border-color;
 }
 
 .red {
@@ -51,4 +109,8 @@ body {
 
 .green {
   color: green;
+}
+
+.default-padding {
+  padding: @general-padding;
 }

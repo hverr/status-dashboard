@@ -3,8 +3,22 @@
 
 **Status Dashboard** is a highly configurable **AngularJS** application backed by a **Go** API to show information about **multiple servers** in a dasboard style way.
 
+ - [Features](#features)
  - [Development](#development)
  - [Screenshot](#screenshot)
+
+## Features
+
+ - **Efficient**
+   - Machines only send information when someone has opened the dashboard.
+   - No database or permanent file storage needed.
+ - **Dynamic**
+   - Add and remove widgets.
+   - Reorder and resize widgets.
+   - Add and remove columns and rows.
+   - Can refresh as often as every second.
+ - **Persistent**
+   - Bookmark a layout in your browser.
 
 ## Development
 The following dependencies are needed to build and run the application.
