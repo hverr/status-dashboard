@@ -5,9 +5,26 @@ angular.module('dashboard').controller('GridController', [
   'widgetsManager',
   'LoadWidget',
   'UptimeWidget',
-  function($scope, widgetsManager, LoadWidget, UptimeWidget) {
+  '$log',
+  function($scope, widgetsManager, LoadWidget, UptimeWidget, $log) {
     widgetsManager.register(new LoadWidget("webserver", 0, 0));
     widgetsManager.register(new UptimeWidget("webserver", 0, 1));
+
+    $scope.addColumn = function() {
+      $log.debug('addColumn');
+    };
+
+    $scope.removeColumn = function() {
+      $log.debug('removeColumn');
+    };
+
+    $scope.addWidgets = function() {
+      $log.debug('addWidgets');
+    };
+
+    $scope.saveLayout = function() {
+      $log.debug('saveLayout');
+    };
 
     $scope.widgetGridsterMap = {
       sizeX: 'widget.height',
