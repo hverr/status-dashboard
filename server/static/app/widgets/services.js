@@ -87,23 +87,6 @@ angular.module('dashboard').factory('api', [
         return baseURL + resource;
       },
 
-      widget: function(w) {
-        var deferred = $q.defer();
-
-        var r = this.resource('/clients/' + w.client + '/widgets/' + w.identifier);
-        $http
-          .get(r)
-          .then(function(result) {
-            deferred.resolve(result.data);
-
-          }, function(reason) {
-            $log.error('error: api.widget:', reason);
-            deferred.reject(reason);
-          });
-
-        return deferred.promise;
-      },
-
       bulk: function(widgets, force) {
         var deferred = $q.defer();
 
