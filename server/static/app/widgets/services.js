@@ -6,34 +6,6 @@ angular.module('dashboard').factory('widgetsManager', [
   '$log',
   function($timeout, api, $log) {
     var clients = {};
-
-    function registeredWidgets() {
-      var widgets = [];
-      for(var clientIdentifier in clients) {
-        var client = clients[clientIdentifier];
-        for(var widgetType in client) {
-          widgets.push(client[widgetType]);
-        }
-      }
-
-      return widgets;
-    }
-
-    return {
-      register : function(widget) {
-        $log.info('Registering', widget);
-        if(clients[widget.client] === undefined) {
-          clients[widget.client] = {};
-        }
-        clients[widget.client][widget.identifier] = widget;
-      },
-
-      registeredWidgets : registeredWidgets,
-
-      start : function() {
-        $log.debug('Should start updating');
-      },
-    };
   }
 ]);
 
@@ -45,10 +17,30 @@ angular.module('dashboard').factory('api', [
     var self = {
       baseURL : '/api',
 
+      error: defaultError,
+
+      availableWidgets: availableWidgets,
     };
 
     function resource(path) {
       return self.baseURL + path;
+    }
+
+    function availableWidgets() {
+      var d = $q.defer();
+
+      $http.get(resource('/available_widgets')).then(function(result) {
+        d.resolve(result.data);
+      }, function(reason) {
+        self.error(reason);
+        d.reject(reason);
+      });
+
+      return d.promise;
+    }
+
+    function defaultError(reason) {
+      $log.error('HTTP error:', reason);
     }
 
     return self;

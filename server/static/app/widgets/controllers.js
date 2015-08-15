@@ -7,9 +7,6 @@ angular.module('dashboard').controller('GridController', [
   'UptimeWidget',
   '$log',
   function($scope, widgetsManager, LoadWidget, UptimeWidget, $log) {
-    widgetsManager.register(new LoadWidget("webserver", 0, 0));
-    widgetsManager.register(new UptimeWidget("webserver", 0, 1));
-
     $scope.addColumn = function() {
       $scope.gridsterOpts.columns += 1;
     };
@@ -39,8 +36,6 @@ angular.module('dashboard').controller('GridController', [
       columns: 4,
       margins: [16, 16],
     };
-
-    $scope.widgets = widgetsManager.registeredWidgets();
 
     widgetsManager.start();
   }
