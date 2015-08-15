@@ -86,7 +86,7 @@ angular.module('dashboard').factory('widgetsManager', [
         }
 
         widget.referenceCounter = 1;
-        widget.available = true;
+        widget.available = false;
         widgets[clientIdentifier][widgetType] = widget;
 
       } else {
