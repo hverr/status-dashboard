@@ -10,6 +10,8 @@ angular.module('dashboard').factory('Widget', [
         row: 0,
         col: 0,
 
+        type: null,
+        clientIdentifier: null,
         client: null,
         name: name,
 
