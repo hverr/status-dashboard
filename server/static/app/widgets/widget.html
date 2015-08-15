@@ -9,3 +9,8 @@
   <widget-dynamic-info><!-- Will be replaced by widget.directive --></widget-dynamic-info>
 </div>
 <div class="system-info">{{ widget.client | uppercase}} - {{ widget.name | uppercase }}</div>
+<div ng-show="widget.hover" class="remove-button">
+  <a href="#">
+    <span class="glyphicon glyphicon-remove"></span>
+  </a>
+</div>

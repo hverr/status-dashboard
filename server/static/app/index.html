@@ -27,7 +27,12 @@
     <div gridster="gridsterOpts">
       <ul>
         <li class="widget-grid-item" gridster-item="widgetGridsterMap" ng-repeat="widget in widgets">
-          <div widget class="widget"></div>
+          <div widget
+               ng-mouseover="widget.hover = true"
+               ng-mouseout="widget.hover = false"
+               class="widget"
+          >
+          </div>
         </li>
       </ul>
     </div>
