@@ -70,6 +70,9 @@ angular.module('dashboard').factory('widgetsManager', [
         update(force).then(function() {
           force = false;
           $timeout(f, 100);
+        }, function() {
+          force = false;
+          $timeout(f, 10*1000);
         });
       }
 
@@ -128,8 +131,8 @@ angular.module('dashboard').factory('widgetsManager', [
         }
 
         done.resolve();
-      }, function() {
-        done.resolve();
+      }, function(reason) {
+        done.reject(reason);
       });
 
       return done.promise;
