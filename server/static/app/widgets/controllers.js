@@ -2,11 +2,44 @@
 
 angular.module('dashboard').controller('GridController', [
   '$scope',
+  '$rootScope',
   'widgetsManager',
   'LoadWidget',
   'UptimeWidget',
   '$log',
-  function($scope, widgetsManager, LoadWidget, UptimeWidget, $log) {
+  function($scope, $rootScope, widgetsManager, LoadWidget, UptimeWidget, $log) {
+    function findFreeTile(width) {
+      var cols = $scope.gridsterOpts.columns;
+      var row = 0;
+      var col = 0;
+
+      $scope.widgets.forEach(function(w) {
+        if(w.row > row) {
+          row = w.row;
+          col = 0;
+        }
+
+        if(w.row === row && w.col + w.width > col) {
+          col = w.col + w.width;
+        }
+
+        if(col >= cols) {
+          row += 1;
+          col = 0;
+        }
+      });
+
+      if(col !== 0 && col + width > cols) {
+        col = 0;
+        row += 1;
+      }
+
+      return {
+        row: row,
+        column: col,
+      };
+    }
+
     $scope.addColumn = function() {
       $scope.gridsterOpts.columns += 1;
     };
@@ -37,16 +70,21 @@ angular.module('dashboard').controller('GridController', [
       margins: [16, 16],
     };
 
+    $scope.widgets = [];
+
+    $rootScope.$on(widgetsManager.addWidgetRequestEvent, function(ev, client, type) {
+      var w = widgetsManager.add(client, type);
+      w.client = client;
+
+      var position = findFreeTile(w.width);
+      w.col = position.column;
+      w.row = position.row;
+
+      $scope.widgets.push(w);
+      widgetsManager.update(true);
+    });
+
     widgetsManager.start();
-
-    var l = widgetsManager.add('webserver', 'load');
-    l.client = 'Web Server';
-    $scope.widgets = [l];
-
-    var u = widgetsManager.add('webserver', 'uptime');
-    u.client = 'Web Server';
-    $scope.widgets.push(u);
-
     widgetsManager.update(true);
   }
 ]);
@@ -83,7 +121,7 @@ angular.module('dashboard').controller('AddWidgetsDialogController', [
     });
 
     $scope.addWidget = function(clientIdentifier, widgetType) {
-      $log.debug('Should add', clientIdentifier, ':', widgetType);
+      $rootScope.$emit(widgetsManager.addWidgetRequestEvent, clientIdentifier, widgetType);
     };
   }
 ]);

@@ -57,6 +57,7 @@ angular.module('dashboard').factory('widgetsManager', [
       availableClients: null,
 
       availableClientsChangedEvent: 'AvailableClientsChangedEvent',
+      addWidgetRequestEvent: 'AddWidgetRequestEvent',
     };
 
     var widgets = {};
