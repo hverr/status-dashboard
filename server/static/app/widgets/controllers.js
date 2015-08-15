@@ -50,6 +50,6 @@ angular.module('dashboard').controller('GridController', [
 angular.module('dashboard').controller('WidgetDataController', [
   '$scope',
   function($scope) {
-    $scope.widget = $scope.widget.data;
+    $scope.data = $scope.widget.data;
   }
 ]);
