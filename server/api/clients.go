@@ -23,32 +23,6 @@ func registerClient(c *gin.Context) {
 	c.JSON(200, gin.H{})
 }
 
-func updateClientWidget(c *gin.Context) {
-	client, ok := server.GetClient(c.Param("client"))
-	if !ok {
-		c.AbortWithError(404, errors.New("Client not found."))
-		return
-	}
-
-	initiator := widgets.AllWidgets[c.Param("widget")]
-	if initiator == nil {
-		c.AbortWithError(404, errors.New("Widget not found."))
-		return
-	}
-
-	widget := initiator()
-	if err := c.BindJSON(&widget); err != nil {
-		c.AbortWithError(400, err)
-		return
-	}
-
-	client.SetWidget(widget)
-
-	scheduler.NotifyUpdateListeners()
-
-	c.JSON(200, gin.H{"status": "OK"})
-}
-
 func bulkUpdateClient(c *gin.Context) {
 	client, _ := server.GetClient(c.Param("client"))
 	if client == nil {
