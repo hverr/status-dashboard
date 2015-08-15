@@ -15,6 +15,7 @@ func Install(engine *gin.Engine) error {
 
 	// Angular API
 	engine.GET("/api/available_clients", availableClients)
+	engine.POST("/api/update_request", updateRequest)
 
 	return nil
 }

@@ -44,6 +44,8 @@ angular.module('dashboard').controller('GridController', [
 
     $log.debug('Widget:', w);
     $scope.widgets = [w];
+
+    widgetsManager.update();
   }
 ]);
 
