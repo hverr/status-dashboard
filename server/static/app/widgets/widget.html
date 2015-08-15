@@ -10,7 +10,7 @@
 </div>
 <div class="system-info">{{ widget.client | uppercase}} - {{ widget.name | uppercase }}</div>
 <div ng-show="widget.hover" class="remove-button">
-  <a href="#">
+  <a href="#" ng-click="removeWidget($index)">
     <span class="glyphicon glyphicon-remove"></span>
   </a>
 </div>

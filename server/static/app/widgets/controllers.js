@@ -42,6 +42,11 @@ angular.module('dashboard').controller('GridController', [
       };
     }
 
+    $scope.removeWidget = function(index) {
+      widgetsManager.remove($scope.widgets[index]);
+      $scope.widgets.splice(index, 1);
+    };
+
     $scope.addColumn = function() {
       $scope.gridsterOpts.columns += 1;
     };

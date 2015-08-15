@@ -57,6 +57,7 @@ angular.module('dashboard').factory('widgetsManager', [
       update: update,
 
       add: add,
+      remove: remove,
       availableClients: null,
 
       serialize: serialize,
@@ -102,8 +103,20 @@ angular.module('dashboard').factory('widgetsManager', [
       w.type = widgetType;
       w.available = false;
 
+      w.widgetsManagerHandle = widgets.length;
       widgets.push(w);
       return w;
+    }
+
+    function remove(widget) {
+      var handle = widget.widgetsManagerHandle;
+
+      widgets.splice(handle, 1);
+      if(widgets.length > 0 && widgets.length !== handle) {
+        widgets.slice(handle, widgets.length).forEach(function(w) {
+          w.widgetsManagerHandle -= 1;
+        });
+      }
     }
 
     function update(force) {
