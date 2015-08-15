@@ -3,11 +3,12 @@
 angular.module('dashboard').controller('GridController', [
   '$scope',
   '$rootScope',
+  '$location',
   'widgetsManager',
   'LoadWidget',
   'UptimeWidget',
   '$log',
-  function($scope, $rootScope, widgetsManager, LoadWidget, UptimeWidget, $log) {
+  function($scope, $rootScope, $location, widgetsManager, LoadWidget, UptimeWidget, $log) {
     function findFreeTile(width) {
       var cols = $scope.gridsterOpts.columns;
       var row = 0;
@@ -55,10 +56,13 @@ angular.module('dashboard').controller('GridController', [
     };
 
     $scope.saveLayout = function() {
-      $log.debug('saveLayout');
-      var data = angular.toJson(widgetsManager.serialize());
+      var widgetsData = widgetsManager.serialize();
+      var data = {
+        columns: $scope.gridsterOpts.columns,
+        widgets: widgetsData,
+      };
       $log.debug(data);
-      $log.debug(encodeURIComponent(data));
+      $log.debug(encodeURIComponent(angular.toJson(data)));
     };
 
     $scope.widgetGridsterMap = {
@@ -88,6 +92,22 @@ angular.module('dashboard').controller('GridController', [
     });
 
     widgetsManager.start();
+
+    var query = $location.search();
+    if("layout" in query) {
+      try {
+        var json = angular.fromJson(query.layout);
+        var columns = json.columns;
+        var loaded = widgetsManager.deserialize(json.widgets);
+
+        $scope.columns = columns;
+        $scope.widgets = loaded;
+
+      } catch(error) {
+        $log.error('Could not load layout: invalid JSON:', error);
+      }
+    }
+
     widgetsManager.update(true);
   }
 ]);

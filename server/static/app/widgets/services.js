@@ -60,7 +60,7 @@ angular.module('dashboard').factory('widgetsManager', [
       availableClients: null,
 
       serialize: serialize,
-      load: load,
+      deserialize: deserialize,
 
       availableClientsChangedEvent: 'AvailableClientsChangedEvent',
       addWidgetRequestEvent: 'AddWidgetRequestEvent',
@@ -166,8 +166,24 @@ angular.module('dashboard').factory('widgetsManager', [
       return json;
     }
 
-    function load(json) {
-      $log.debug('Should load:', json);
+    function deserialize(json) {
+      var result = [];
+
+      $log.debug('Loading widgets:', json);
+
+      json.forEach(function(data) {
+        var w = add(data.client, data.type);
+        w.client = data.client;
+
+        w.width = data.width;
+        w.height = data.height;
+        w.row = data.row;
+        w.col = data.col;
+
+        result.push(w);
+      });
+
+      return result;
     }
 
     return self;
