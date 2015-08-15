@@ -3,7 +3,6 @@ package api
 import (
 	"encoding/json"
 	"errors"
-	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/hverr/status-dashboard/server"
@@ -103,51 +102,4 @@ func requestedClientWidgets(c *gin.Context) {
 	<-scheduler.RegisterClientUpdateListener(client)
 
 	c.JSON(200, gin.H{"widgets": client.RequestedWidgets()})
-}
-
-func allWidgets(c *gin.Context) {
-	var request map[string][]string
-
-	scheduler.RegisterWidgetRequest()
-	defer scheduler.DeregisterWidgetRequest()
-
-	if err := c.BindJSON(&request); err != nil {
-		c.AbortWithError(400, err)
-		return
-	}
-
-	if c.Query("force") != "true" {
-		select {
-		case <-scheduler.RegisterUpdateListener():
-		case <-time.After(1 * time.Minute):
-			c.JSON(202, gin.H{"reason": "No updates."})
-			return
-		}
-	}
-
-	result := make(map[string]map[string]widgets.Widget)
-
-	for clientIdentifier, widgetTypes := range request {
-		client, ok := server.GetClient(clientIdentifier)
-		if !ok {
-			c.AbortWithError(404, errors.New("Client not found: "+clientIdentifier))
-			return
-		}
-
-		for _, widgetType := range widgetTypes {
-			widget := client.GetWidget(widgetType)
-			if widget == nil {
-				c.AbortWithError(404, errors.New("Widget "+widgetType+
-					" for "+clientIdentifier+"not found"))
-				return
-			}
-
-			if result[clientIdentifier] == nil {
-				result[clientIdentifier] = make(map[string]widgets.Widget)
-			}
-			result[clientIdentifier][widgetType] = widget
-		}
-	}
-
-	c.JSON(200, result)
 }
