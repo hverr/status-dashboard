@@ -1,11 +1,5 @@
 {
     "clients" : [
         "webserver"
-    ],
-    "defaultWidgets" : {
-        "webserver" : [
-            "uptime",
-            "load"
-        ]
-    }
+    ]
 }

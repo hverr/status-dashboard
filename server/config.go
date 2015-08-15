@@ -7,8 +7,7 @@ import (
 
 // Configuration holds the server configuration
 var Configuration struct {
-	Clients        []string            `json:"clients"`
-	DefaultWidgets map[string][]string `json:"defaultWidgets"`
+	Clients []string `json:"clients"`
 }
 
 // Validate a configuration if it is invalid an error is returned.
