@@ -56,6 +56,9 @@ angular.module('dashboard').controller('GridController', [
 
     $scope.saveLayout = function() {
       $log.debug('saveLayout');
+      var data = angular.toJson(widgetsManager.serialize());
+      $log.debug(data);
+      $log.debug(encodeURIComponent(data));
     };
 
     $scope.widgetGridsterMap = {

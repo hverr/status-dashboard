@@ -59,6 +59,9 @@ angular.module('dashboard').factory('widgetsManager', [
       add: add,
       availableClients: null,
 
+      serialize: serialize,
+      load: load,
+
       availableClientsChangedEvent: 'AvailableClientsChangedEvent',
       addWidgetRequestEvent: 'AddWidgetRequestEvent',
     };
@@ -145,6 +148,26 @@ angular.module('dashboard').factory('widgetsManager', [
       });
 
       return done.promise;
+    }
+
+    function serialize() {
+      var json = [];
+      widgets.forEach(function(w) {
+        json.push({
+          client: w.clientIdentifier,
+          type: w.type,
+
+          height: w.height,
+          width: w.width,
+          row: w.row,
+          col: w.col,
+        });
+      });
+      return json;
+    }
+
+    function load(json) {
+      $log.debug('Should load:', json);
     }
 
     return self;
