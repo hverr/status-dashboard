@@ -15,32 +15,19 @@ angular.module('dashboard').controller('LoadWidgetController', [
 ]);
 
 angular.module('dashboard').factory('LoadWidget', [
-  function() {
+  'Widget',
+  function(Widget) {
     return function() {
-      return {
-        directive: "load-widget",
-        height: 1,
-        width: 1,
-        row: 0,
-        col: 0,
+      var self = new Widget('load-widget', 'Load');
 
-        client: null,
-        name: "Load",
-
-        data : {
-          cores: 4,
-          one : "1.05",
-          five : "4.02",
-          fifteen : "1.02",
-        },
-
-        update : function(object) {
-          this.cores = object.cores;
-          this.one = object.one;
-          this.five = object.five;
-          this.fifteen = object.fifteen;
-        },
+      self.data = {
+        cores: 4,
+        one : "1.05",
+        five : "4.02",
+        fifteen : "1.02",
       };
+
+      return self;
     };
   }
 ]);

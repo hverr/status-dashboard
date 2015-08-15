@@ -1,5 +1,29 @@
 'use strict';
 
+angular.module('dashboard').factory('Widget', [
+  function() {
+    return function(directive, name) {
+      var self = {
+        directive: directive,
+        height: 1,
+        width: 1,
+        row: 0,
+        col: 0,
+
+        client: null,
+        name: name,
+
+        data: null,
+        update: function(data) {
+          self.data = data;
+        },
+      };
+
+      return self;
+    };
+  }
+]);
+
 angular.module('dashboard').factory('widgetFactory', [
   'LoadWidget',
   'UptimeWidget',
