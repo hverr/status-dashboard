@@ -123,6 +123,8 @@ angular.module('dashboard').factory('widgetsManager', [
               widget.available = false;
             } else if(!(widgetType in result[clientIdentifier])) {
               widget.available = false;
+            } else if(!result[clientIdentifier][widgetType]) {
+              widget.available = false;
             } else {
               widget.update(result[clientIdentifier][widgetType]);
               widget.available = true;

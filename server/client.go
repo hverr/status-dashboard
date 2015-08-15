@@ -5,6 +5,7 @@ import (
 	"log"
 	"time"
 
+	"github.com/hverr/status-dashboard/server/settings"
 	"github.com/hverr/status-dashboard/widgets"
 	"github.com/pmylund/go-cache"
 )
@@ -62,10 +63,17 @@ func GetClient(identifier string) (*Client, bool) {
 	if !ok {
 		return nil, false
 	}
-	return o.(*Client), true
+
+	c := o.(*Client)
+	if time.Since(c.LastSeen) > settings.MaximumWidgetAge {
+		return c, false
+	}
+
+	return c, true
 }
 
 func (c *Client) SetWidget(w widgets.Widget) {
+	c.LastSeen = time.Now()
 	c.widgets.Set(w.Type(), w, cache.DefaultExpiration)
 }
 

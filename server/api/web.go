@@ -29,10 +29,10 @@ func updateRequest(c *gin.Context) {
 	for clientIdentifier, requestedWidgets := range request {
 		clientResult := make(map[string]interface{})
 
-		client, found := server.GetClient(clientIdentifier)
+		client, active := server.GetClient(clientIdentifier)
 
 		for _, widgetType := range requestedWidgets {
-			if !found {
+			if client == nil || !active {
 				clientResult[widgetType] = nil
 			} else {
 				clientResult[widgetType] = client.GetWidget(widgetType)

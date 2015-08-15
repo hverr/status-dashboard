@@ -50,8 +50,8 @@ func updateClientWidget(c *gin.Context) {
 }
 
 func bulkUpdateClient(c *gin.Context) {
-	client, ok := server.GetClient(c.Param("client"))
-	if !ok {
+	client, _ := server.GetClient(c.Param("client"))
+	if client == nil {
 		c.AbortWithError(404, errors.New("Client not found."))
 		return
 	}
@@ -93,8 +93,8 @@ func bulkUpdateClient(c *gin.Context) {
 }
 
 func requestedClientWidgets(c *gin.Context) {
-	client, ok := server.GetClient(c.Param("client"))
-	if !ok {
+	client, _ := server.GetClient(c.Param("client"))
+	if client == nil {
 		c.AbortWithError(404, errors.New("Client not found."))
 		return
 	}
