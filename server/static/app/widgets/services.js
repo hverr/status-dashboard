@@ -61,6 +61,7 @@ angular.module('dashboard').factory('widgetsManager', [
     };
 
     var widgets = {};
+    var lastUpdateCall = new Date();
 
     function start() {
       api.availableClients().then(function(clients) {
@@ -108,6 +109,9 @@ angular.module('dashboard').factory('widgetsManager', [
     function update(force) {
       var done = $q.defer();
 
+      var thisUpdateCall = new Date();
+      lastUpdateCall = thisUpdateCall;
+
       var request = {};
       for(var clientIdentifier in widgets) {
         request[clientIdentifier] = [];
@@ -117,21 +121,22 @@ angular.module('dashboard').factory('widgetsManager', [
       }
 
       api.updateRequest(force, request).then(function(result) {
-        $log.debug('Got update:', result);
-        for(var clientIdentifier in widgets) {
-          request[clientIdentifier] = [];
-          for(var widgetType in widgets[clientIdentifier]) {
-            var widget = widgets[clientIdentifier][widgetType];
+        if(lastUpdateCall === thisUpdateCall) {
+          for(var clientIdentifier in widgets) {
+            request[clientIdentifier] = [];
+            for(var widgetType in widgets[clientIdentifier]) {
+              var widget = widgets[clientIdentifier][widgetType];
 
-            if(!(clientIdentifier in result)) {
-              widget.available = false;
-            } else if(!(widgetType in result[clientIdentifier])) {
-              widget.available = false;
-            } else if(!result[clientIdentifier][widgetType]) {
-              widget.available = false;
-            } else {
-              widget.update(result[clientIdentifier][widgetType]);
-              widget.available = true;
+              if(!(clientIdentifier in result)) {
+                widget.available = false;
+              } else if(!(widgetType in result[clientIdentifier])) {
+                widget.available = false;
+              } else if(!result[clientIdentifier][widgetType]) {
+                widget.available = false;
+              } else {
+                widget.update(result[clientIdentifier][widgetType]);
+                widget.available = true;
+              }
             }
           }
         }
