@@ -44,24 +44,27 @@ angular.module('dashboard').factory('widgetFactory', [
 angular.module('dashboard').factory('widgetsManager', [
   '$timeout',
   '$q',
+  '$rootScope',
   'api',
   'widgetFactory',
   '$log',
-  function($timeout, $q, api, widgetFactory, $log) {
+  function($timeout, $q, $rootScope, api, widgetFactory, $log) {
     var self = {
       start: start,
       update: update,
 
       add: add,
+      availableClients: null,
+
+      availableClientsChangedEvent: 'AvailableClientsChangedEvent',
     };
 
-    var availableClients;
     var widgets = {};
 
     function start() {
       api.availableClients().then(function(clients) {
-        $log.debug('Got available clients:', clients);
-        availableClients = clients;
+        self.availableClients = clients;
+        $rootScope.$emit(self.availableClientsChangedEvent);
       });
 
       var force = true;

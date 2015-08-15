@@ -60,3 +60,30 @@ angular.module('dashboard').controller('WidgetDataController', [
     });
   }
 ]);
+
+angular.module('dashboard').controller('AddWidgetsDialogController', [
+  '$scope',
+  '$rootScope',
+  'widgetsManager',
+  '$log',
+  function($scope, $rootScope, widgetsManager, $log) {
+    function update() {
+      $scope.clients = widgetsManager.availableClients;
+      $log.debug('Available:', $scope.clients);
+      if(!$scope.clients) {
+        $scope.message = "No clients connected, please refersh.";
+      } else {
+        $scope.message = null;
+      }
+    }
+
+    update();
+    $rootScope.$on(widgetsManager.availableClientsChangedEvent, function() {
+      update();
+    });
+
+    $scope.addWidget = function(clientIdentifier, widgetType) {
+      $log.debug('Should add', clientIdentifier, ':', widgetType);
+    };
+  }
+]);

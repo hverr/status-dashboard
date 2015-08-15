@@ -46,7 +46,7 @@
     </div>
   </div>
 
-  <div class="modal fade" id="addWidgetsDialog" tabindex="-1">
+  <div ng-controller="AddWidgetsDialogController" class="modal fade" id="addWidgetsDialog" tabindex="-1">
     <div class="modal-dialog" role="document">
       <div class="modal-content">
         <div class="modal-header">
@@ -56,7 +56,23 @@
           <h4 class="modal-title">Add Widgets</h4>
         </div>
         <div class="modal-body">
-          <p>Hello World!</p>
+          <div ng-if="message">
+            <span>{{ message }}</span>
+          </div>
+          <div ng-if="!message">
+            <div ng-repeat="client in clients">
+              <span class="client-name">{{ client.name }}</span>
+              <div class="list-group">
+                <a ng-repeat="widget in client.availableWidgets"
+                   ng-click="addWidget(client.identifier, widget)"
+                   href="#"
+                   class="list-group-item"
+                >
+                  {{ widget }}
+                </a>
+              </div>
+            </div>
+          </div>
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-primary" data-dismiss="modal">Done</button>
