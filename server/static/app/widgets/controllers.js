@@ -39,11 +39,13 @@ angular.module('dashboard').controller('GridController', [
 
     widgetsManager.start();
 
-    var w = widgetsManager.add('webserver', 'load');
-    w.client = 'Web Server';
+    var l = widgetsManager.add('webserver', 'load');
+    l.client = 'Web Server';
+    $scope.widgets = [l];
 
-    $log.debug('Widget:', w);
-    $scope.widgets = [w];
+    var u = widgetsManager.add('webserver', 'uptime');
+    u.client = 'Web Server';
+    $scope.widgets.push(u);
 
     widgetsManager.update();
   }
