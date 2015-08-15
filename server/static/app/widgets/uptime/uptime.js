@@ -34,6 +34,10 @@ angular.module('dashboard').directive('uptimeWidget', [
       });
 
       var increase = function() {
+        if(!scope.data) {
+          return;
+        }
+
         scope.data.seconds += 1;
 
         if(scope.data.seconds >= 60) {
