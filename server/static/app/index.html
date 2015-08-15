@@ -39,9 +39,28 @@
         <ul class="dropdown-menu dropdown-menu-right">
           <li><a href="#" ng-click="addColumn()">Add Column</a></li>
           <li><a href="#" ng-click="removeColumn()">Remove Column</a></li>
-          <li><a href="#" ng-click="addWidgets()">Add Widgets</a></li>
+          <li><a href="#" data-toggle="modal" data-target="#addWidgetsDialog">Add Widgets</a></li>
           <li><a href="#" ng-click="saveLayout()">Save Layout</a></li>
         </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal fade" id="addWidgetsDialog" tabindex="-1">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+          <h4 class="modal-title">Add Widgets</h4>
+        </div>
+        <div class="modal-body">
+          <p>Hello World!</p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-primary" data-dismiss="modal">Done</button>
+        </div>
       </div>
     </div>
   </div>
