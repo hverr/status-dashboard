@@ -60,7 +60,7 @@ angular.module('dashboard').factory('widgetsManager', [
       addWidgetRequestEvent: 'AddWidgetRequestEvent',
     };
 
-    var widgets = {};
+    var widgets = [];
     var lastUpdateCall = new Date();
 
     function start() {
@@ -85,25 +85,17 @@ angular.module('dashboard').factory('widgetsManager', [
     }
 
     function add(clientIdentifier, widgetType) {
-      if(!widgets[clientIdentifier]) {
-        widgets[clientIdentifier] = {};
+      var w = widgetFactory(widgetType);
+      if(w === null) {
+        throw 'Unknown widget type: ' + widgetType;
       }
 
-      if(!widgets[clientIdentifier][widgetType]) {
-        var widget = widgetFactory(widgetType);
-        if(widget === null) {
-          throw 'Unknown widget type: ' + widgetType;
-        }
+      w.clientIdentifier = clientIdentifier;
+      w.type = widgetType;
+      w.available = false;
 
-        widget.referenceCounter = 1;
-        widget.available = false;
-        widgets[clientIdentifier][widgetType] = widget;
-
-      } else {
-        widgets[clientIdentifier][widgetType].referenceCounter += 1;
-      }
-
-      return widgets[clientIdentifier][widgetType];
+      widgets.push(w);
+      return w;
     }
 
     function update(force) {
@@ -113,32 +105,33 @@ angular.module('dashboard').factory('widgetsManager', [
       lastUpdateCall = thisUpdateCall;
 
       var request = {};
-      for(var clientIdentifier in widgets) {
-        request[clientIdentifier] = [];
-        for(var widgetType in widgets[clientIdentifier]) {
-          request[clientIdentifier].push(widgetType);
+      widgets.forEach(function(w) {
+        if(!(w.clientIdentifier in request)) {
+          request[w.clientIdentifier] = [];
         }
-      }
+
+        if(!(w.type in request[w.clientIdentifier])) {
+          request[w.clientIdentifier].push(w.type);
+        }
+      });
 
       api.updateRequest(force, request).then(function(result) {
         if(lastUpdateCall === thisUpdateCall) {
-          for(var clientIdentifier in widgets) {
-            request[clientIdentifier] = [];
-            for(var widgetType in widgets[clientIdentifier]) {
-              var widget = widgets[clientIdentifier][widgetType];
+          widgets.forEach(function(widget) {
+            var clientIdentifier = widget.clientIdentifier;
+            var widgetType = widget.type;
 
-              if(!(clientIdentifier in result)) {
-                widget.available = false;
-              } else if(!(widgetType in result[clientIdentifier])) {
-                widget.available = false;
-              } else if(!result[clientIdentifier][widgetType]) {
-                widget.available = false;
-              } else {
-                widget.update(result[clientIdentifier][widgetType]);
-                widget.available = true;
-              }
+            if(!(clientIdentifier in result)) {
+              widget.available = false;
+            } else if(!(widgetType in result[clientIdentifier])) {
+              widget.available = false;
+            } else if(!result[clientIdentifier][widgetType]) {
+              widget.available = false;
+            } else {
+              widget.update(result[clientIdentifier][widgetType]);
+              widget.available = true;
             }
-          }
+          });
         }
 
         done.resolve();
