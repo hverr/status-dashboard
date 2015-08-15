@@ -11,11 +11,13 @@ angular.module('dashboard').controller('GridController', [
     widgetsManager.register(new UptimeWidget("webserver", 0, 1));
 
     $scope.addColumn = function() {
-      $log.debug('addColumn');
+      $scope.gridsterOpts.columns += 1;
     };
 
     $scope.removeColumn = function() {
-      $log.debug('removeColumn');
+      if($scope.gridsterOpts.columns > 0) {
+        $scope.gridsterOpts.columns -= 1;
+      }
     };
 
     $scope.addWidgets = function() {
