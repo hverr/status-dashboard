@@ -18,6 +18,15 @@ angular.module('dashboard').factory('UptimeWidget', [
         seconds: 0,
       };
 
+      // We clone the data, because otherwise multiple directives sharing
+      // the data would increase the time more than once per second.
+      self.update = function(data) {
+        self.data.days = data.days;
+        self.data.hours = data.hours;
+        self.data.minutes = data.minutes;
+        self.data.seconds = data.seconds;
+      };
+
       return self;
     };
   }
