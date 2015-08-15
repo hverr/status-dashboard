@@ -17,8 +17,7 @@ type Client struct {
 	AvailableWidgets []string  `json:"availableWidgets" binding:"required"`
 	LastSeen         time.Time `json:"-"`
 
-	widgets          *cache.Cache `json:"-"`
-	requestedWidgets []string     `json:"-"`
+	widgets *cache.Cache `json:"-"`
 }
 
 var RegisteredClients = cache.New(cache.NoExpiration, cache.NoExpiration)
@@ -80,5 +79,5 @@ func (c *Client) GetWidget(widgetType string) widgets.Widget {
 }
 
 func (c *Client) RequestedWidgets() []string {
-	return c.requestedWidgets
+	return c.AvailableWidgets
 }
