@@ -18,10 +18,12 @@ func updateRequest(c *gin.Context) {
 		return
 	}
 
-	scheduler.RegisterWidgetRequest()
-	defer scheduler.DeregisterWidgetRequest()
+	if c.Query("force") != "true" {
+		scheduler.RegisterWidgetRequest()
+		defer scheduler.DeregisterWidgetRequest()
 
-	<-scheduler.RegisterUpdateListener()
+		<-scheduler.RegisterUpdateListener()
+	}
 
 	result := make(map[string]map[string]interface{})
 	for clientIdentifier, requestedWidgets := range request {

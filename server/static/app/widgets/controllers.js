@@ -47,7 +47,7 @@ angular.module('dashboard').controller('GridController', [
     u.client = 'Web Server';
     $scope.widgets.push(u);
 
-    widgetsManager.update();
+    widgetsManager.update(true);
   }
 ]);
 

@@ -64,9 +64,11 @@ angular.module('dashboard').factory('widgetsManager', [
         availableClients = clients;
       });
 
+      var force = true;
       function f() {
-        update().then(function() {
-          $log.debug('Updating');
+        $log.debug('Updating');
+        update(force).then(function() {
+          force = false;
           $timeout(f, 1000);
         });
       }
@@ -96,7 +98,7 @@ angular.module('dashboard').factory('widgetsManager', [
       return widgets[clientIdentifier][widgetType];
     }
 
-    function update() {
+    function update(force) {
       var done = $q.defer();
 
       var request = {};
@@ -107,7 +109,7 @@ angular.module('dashboard').factory('widgetsManager', [
         }
       }
 
-      api.updateRequest(request).then(function(result) {
+      api.updateRequest(force, request).then(function(result) {
         $log.debug('Got update:', result);
         for(var clientIdentifier in widgets) {
           request[clientIdentifier] = [];
@@ -168,10 +170,15 @@ angular.module('dashboard').factory('api', [
       return d.promise;
     }
 
-    function updateRequest(widgets) {
+    function updateRequest(force, widgets) {
       var d = $q.defer();
 
-      $http.post(resource('/update_request'), widgets).then(function(result) {
+      var r = resource('/update_request');
+      if(force === true) {
+        r += '?force=true';
+      }
+
+      $http.post(r, widgets).then(function(result) {
         d.resolve(result.data);
       }, function(reason) {
         self.error(reason);
