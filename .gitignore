@@ -6,7 +6,7 @@
 .*.swp
 
 # Bower
-server/static/app/bower_components
+bower_components
 
 # Node
 node_modules
