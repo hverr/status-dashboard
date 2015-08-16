@@ -35,6 +35,8 @@ func RequestUpdateRequest(client string) chan []string {
 				out <- s
 				return
 			}
+			// TODO: Fix race condition
+			// Might have become dirty here
 			<-c.dirty.Listen()
 		}
 	}()
