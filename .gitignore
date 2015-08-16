@@ -10,3 +10,6 @@ bower_components
 
 # Node
 node_modules
+
+# Testing
+coverage

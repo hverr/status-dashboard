@@ -14,12 +14,16 @@ module.exports = function(config) {
 
       'app/app.js',
       'app/filters.js',
-      'app/widgets/services.js',
+      'app/widgets/**/**.js',
 
-      'app/filters_test.js',
-      'app/widgets/services_test.js',
+      'app/tests/**/*.js',
     ],
-    reporters: ['progress'],
+    preprocessors: {
+      'app/app.js' : ['coverage'],
+      'app/filters.js' : ['coverage'],
+      'app/widgets/**/**.js' : ['coverage'],
+    },
+    reporters: ['progress', 'coverage'],
     port: 9876,
     colors: true,
     logLevel: config.LOG_INFO,
