@@ -4,9 +4,8 @@ go:
 
 script:
   - go build -race -o /tmp/dashboard-server server/main/*.go
-  - go build -race -o /tmp/dashboard-server client/main/*.go
+  - go build -race -o /tmp/dashboard-client client/main/*.go
   - go test ./...
-  - cd server
   - npm install
   - gulp lint
 
