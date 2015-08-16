@@ -10,8 +10,9 @@ import (
 
 var widgetRequests = cache.New(cache.NoExpiration, cache.NoExpiration)
 
-func RequestWidgets(client string, widgets []string) chan bool {
+func RequestWidgets(client string, widgets []string, immediately bool) chan bool {
 	r := newWidgetRequest(widgets)
+	r.immediately = immediately
 
 	o, ok := widgetRequests.Get(client)
 	if !ok {
@@ -29,8 +30,9 @@ func RequestWidgets(client string, widgets []string) chan bool {
 }
 
 type widgetRequest struct {
-	widgets   []string
-	fulfilled chan bool
+	widgets     []string
+	fulfilled   chan bool
+	immediately bool
 }
 
 type widgetRequestsContainer struct {
@@ -70,6 +72,21 @@ func (r *widgetRequest) isFulfilledBy(widgets []string) bool {
 	}
 
 	return true
+}
+
+func (c *widgetRequestsContainer) hasImmediateRequest() bool {
+	flag := false
+
+	c.requestsLock.RLock()
+	for _, r := range c.requests {
+		if r.immediately {
+			flag = true
+			break
+		}
+	}
+	c.requestsLock.RUnlock()
+
+	return flag
 }
 
 func (c *widgetRequestsContainer) requestedWidgets() []string {

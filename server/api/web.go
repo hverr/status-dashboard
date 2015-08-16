@@ -32,7 +32,7 @@ func updateRequest(c *gin.Context) {
 	// Inform the scheduler about all requested widgets
 	fulfilled := make([]chan bool, 0, len(request))
 	for client, widgets := range request {
-		r := scheduler.RequestWidgets(client, widgets)
+		r := scheduler.RequestWidgets(client, widgets, c.Query("force") == "true")
 
 		if r == nil {
 			// The client is unavailable. Pretend querying the client

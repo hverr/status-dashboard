@@ -25,7 +25,7 @@ func RequestUpdateRequest(client string) chan []string {
 		minAge := settings.MinimumClientUpdateInterval
 		age := time.Since(c.lastUpdated)
 
-		if age < minAge {
+		if age < minAge && !c.hasImmediateRequest() {
 			<-time.After(minAge - age)
 		}
 
