@@ -57,6 +57,10 @@ angular.module('dashboard').controller('GridController', [
       }
     };
 
+    $scope.addWidgets = function() {
+      widgetsManager.updateAvailableClients();
+    };
+
     $scope.saveLayout = function() {
       var widgetsData = widgetsManager.serialize();
       var data = {

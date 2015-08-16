@@ -55,6 +55,7 @@ angular.module('dashboard').factory('widgetsManager', [
     var self = {
       start: start,
       update: update,
+      updateAvailableClients : updateAvailableClients,
 
       add: add,
       remove: remove,
@@ -73,10 +74,7 @@ angular.module('dashboard').factory('widgetsManager', [
     function start() {
       oneSecondService.start();
 
-      api.availableClients().then(function(clients) {
-        self.availableClients = clients;
-        $rootScope.$emit(self.availableClientsChangedEvent);
-      });
+      updateAvailableClients();
 
       var force = true;
       function f() {
@@ -91,6 +89,13 @@ angular.module('dashboard').factory('widgetsManager', [
       }
 
       f();
+    }
+
+    function updateAvailableClients() {
+      api.availableClients().then(function(clients) {
+        self.availableClients = clients;
+        $rootScope.$emit(self.availableClientsChangedEvent);
+      });
     }
 
     function add(clientIdentifier, widgetType) {
