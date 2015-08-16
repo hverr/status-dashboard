@@ -21,5 +21,15 @@ describe('widget services', function() {
 
       expect(w.data).to.equal(null);
     }));
+
+    it('should update properly', inject(function(Widget) {
+      var w = new Widget('my-directive', 'Widget Name');
+
+      expect(w.data).to.equal(null);
+
+      var d = { 'message' : 'Hello World!' };
+      w.update(d);
+      expect(w.data).to.equal(d);
+    }));
   });
 });
