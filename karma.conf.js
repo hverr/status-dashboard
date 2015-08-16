@@ -14,8 +14,10 @@ module.exports = function(config) {
 
       'app/app.js',
       'app/filters.js',
+      'app/widgets/services.js',
 
       'app/filters_test.js',
+      'app/widgets/services_test.js',
     ],
     reporters: ['progress'],
     port: 9876,
