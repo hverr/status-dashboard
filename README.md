@@ -12,6 +12,7 @@
  - **Efficient**
    - Machines only send information when someone has opened the dashboard.
    - No database or permanent file storage needed.
+   - Only update requested information.
  - **Dynamic**
    - Add and remove widgets.
    - Reorder and resize widgets.

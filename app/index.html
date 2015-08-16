@@ -44,7 +44,7 @@
         <ul class="dropdown-menu dropdown-menu-right">
           <li><a href="#" ng-click="addColumn()">Add Column</a></li>
           <li><a href="#" ng-click="removeColumn()">Remove Column</a></li>
-          <li><a href="#" data-toggle="modal" data-target="#addWidgetsDialog">Add Widgets</a></li>
+          <li><a href="#" ng-click="addWidgets()" data-toggle="modal" data-target="#addWidgetsDialog">Add Widgets</a></li>
           <li><a href="#" ng-click="saveLayout()" data-toggle="modal" data-target="#saveLayoutDialog">Save Layout</a></li>
         </ul>
       </div>
@@ -111,6 +111,7 @@
           </div>
         </div>
         <div class="modal-footer">
+          <button type="button" class="btn btn-default" ng-click="refresh()">Refresh</button>
           <button type="button" class="btn btn-primary" data-dismiss="modal">Done</button>
         </div>
       </div>

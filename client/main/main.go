@@ -1,7 +1,6 @@
 package main
 
 import (
-	"errors"
 	"flag"
 	"fmt"
 	"log"
@@ -69,14 +68,19 @@ func update() error {
 	results := make([]widgets.BulkElement, 0, len(requested.Widgets))
 
 	for _, w := range requested.Widgets {
+		var widget widgets.Widget
+
 		initiator := widgets.AllWidgets[w]
 		if initiator == nil {
-			return errors.New("Unknown requested widget type: " + w)
-		}
+			log.Print("Unknown requested widget type: " + w)
+			widget = nil
 
-		widget := initiator()
-		if err := widget.Update(); err != nil {
-			return err
+		} else {
+			widget = initiator()
+			if err := widget.Update(); err != nil {
+				log.Printf("Can't update %v: %v", w, err)
+				widget = nil
+			}
 		}
 
 		e := widgets.BulkElement{
