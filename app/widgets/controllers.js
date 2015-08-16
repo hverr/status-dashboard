@@ -152,8 +152,8 @@ angular.module('dashboard').controller('AddWidgetsDialogController', [
     function update() {
       $scope.clients = widgetsManager.availableClients;
       $log.debug('Available:', $scope.clients);
-      if(!$scope.clients) {
-        $scope.message = "No clients connected, please refersh.";
+      if(!$scope.clients || !$scope.clients.length) {
+        $scope.message = "No clients connected, please refresh.";
       } else {
         $scope.message = null;
       }
