@@ -3,10 +3,12 @@ package api
 import (
 	"encoding/json"
 	"errors"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/hverr/status-dashboard/server"
 	"github.com/hverr/status-dashboard/server/scheduler"
+	"github.com/hverr/status-dashboard/server/settings"
 	"github.com/hverr/status-dashboard/widgets"
 )
 
@@ -86,7 +88,10 @@ func requestedClientWidgets(c *gin.Context) {
 		return
 	}
 
-	requested := <-scheduler.RequestUpdateRequest(client.Identifier)
-
-	c.JSON(200, gin.H{"widgets": requested})
+	select {
+	case requested := <-scheduler.RequestUpdateRequest(client.Identifier):
+		c.JSON(200, gin.H{"widgets": requested})
+	case <-time.After(settings.MaximumClientUpdateInterval):
+		c.JSON(200, gin.H{"widgets": []string{}})
+	}
 }
