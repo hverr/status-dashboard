@@ -18,7 +18,7 @@ func registerClient(c *gin.Context) {
 	}
 
 	server.RegisterClient(&client)
-	scheduler.RegisterClient(&client)
+	scheduler.RegisterClient(client.Identifier)
 
 	c.JSON(200, gin.H{})
 }
@@ -35,7 +35,9 @@ func bulkUpdateClient(c *gin.Context) {
 		c.AbortWithError(400, err)
 	}
 
+	updated := make([]string, 0, len(updates))
 	result := make([]widgets.Widget, 0, len(updates))
+	missing := make([]string, 0)
 	for _, u := range updates {
 		initiator := widgets.AllWidgets[u.Type]
 		if initiator == nil {
@@ -43,25 +45,36 @@ func bulkUpdateClient(c *gin.Context) {
 			return
 		}
 
-		widget := initiator()
-		encoded, err := json.Marshal(u.Widget)
-		if err != nil {
-			c.AbortWithError(500, err)
+		if u.Widget != nil {
+			widget := initiator()
+			encoded, err := json.Marshal(u.Widget)
+			if err != nil {
+				c.AbortWithError(500, err)
+			}
+
+			if err := json.Unmarshal(encoded, &widget); err != nil {
+				c.AbortWithError(400, err)
+				return
+			}
+
+			result = append(result, widget)
+
+		} else {
+			missing = append(missing, u.Type)
 		}
 
-		if err := json.Unmarshal(encoded, &widget); err != nil {
-			c.AbortWithError(400, err)
-			return
-		}
-
-		result = append(result, widget)
+		updated = append(updated, u.Type)
 	}
 
 	for _, w := range result {
 		client.SetWidget(w)
 	}
 
-	scheduler.NotifyUpdateListeners()
+	for _, w := range missing {
+		client.DeleteWidget(w)
+	}
+
+	scheduler.FulfillUpdateRequest(client.Identifier, updated)
 
 	c.JSON(200, gin.H{"status": "OK"})
 }
@@ -73,7 +86,7 @@ func requestedClientWidgets(c *gin.Context) {
 		return
 	}
 
-	<-scheduler.RegisterClientUpdateListener(client)
+	requested := <-scheduler.RequestUpdateRequest(client.Identifier)
 
-	c.JSON(200, gin.H{"widgets": client.RequestedWidgets()})
+	c.JSON(200, gin.H{"widgets": requested})
 }
