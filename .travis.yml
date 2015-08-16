@@ -7,5 +7,7 @@ script:
   - go build -race -o /tmp/dashboard-client client/main/*.go
   - go test ./...
   - npm install
+  - bower install
+  - karma start
   - gulp lint
 
