@@ -153,7 +153,7 @@ angular.module('dashboard').controller('AddWidgetsDialogController', [
       $scope.clients = widgetsManager.availableClients;
       $log.debug('Available:', $scope.clients);
       if(!$scope.clients || !$scope.clients.length) {
-        $scope.message = "No clients connected, please refresh.";
+        $scope.message = "No clients connected. Connect a client and refresh.";
       } else {
         $scope.message = null;
       }
@@ -166,6 +166,10 @@ angular.module('dashboard').controller('AddWidgetsDialogController', [
 
     $scope.addWidget = function(clientIdentifier, widgetType) {
       $rootScope.$emit(widgetsManager.addWidgetRequestEvent, clientIdentifier, widgetType);
+    };
+
+    $scope.refresh = function() {
+      widgetsManager.updateAvailableClients();
     };
   }
 ]);
