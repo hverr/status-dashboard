@@ -13,8 +13,10 @@
     "karma-chai": "^0.1.0",
     "karma-coverage": "^0.5.0",
     "karma-mocha": "^0.2.0",
+    "karma-ng-html2js-preprocessor": "^0.1.2",
     "karma-phantomjs-launcher": "^0.2.1",
     "mocha": "^2.2.5",
+    "ng-html2js": "^2.0.0",
     "phantomjs": "^1.9.18"
   },
   "scripts": {},

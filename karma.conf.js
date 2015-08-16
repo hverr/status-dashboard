@@ -15,6 +15,7 @@ module.exports = function(config) {
       'app/app.js',
       'app/filters.js',
       'app/widgets/**/**.js',
+      'app/**/*.html',
 
       'app/tests/**/*.js',
     ],
@@ -22,6 +23,11 @@ module.exports = function(config) {
       'app/app.js' : ['coverage'],
       'app/filters.js' : ['coverage'],
       'app/widgets/**/**.js' : ['coverage'],
+      'app/**/*.html' : ['ng-html2js'],
+    },
+    ngHtml2JsPreprocessor: {
+      stripPrefix: 'app/',
+      moduleName: 'testTemplates',
     },
     reporters: ['progress', 'coverage'],
     port: 9876,
