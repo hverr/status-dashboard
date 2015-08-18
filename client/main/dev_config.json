@@ -4,6 +4,7 @@
     "name" : "Web Server",
     "widgets" : [
         "uptime",
-        "load"
+        "load",
+        "meminfo"
     ]
 }
