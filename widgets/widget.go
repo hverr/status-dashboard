@@ -22,8 +22,9 @@ type Widget interface {
 type WidgetInitiator func() Widget
 
 var AllWidgets = map[string]WidgetInitiator{
-	LoadWidgetType:   func() Widget { return &LoadWidget{} },
-	UptimeWidgetType: func() Widget { return &UptimeWidget{} },
+	LoadWidgetType:    func() Widget { return &LoadWidget{} },
+	UptimeWidgetType:  func() Widget { return &UptimeWidget{} },
+	MeminfoWidgetType: func() Widget { return &MeminfoWidget{} },
 }
 
 type BulkElement struct {

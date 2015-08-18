@@ -29,13 +29,16 @@ angular.module('dashboard').factory('Widget', [
 angular.module('dashboard').factory('widgetFactory', [
   'LoadWidget',
   'UptimeWidget',
-  function(LoadWidget, UptimeWidget) {
+  'MeminfoWidget',
+  function(LoadWidget, UptimeWidget, MeminfoWidget) {
     return function(widgetType) {
       switch(widgetType) {
         case 'load':
           return new LoadWidget();
         case 'uptime':
           return new UptimeWidget();
+        case 'meminfo':
+          return new MeminfoWidget();
         default:
           return null;
       }

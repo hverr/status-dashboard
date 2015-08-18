@@ -1,0 +1,6 @@
+<div text-widget ng-controller="MeminfoWidgetController">
+  <div class="text">
+    <span ng-class="{ red: isCritical(), green: !isCritical() }">{{ data.used }} MB</span><br>
+    <span>{{ data.total }} MB</span>
+  </div>
+</div>
