@@ -9,7 +9,7 @@ angular.module('dashboard').controller('LoadWidgetController', [
         return false;
       }
 
-      return f > $scope.widget.cores;
+      return f > $scope.data.cores;
     };
   }
 ]);

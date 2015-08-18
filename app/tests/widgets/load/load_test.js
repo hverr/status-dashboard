@@ -31,7 +31,7 @@ describe('load widget', function() {
 
     beforeEach(inject(function($controller) {
       scope = {
-        widget: new LoadWidget().data,
+        data: {},
       };
       LoadWidgetController = $controller('LoadWidgetController', {
         $scope: scope
@@ -39,21 +39,21 @@ describe('load widget', function() {
     }));
 
     it('should detect large loads', function() {
-      scope.widget.cores = 4;
+      scope.data.cores = 4;
 
       expect(scope.isLargeLoad(5.04)).to.equal(true);
       expect(scope.isLargeLoad("7.8")).to.equal(true);
     });
 
     it('should not detect normal loads', function() {
-      scope.widget.cores = 4;
+      scope.data.cores = 4;
 
       expect(scope.isLargeLoad(2.95)).to.equal(false);
       expect(scope.isLargeLoad("1.06")).to.equal(false);
     });
 
     it('should handle invalid loads', function() {
-      scope.widget.cores = 4;
+      scope.data.cores = 4;
 
       expect(scope.isLargeLoad("sheep")).to.equal(false);
       expect(scope.isLargeLoad(function() {})).to.equal(false);
