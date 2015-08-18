@@ -32,4 +32,21 @@ describe('widget services', function() {
       expect(w.data).to.equal(d);
     }));
   });
+
+  describe('widgetFactory', function() {
+    var widgetFactory;
+
+    beforeEach(inject(function(_widgetFactory_) {
+      widgetFactory = _widgetFactory_;
+    }));
+
+    it('should return null for an unknown widget', function() {
+      expect(widgetFactory('non-existing')).to.equal(null);
+    });
+
+    it('should create widgets', function() {
+      expect(widgetFactory('load')).not.to.equal(null);
+      expect(widgetFactory('uptime')).not.to.equal(null);
+    });
+  });
 });
