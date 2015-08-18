@@ -5,6 +5,9 @@
 
  - [Features](#features)
  - [Development](#development)
+   - [Server](#server)
+   - [Client](#client)
+   - [Adding Widgets](#adding-widgets)
  - [Screenshot](#screenshot)
 
 ## Features
@@ -53,6 +56,21 @@ Build and run the client(s)
 cd $GOPATH/src/github.com/hverr/status-dashboard/client/main
 go run *.go -c dev_config.json
 ```
+
+### Adding Widgets
+
+To add widgets, you must implement several class in the following locations:
+
+ - Go
+   - Add widget model in [widgets/yourwidget.go](widgets/) *(e.g. [meminfo.go](widgets/meminfo.go))*
+   - Add widget to global widget list in [widgets/widget.go](widgets/widget.go)
+   - Enable the widget in your client in [dev_config.json](client/main/dev_config.json)
+ - AngularJS
+   - Add widget model, controller and directive in [app/widgets/yourwidget/yourwidget.js](app/widgets) *(e.g. [meminfo.js](app/widgets/meminfo/meminfo.js)*
+   - Add widget template in [app/widgets/yourwidget/yourwidget.html](app/widgets) *(e.g. [meminfo.html](app/widgets/meminfo/meminfo.html)*
+     - For text-based widgets you want to use the `<div text-widget>` directive and wrap the content in a `<div class="text">`
+   - Add widget to the [`widgetFactory`](app/widgets/services.js)
+   - Load the new JavaScript file in the [index.html](app/index.html)
 
 ## Screenshot
 ![Screenshot](screenshot.png)
