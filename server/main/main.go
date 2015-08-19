@@ -39,6 +39,9 @@ func main() {
 	router := gin.Default()
 
 	if err := static.Install(router); err != nil {
+		log.Println("We could not serve the static files. If not already")
+		log.Println("done, set the HTML_ROOT environment variable to the")
+		log.Println("of the static files.")
 		log.Fatal("fatal: could not serve static files:", err)
 	}
 

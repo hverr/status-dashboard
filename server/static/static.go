@@ -1,6 +1,7 @@
 package static
 
 import (
+	"log"
 	"os"
 
 	"github.com/hverr/status-dashboard/server/settings"
@@ -10,11 +11,32 @@ import (
 )
 
 func Install(engine *gin.Engine) error {
-	if _, err := os.Stat(settings.StaticAppRoot); err != nil {
+	var err error
+	var root string
+
+	toTry := []string{
+		settings.StaticAppRoot,
+		"./dist",
+	}
+	if envRoot := os.Getenv("HTML_ROOT"); envRoot != "" {
+		toTry = append([]string{envRoot}, toTry...)
+	}
+
+	for _, path := range toTry {
+		if _, err = os.Stat(path); err != nil {
+			log.Println("warning: could not serve from", path)
+		} else {
+			root = path
+			break
+		}
+	}
+
+	if err != nil {
 		return err
 	}
 
-	engine.Use(static.Serve("/", static.LocalFile(settings.StaticAppRoot, true)))
+	log.Println("Serving static content from", root)
+	engine.Use(static.Serve("/", static.LocalFile(root, true)))
 
 	return nil
 }
