@@ -2,6 +2,11 @@ var gulp = require('gulp');
 var jshint = require('gulp-jshint');
 var recess = require('gulp-recess');
 var trimlines = require('gulp-trimlines');
+var uglify = require('gulp-uglify');
+var concat = require('gulp-concat');
+var rename = require('gulp-rename');
+var less = require('gulp-less');
+var minify =require('gulp-minify-css');
 
 gulp.task('lint', ['jshint', 'recess'], function() {});
 
@@ -34,3 +39,60 @@ gulp.task('trimlines', function() {
     .pipe(trimlines(options))
     .pipe(gulp.dest("app"));
 });
+
+gulp.task('buildjs', function() {
+  var source = [
+    'app/bower_components/html5-boilerplate/dist/js/vendor/modernizr-2.8.3.min.js',
+    'app/bower_components/jquery/dist/jquery.min.js',
+    'app/bower_components/bootstrap/dist/js/bootstrap.min.js',
+    'app/bower_components/angular/angular.js',
+    'app/bower_components/angular-route/angular-route.js',
+    'app/bower_components/javascript-detect-element-resize/jquery.resize.js',
+    'app/bower_components/angular-gridster/dist/angular-gridster.min.js',
+
+    'app/app.js',
+    'app/filters.js',
+    'app/widgets/**/*.js',
+  ];
+
+  gulp.src(source)
+    .pipe(uglify())
+    .pipe(concat('a.js'))
+    .pipe(gulp.dest('dist'));
+});
+
+gulp.task('buildhtml', function() {
+  gulp.src(['app/index_dist.html'])
+    .pipe(rename('index.html'))
+    .pipe(gulp.dest('dist'));
+
+  var source = [
+    'app/**/*.html',
+
+    '!app/index*.html',
+    '!app/bower_components/**',
+  ];
+  gulp.src(source)
+    .pipe(gulp.dest('dist'));
+});
+
+gulp.task('buildcss', function() {
+  gulp.src(['app/app.less'])
+    .pipe(less())
+    .pipe(concat('a.css'))
+    .pipe(minify())
+    .pipe(gulp.dest('dist'));
+
+  var source = [
+    'app/bower_components/html5-boilerplate/dist/css/normalize.css',
+    'app/bower_components/bootstrap/dist/css/bootstrap.css',
+    'app/bower_components/angular-gridster/dist/angular-gridster.css',
+  ];
+
+  gulp.src(source)
+    .pipe(concat('b.css'))
+    .pipe(minify())
+    .pipe(gulp.dest('dist'));
+});
+
+gulp.task('build', ['buildcss', 'buildjs', 'buildhtml']);
