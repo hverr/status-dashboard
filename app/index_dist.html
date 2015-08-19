@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<!--[if lt IE 7]>      <html lang="en" ng-app="dashboard" class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
+<!--[if IE 7]>         <html lang="en" ng-app="dashboard" class="no-js lt-ie9 lt-ie8"> <![endif]-->
+<!--[if IE 8]>         <html lang="en" ng-app="dashboard" class="no-js lt-ie9"> <![endif]-->
+<!--[if gt IE 8]><!--> <html lang="en" ng-app="dashboard" class="no-js"> <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <title>My AngularJS App</title>
+  <meta name="description" content="">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link href="//fonts.googleapis.com/css?family=Open+Sans:400,400italic,600,600italic,700,700italic,800,800italic" rel="stylesheet" type="text/css">
+  <link href="b.css" rel="stylesheet" type="text/css">
+  <link href="a.css" rel="stylesheet" type="text/css">
+</head>
+<body>
+  <!--[if lt IE 7]>
+      <p class="browsehappy">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
+  <![endif]-->
+
+  <div ng-controller="GridController">
+    <div gridster="gridsterOpts">
+      <ul>
+        <li class="widget-grid-item" gridster-item="widgetGridsterMap" ng-repeat="widget in widgets">
+          <div widget
+               ng-mouseover="widget.hover = true"
+               ng-mouseout="widget.hover = false"
+               class="widget"
+          >
+          </div>
+        </li>
+      </ul>
+    </div>
+    <div class="action-menu">
+      <div class="dropup">
+        <button class="btn btn-default btn-dark" type="button" data-toggle="dropdown" aria-haspopup="true">
+          <span class="caret white"></span>
+        </button>
+        <ul class="dropdown-menu dropdown-menu-right">
+          <li><a href="#" ng-click="addColumn()">Add Column</a></li>
+          <li><a href="#" ng-click="removeColumn()">Remove Column</a></li>
+          <li><a href="#" ng-click="addWidgets()" data-toggle="modal" data-target="#addWidgetsDialog">Add Widgets</a></li>
+          <li><a href="#" ng-click="saveLayout()" data-toggle="modal" data-target="#saveLayoutDialog">Save Layout</a></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="modal fade save-layout-dialog" id="saveLayoutDialog" tabindex="-1">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+            <h4 class="modal-title">Save Layout</h4>
+          </div>
+          <div class="modal-body">
+            <div style="margin-bottom: 16px;">
+              <span class="input-label">URL:</span><br>
+              <div class="input-group input-field">
+                <span class="input-group-btn">
+                  <button type="button" class="btn btn-success" ng-click="goToLayoutURL()">Go</button>
+                </span>
+                <input class="form-control" ng-value="saveLayout.url">
+              </div>
+            </div>
+            <div>
+              <span clas="input-label">Raw:</span>
+              <textarea class="form-control raw-field">{{ saveLayout.raw }}</textarea>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-primary" data-dismiss="modal">Done</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div ng-controller="AddWidgetsDialogController" class="modal fade" id="addWidgetsDialog" tabindex="-1">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+          <h4 class="modal-title">Add Widgets</h4>
+        </div>
+        <div class="modal-body">
+          <div ng-if="message">
+            <span>{{ message }}</span>
+          </div>
+          <div ng-if="!message">
+            <div ng-repeat="client in clients">
+              <span class="client-name">{{ client.name }}</span>
+              <div class="list-group">
+                <a ng-repeat="widget in client.availableWidgets"
+                   ng-click="addWidget(client.identifier, widget)"
+                   href="#"
+                   class="list-group-item"
+                >
+                  {{ widget | widgetName }}
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default" ng-click="refresh()">Refresh</button>
+          <button type="button" class="btn btn-primary" data-dismiss="modal">Done</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="a.js"></script>
+</body>
+</html>
