@@ -14,29 +14,38 @@ func Install(engine *gin.Engine) error {
 	var err error
 	var root string
 
-	toTry := []string{
-		settings.StaticAppRoot,
-		"./dist",
-	}
-	if envRoot := os.Getenv("HTML_ROOT"); envRoot != "" {
-		toTry = append([]string{envRoot}, toTry...)
-	}
+	fs, err := LoadAssetFileSystem("/dist", true)
+	if err == nil {
+		log.Println("Serving static content from binary")
+		engine.Use(static.Serve("/", fs))
 
-	for _, path := range toTry {
-		if _, err = os.Stat(path); err != nil {
-			log.Println("warning: could not serve from", path)
-		} else {
-			root = path
-			break
+	} else {
+		log.Println("warning: could not read assets from binary:", err)
+
+		toTry := []string{
+			settings.StaticAppRoot,
+			"./dist",
 		}
-	}
+		if envRoot := os.Getenv("HTML_ROOT"); envRoot != "" {
+			toTry = append([]string{envRoot}, toTry...)
+		}
 
-	if err != nil {
-		return err
-	}
+		for _, path := range toTry {
+			if _, err = os.Stat(path); err != nil {
+				log.Println("warning: could not serve from", path)
+			} else {
+				root = path
+				break
+			}
+		}
 
-	log.Println("Serving static content from", root)
-	engine.Use(static.Serve("/", static.LocalFile(root, true)))
+		if err != nil {
+			return err
+		}
+
+		log.Println("Serving static content from", root)
+		engine.Use(static.Serve("/", static.LocalFile(root, true)))
+	}
 
 	return nil
 }
