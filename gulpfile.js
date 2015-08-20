@@ -45,11 +45,10 @@ gulp.task('buildjs', function() {
     'app/bower_components/html5-boilerplate/dist/js/vendor/modernizr-2.8.3.min.js',
     'app/bower_components/jquery/dist/jquery.min.js',
     'app/bower_components/bootstrap/dist/js/bootstrap.min.js',
-    'app/bower_components/angular/angular.js',
-    'app/bower_components/angular-route/angular-route.js',
+    'app/bower_components/angular/angular.min.js',
+    'app/bower_components/angular-route/angular-route.min.js',
     'app/bower_components/javascript-detect-element-resize/jquery.resize.js',
     'app/bower_components/angular-gridster/dist/angular-gridster.min.js',
-
     'app/app.js',
     'app/filters.js',
     'app/widgets/**/*.js',
@@ -85,8 +84,8 @@ gulp.task('buildcss', function() {
 
   var source = [
     'app/bower_components/html5-boilerplate/dist/css/normalize.css',
-    'app/bower_components/bootstrap/dist/css/bootstrap.css',
-    'app/bower_components/angular-gridster/dist/angular-gridster.css',
+    'app/bower_components/bootstrap/dist/css/bootstrap.min.css',
+    'app/bower_components/angular-gridster/dist/angular-gridster.min.css',
   ];
 
   gulp.src(source)
@@ -95,4 +94,9 @@ gulp.task('buildcss', function() {
     .pipe(gulp.dest('dist'));
 });
 
-gulp.task('build', ['buildcss', 'buildjs', 'buildhtml']);
+gulp.task('buildassets', function() {
+  gulp.src(['app/bower_components/bootstrap/dist/fonts/**'])
+    .pipe(gulp.dest('dist/fonts'));
+});
+
+gulp.task('build', ['buildcss', 'buildjs', 'buildhtml', 'buildassets']);
