@@ -10,4 +10,5 @@ script:
   - bower install
   - karma start
   - gulp lint
+  - gulp build
 
