@@ -17,3 +17,4 @@ coverage
 # Build
 dist
 dashboard-server
+dashboard-client

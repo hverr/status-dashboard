@@ -1,5 +1,5 @@
 .PHONY: all
-all: dashboard-server
+all: dashboard-server dashboard-client
 
 dashboard-server:
 	gulp build
@@ -7,6 +7,9 @@ dashboard-server:
 	rm -f assets; zip -r assets dist
 	cat assets.zip >> dashboard-server
 	rm assets.zip
+
+dashboard-client:
+	go build -o dashboard-client client/main/*.go
 
 .PHONY: clean
 clean:
