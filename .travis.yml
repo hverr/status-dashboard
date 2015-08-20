@@ -11,4 +11,5 @@ script:
   - karma start
   - gulp lint
   - gulp build
+  - make
 
