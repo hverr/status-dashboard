@@ -17,6 +17,7 @@ func registerClient(c *gin.Context) {
 
 	if err := c.BindJSON(&client); err != nil {
 		c.AbortWithError(400, err)
+		return
 	}
 
 	server.RegisterClient(&client)
@@ -35,6 +36,7 @@ func bulkUpdateClient(c *gin.Context) {
 	updates := make([]widgets.BulkElement, 0)
 	if err := c.BindJSON(&updates); err != nil {
 		c.AbortWithError(400, err)
+		return
 	}
 
 	updated := make([]string, 0, len(updates))
@@ -52,6 +54,7 @@ func bulkUpdateClient(c *gin.Context) {
 			encoded, err := json.Marshal(u.Widget)
 			if err != nil {
 				c.AbortWithError(500, err)
+				return
 			}
 
 			if err := json.Unmarshal(encoded, &widget); err != nil {
