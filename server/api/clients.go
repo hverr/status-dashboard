@@ -20,6 +20,10 @@ func registerClient(c *gin.Context) {
 		return
 	}
 
+	if !server.AuthenticateClient(c, client.Identifier) {
+		return
+	}
+
 	server.RegisterClient(&client)
 	scheduler.RegisterClient(client.Identifier)
 
@@ -30,6 +34,10 @@ func bulkUpdateClient(c *gin.Context) {
 	client, _ := server.GetClient(c.Param("client"))
 	if client == nil {
 		c.AbortWithError(404, errors.New("Client not found."))
+		return
+	}
+
+	if !server.AuthenticateClient(c, client.Identifier) {
 		return
 	}
 
@@ -88,6 +96,10 @@ func requestedClientWidgets(c *gin.Context) {
 	client, _ := server.GetClient(c.Param("client"))
 	if client == nil {
 		c.AbortWithError(404, errors.New("Client not found."))
+		return
+	}
+
+	if !server.AuthenticateClient(c, client.Identifier) {
 		return
 	}
 

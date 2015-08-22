@@ -5,9 +5,13 @@ import (
 	"os"
 )
 
+type ClientConfiguration struct {
+	Secret string `json:"secret"`
+}
+
 // Configuration holds the server configuration
 var Configuration struct {
-	Clients []string `json:"clients"`
+	Clients map[string]ClientConfiguration `json:"clients"`
 }
 
 // Validate a configuration if it is invalid an error is returned.

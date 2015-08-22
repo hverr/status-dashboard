@@ -1,5 +1,7 @@
 {
-    "clients" : [
-        "webserver"
-    ]
+    "clients" : {
+        "webserver" : {
+            "secret" : "supersecretkey"
+        }
+    }
 }
