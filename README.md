@@ -4,6 +4,10 @@
 **Status Dashboard** is a highly configurable **AngularJS** application backed by a **Go** API to show information about **multiple servers** in a dasboard style way.
 
  - [Features](#features)
+ - [Installation](#installation)
+ - [Building](#building)
+   - [Using Docker](#using-docker)
+   - [Locally](#locally)
  - [Development](#development)
    - [Server](#server)
    - [Client](#client)
@@ -23,6 +27,36 @@
    - Can refresh as often as every second.
  - **Persistent**
    - Bookmark a layout in your browser.
+
+## Installation
+Binaries (assets included) are available in the [release section](https://github.com/hverr/status-dashboard/releases), or can be [built manually](#building).
+
+Releases include 32-bit and 64-bit binaries for:
+ - linux
+ - darwin
+ - windows
+
+## Building
+Building a binary for your platform is easiest using Docker on a Linux machine, or locally using the [Makefile](Makefile).
+
+### Using Docker
+The [Dockerfile](Dockerfile) for this repository contains everything to build the application binary. You can compile the binary for any platform supported by the Go cross compiler.
+
+```sh
+make docker # Create a Docker image named `status-dashboard`
+make docker-build GOOS=yourplatform GOARCH=yourarchitecture # Create the binary
+make docker-release # Make a release for some common platforms and architectures
+```
+
+### Locally
+Node, NPM and Gulp are needed to build the binary. The Makefile can be used to build the binaries.
+
+```sh
+npm install -g gulp
+make
+./dashboard-server
+./dashboard-client
+```
 
 ## Development
 The following dependencies are needed to build and run the application.
