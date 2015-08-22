@@ -2,6 +2,7 @@
     "api" : "http://localhost:8050/api",
     "identifier" : "webserver",
     "name" : "Web Server",
+    "secret" : "supersecretkey",
     "widgets" : [
         "uptime",
         "load",

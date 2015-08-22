@@ -13,6 +13,7 @@ var Configuration struct {
 	API        string   `json:"api"`
 	Identifier string   `json:"identifier"`
 	Name       string   `json:"name"`
+	Secret     string   `json:"secret"`
 	Widgets    []string `json:"widgets"`
 }
 

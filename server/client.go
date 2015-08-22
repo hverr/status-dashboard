@@ -1,16 +1,15 @@
 package server
 
 import (
-	"errors"
 	"log"
+	"net/http"
 	"time"
 
+	"github.com/gin-gonic/gin"
 	"github.com/hverr/status-dashboard/server/settings"
 	"github.com/hverr/status-dashboard/widgets"
 	"github.com/pmylund/go-cache"
 )
-
-var UnknownClientError = errors.New("Client unknown to the server.")
 
 type Client struct {
 	Name             string    `json:"name" binding:"required"`
@@ -23,29 +22,14 @@ type Client struct {
 
 var RegisteredClients = cache.New(cache.NoExpiration, cache.NoExpiration)
 
-func RegisterClient(client *Client) error {
+func RegisterClient(client *Client) {
 	client.widgets = cache.New(cache.NoExpiration, cache.NoExpiration)
 
 	log.Printf("Client registration request %v (%v)", client.Name, client.Identifier)
 
-	// Make sure the client is allowed to connect.
-	found := false
-	for _, c := range Configuration.Clients {
-		if c == client.Identifier {
-			found = true
-			break
-		}
-	}
-
-	if !found {
-		return UnknownClientError
-	}
-
 	// Actually register the client.
 	client.LastSeen = time.Now()
 	RegisteredClients.Set(client.Identifier, client, cache.DefaultExpiration)
-
-	return nil
 }
 
 func AllRegisteredClients() []*Client {
@@ -70,6 +54,19 @@ func GetClient(identifier string) (*Client, bool) {
 	}
 
 	return c, true
+}
+
+func AuthenticateClient(c *gin.Context, clientIdentifier string) bool {
+	clientSecret := c.Request.Header.Get("X-Client-Secret")
+	clientConfig, ok := Configuration.Clients[clientIdentifier]
+	if !ok || clientSecret != clientConfig.Secret {
+		c.JSON(http.StatusUnauthorized, gin.H{
+			"message": "Could not authenticate client.",
+		})
+		return false
+	}
+
+	return true
 }
 
 func (c *Client) SetWidget(w widgets.Widget) {
