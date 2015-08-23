@@ -1,9 +1,13 @@
 package main
 
 import (
+	"crypto/tls"
+	"crypto/x509"
 	"flag"
 	"fmt"
+	"io/ioutil"
 	"log"
+	"net/http"
 	"os"
 	"time"
 
@@ -13,8 +17,10 @@ import (
 
 func main() {
 	var configFile string
+	var ca string
 
 	flag.StringVar(&configFile, "c", "", "Configuration file.")
+	flag.StringVar(&ca, "ca", "", "Root CA certificate.")
 	flag.Parse()
 
 	printHelp := func() {
@@ -26,6 +32,26 @@ func main() {
 		fmt.Fprintln(os.Stderr, "")
 		printHelp()
 		os.Exit(1)
+	}
+
+	if ca != "" {
+		var config tls.Config
+		pem, err := ioutil.ReadFile(ca)
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "fatal: read %v: %v\n", ca, err)
+			os.Exit(1)
+		}
+
+		config.RootCAs = x509.NewCertPool()
+		if !config.RootCAs.AppendCertsFromPEM(pem) {
+			log.Println("warning: x509: could not use PEM in", ca)
+		}
+
+		client.Session.Client = &http.Client{
+			Transport: &http.Transport{
+				TLSClientConfig: &config,
+			},
+		}
 	}
 
 	if err := client.ParseConfiguration(configFile); err != nil {
