@@ -1,0 +1,5 @@
+FROM nginx:latest
+
+ADD examples/dashboard.chain.crt /etc/nginx/dashboard.crt
+ADD examples/dashboard.key /etc/nginx/dashboard.key
+COPY examples/nginx.conf /etc/nginx/conf.d/dashboard.conf
