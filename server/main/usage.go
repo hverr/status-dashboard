@@ -13,22 +13,13 @@ CONFIGURATION FILE:
 	The configuration file is formatted in JSON and has the following layout:
 
 	{
-		"clients" : [
-			"webserver",
-			"mysql"
-		],
-		"defaultWidgets" : {
-			"webserver" : [
-				"uptime",
-				"load"
-			],
-			"mysql" : [
-				"load",
-				"queries"
-			]
+		"clients" : {
+			"webserver" : {
+				"secret" : "supersecretkey"
+			},
+			"mysql" : {}
 		}
 	}
 
-	**clients**: List of allowed clients.
-	**defaultWidgets**: Object mapping a client to its default widgets.
+	**clients**: List of allowed clients and their configuration.
 `
