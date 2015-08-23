@@ -1,0 +1,6 @@
+[Unit]
+Description=Status Dashboard Server
+
+[Service]
+ExecStart=/usr/local/bin/dashboard-server -c /etc/status-dashboard/server.json
+User=dashboard
