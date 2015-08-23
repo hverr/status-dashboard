@@ -9,6 +9,8 @@ import (
 	"github.com/jmcvetta/napping"
 )
 
+var Session napping.Session
+
 type RequestedWidgets struct {
 	Widgets []string `json:"widgets"`
 }
@@ -91,5 +93,5 @@ func request(method, resource string, payload, result, errMsg interface{}) *napp
 }
 
 func send(method, resource string, payload, result, errMsg interface{}) (*napping.Response, error) {
-	return napping.Send(request(method, resource, payload, result, errMsg))
+	return Session.Send(request(method, resource, payload, result, errMsg))
 }
