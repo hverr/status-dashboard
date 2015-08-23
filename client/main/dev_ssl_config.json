@@ -1,0 +1,11 @@
+{
+    "api" : "https://localhost:12443/api",
+    "identifier" : "webserver",
+    "name" : "Web Server",
+    "secret" : "supersecretkey",
+    "widgets" : [
+        "uptime",
+        "load",
+        "meminfo"
+    ]
+}

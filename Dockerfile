@@ -9,3 +9,5 @@ RUN apt-get update && apt-get install -y \
     zip
 
 RUN npm install -g gulp
+
+EXPOSE 8050

@@ -1,18 +1,17 @@
 .PHONY: all clean
 .PHONY: dashboard-server dashboard-client
+.PHONY: run-server
+
 .PHONY: docker docker-build docker-release
+.PHONY: docker-run-server
 .PHONY: docker-release-component
+
+.PHONY: nginx nginx-run
 
 all: dashboard-server dashboard-client
 
 GOOS=
 GOARCH=
-
-DOCKER_BUILD_PARAMS=\
-	--rm\
-	-v "${PWD}":/go/src/github.com/hverr/status-dashboard \
-	-w /go/src/github.com/hverr/status-dashboard \
-	status-dashboard
 
 dashboard-server:
 	npm install
@@ -25,8 +24,21 @@ dashboard-server:
 dashboard-client:
 	GOOS=$(GOOS) GOARCH=$(GOARCH) go build -o dashboard-client client/main/*.go
 
+run-server:
+	HTML_ROOT=app go run server/main/*.go -c server/main/dev_config.json
+
 docker:
 	docker build -t status-dashboard .
+
+docker-run-server:
+	docker run \
+		--rm \
+		-it \
+		-v "${GOPATH}":/go \
+		-w /go/src/github.com/hverr/status-dashboard \
+		--name dashboard \
+		status-dashboard \
+		make run-server
 
 docker-build:
 	docker run \
@@ -50,6 +62,19 @@ docker-release-component:
 	make docker-build GOOS=$(GOOS) GOARCH=$(GOARCH)
 	cp dashboard-server release/dashboard-server-$(GOOS)-$(GOARCH)
 	cp dashboard-client release/dashboard-client-$(GOOS)-$(GOARCH)
+
+nginx:
+	docker build -t status-dashboard-nginx -f Dockerfile.nginx .
+
+nginx-run:
+	docker run \
+		--rm \
+		-it \
+		--link dashboard:dashboard \
+		-p 12443:443 \
+		--name dashboard-nginx \
+		status-dashboard-nginx \
+		nginx -g 'daemon off;'
 
 clean:
 	rm -f dashboard-server
