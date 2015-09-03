@@ -1,4 +1,5 @@
 {
+    "updateInterval" : 3,
     "clients" : {
         "webserver" : {
             "secret" : "supersecretkey"

@@ -3,6 +3,9 @@ package server
 import (
 	"encoding/json"
 	"os"
+	"time"
+
+	"github.com/hverr/status-dashboard/server/settings"
 )
 
 type ClientConfiguration struct {
@@ -11,7 +14,8 @@ type ClientConfiguration struct {
 
 // Configuration holds the server configuration
 var Configuration struct {
-	Clients map[string]ClientConfiguration `json:"clients"`
+	UpdateInterval int                            `json:"updateInterval"`
+	Clients        map[string]ClientConfiguration `json:"clients"`
 }
 
 // Validate a configuration if it is invalid an error is returned.
@@ -33,6 +37,11 @@ func ParseConfiguration(file string) error {
 	decoder := json.NewDecoder(fh)
 	if err := decoder.Decode(&Configuration); err != nil {
 		return err
+	}
+
+	if v := Configuration.UpdateInterval; v > 0 {
+		settings.MinimumClientUpdateInterval = time.Duration(v) * time.Second
+		settings.MaximumClientUpdateInterval = time.Duration(3*v/2) * time.Second
 	}
 
 	return ValidateConfiguration()

@@ -13,6 +13,7 @@ CONFIGURATION FILE:
 	The configuration file is formatted in JSON and has the following layout:
 
 	{
+		"updateInterval" : 3,
 		"clients" : {
 			"webserver" : {
 				"secret" : "supersecretkey"
@@ -21,5 +22,6 @@ CONFIGURATION FILE:
 		}
 	}
 
+	**updateInterval**: Minimum time between update requests. (optional)
 	**clients**: List of allowed clients and their configuration.
 `
