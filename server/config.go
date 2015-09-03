@@ -16,6 +16,7 @@ type ClientConfiguration struct {
 var Configuration struct {
 	UpdateInterval int                            `json:"updateInterval"`
 	Clients        map[string]ClientConfiguration `json:"clients"`
+	Users          map[string]string              `json:"users"`
 }
 
 // Validate a configuration if it is invalid an error is returned.

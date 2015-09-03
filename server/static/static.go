@@ -4,6 +4,7 @@ import (
 	"log"
 	"os"
 
+	"github.com/hverr/status-dashboard/server"
 	"github.com/hverr/status-dashboard/server/settings"
 
 	"github.com/gin-gonic/contrib/static"
@@ -44,7 +45,17 @@ func Install(engine *gin.Engine) error {
 		}
 
 		log.Println("Serving static content from", root)
-		engine.Use(static.Serve("/", static.LocalFile(root, true)))
+
+		prefix := "/"
+		fs := static.LocalFile(root, true)
+		staticHandler := static.Serve(prefix, fs)
+		engine.Use(func(c *gin.Context) {
+			if fs.Exists(prefix, c.Request.URL.Path) {
+				if server.BasicAuthForUser(c) {
+					staticHandler(c)
+				}
+			}
+		})
 	}
 
 	return nil
