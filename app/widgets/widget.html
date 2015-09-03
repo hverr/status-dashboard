@@ -8,7 +8,7 @@
 <div class="widget-data" ng-if="widget.available" ng-controller="WidgetDataController">
   <widget-dynamic-info><!-- Will be replaced by widget.directive --></widget-dynamic-info>
 </div>
-<div class="system-info">{{ widget.client | uppercase}} - {{ widget.name | uppercase }}</div>
+<div class="system-info"><span ng-if="widget.client">{{ widget.client | uppercase}} -</span> {{ widget.name | uppercase }}</div>
 <div ng-show="widget.hover" class="remove-button">
   <a href="#" ng-click="removeWidget($index)">
     <span class="glyphicon glyphicon-remove"></span>
