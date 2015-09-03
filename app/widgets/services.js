@@ -31,10 +31,12 @@ angular.module('dashboard').factory('widgetFactory', [
   'UptimeWidget',
   'MeminfoWidget',
   'CurrentTimeWidget',
+  'CurrentDateWidget',
   function(LoadWidget,
            UptimeWidget,
            MeminfoWidget,
-           CurrentTimeWidget)
+           CurrentTimeWidget,
+           CurrentDateWidget)
   {
     return function(widgetType) {
       switch(widgetType) {
@@ -46,6 +48,8 @@ angular.module('dashboard').factory('widgetFactory', [
           return new MeminfoWidget();
         case 'current_time':
           return new CurrentTimeWidget();
+        case 'current_date':
+          return new CurrentDateWidget();
         default:
           return null;
       }
