@@ -162,13 +162,21 @@ angular.module('dashboard').controller('AddWidgetsDialogController', [
   '$log',
   function($scope, $rootScope, widgetsManager, $log) {
     function update() {
-      $scope.clients = widgetsManager.availableClients;
-      $log.debug('Available:', $scope.clients);
-      if(!$scope.clients || !$scope.clients.length) {
-        $scope.message = "No clients connected. Connect a client and refresh.";
-      } else {
-        $scope.message = null;
-      }
+      var clients = widgetsManager.availableClients;
+      $log.debug('Available:', clients);
+
+      var allClients = [
+        {
+          name: 'Built-In',
+          identifier: '',
+          availableWidgets : [
+            'current_time',
+            'current_date',
+          ],
+        },
+      ];
+
+      $scope.clients = allClients.concat(clients);
     }
 
     update();

@@ -30,7 +30,14 @@ angular.module('dashboard').factory('widgetFactory', [
   'LoadWidget',
   'UptimeWidget',
   'MeminfoWidget',
-  function(LoadWidget, UptimeWidget, MeminfoWidget) {
+  'CurrentTimeWidget',
+  'CurrentDateWidget',
+  function(LoadWidget,
+           UptimeWidget,
+           MeminfoWidget,
+           CurrentTimeWidget,
+           CurrentDateWidget)
+  {
     return function(widgetType) {
       switch(widgetType) {
         case 'load':
@@ -39,6 +46,10 @@ angular.module('dashboard').factory('widgetFactory', [
           return new UptimeWidget();
         case 'meminfo':
           return new MeminfoWidget();
+        case 'current_time':
+          return new CurrentTimeWidget();
+        case 'current_date':
+          return new CurrentDateWidget();
         default:
           return null;
       }
@@ -109,7 +120,10 @@ angular.module('dashboard').factory('widgetsManager', [
 
       w.clientIdentifier = clientIdentifier;
       w.type = widgetType;
-      w.available = false;
+      if(clientIdentifier !== "") {
+        // only change widgets for remote clients
+        w.available = false;
+      }
 
       w.widgetsManagerHandle = widgets.length;
       widgets.push(w);
@@ -142,6 +156,10 @@ angular.module('dashboard').factory('widgetsManager', [
 
       var request = {};
       widgets.forEach(function(w) {
+        if(w.clientIdentifier === "") {
+          return; // built-in widgets don't need to be updated
+        }
+
         if(!(w.clientIdentifier in request)) {
           request[w.clientIdentifier] = [];
         }
@@ -156,6 +174,10 @@ angular.module('dashboard').factory('widgetsManager', [
           widgets.forEach(function(widget) {
             var clientIdentifier = widget.clientIdentifier;
             var widgetType = widget.type;
+
+            if(clientIdentifier === "") {
+              return; // ignore built-in widgets
+            }
 
             if(!(clientIdentifier in result)) {
               widget.available = false;
