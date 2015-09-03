@@ -64,6 +64,11 @@ angular.module('dashboard').controller('GridController', [
       widgetsManager.updateAvailableClients();
     };
 
+    $scope.clearWidgets = function() {
+      widgetsStore.clearLayout();
+      $window.location.href = '/';
+    };
+
     $scope.saveLayout = function() {
       var data = widgetsStore.serialize();
       var pretty = angular.toJson(data, true);

@@ -214,6 +214,7 @@ angular.module('dashboard').factory('widgetsStore', [
       deserialize: deserialize,
       saveLayout: saveLayout,
       loadLayout: loadLayout,
+      clearLayout: clearLayout,
     };
 
     function serialize() {
@@ -254,6 +255,10 @@ angular.module('dashboard').factory('widgetsStore', [
       var data = $cookies.get('layout');
 
       return data ? data : null;
+    }
+
+    function clearLayout() {
+      $cookies.remove('layout');
     }
 
     return self;
