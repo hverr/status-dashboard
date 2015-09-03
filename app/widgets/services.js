@@ -52,9 +52,10 @@ angular.module('dashboard').factory('widgetsManager', [
   '$rootScope',
   'api',
   'widgetFactory',
+  'widgetsStore',
   'oneSecondService',
   '$log',
-  function($timeout, $q, $rootScope, api, widgetFactory, oneSecondService, $log) {
+  function($timeout, $q, $rootScope, api, widgetFactory, widgetsStore, oneSecondService, $log) {
     var self = {
       start: start,
       update: update,
@@ -64,8 +65,7 @@ angular.module('dashboard').factory('widgetsManager', [
       remove: remove,
       availableClients: null,
 
-      serialize: serialize,
-      deserialize: deserialize,
+      addFrom: addFrom,
 
       availableClientsChangedEvent: 'AvailableClientsChangedEvent',
       addWidgetRequestEvent: 'AddWidgetRequestEvent',
@@ -113,6 +113,10 @@ angular.module('dashboard').factory('widgetsManager', [
 
       w.widgetsManagerHandle = widgets.length;
       widgets.push(w);
+
+      widgetsStore.widgets = widgets;
+      widgetsStore.saveLayout();
+
       return w;
     }
 
@@ -125,6 +129,9 @@ angular.module('dashboard').factory('widgetsManager', [
           w.widgetsManagerHandle -= 1;
         });
       }
+
+      widgetsStore.widgets = widgets;
+      widgetsStore.saveLayout();
     }
 
     function update(force) {
@@ -171,23 +178,7 @@ angular.module('dashboard').factory('widgetsManager', [
       return done.promise;
     }
 
-    function serialize() {
-      var json = [];
-      widgets.forEach(function(w) {
-        json.push({
-          client: w.clientIdentifier,
-          type: w.type,
-
-          height: w.height,
-          width: w.width,
-          row: w.row,
-          col: w.col,
-        });
-      });
-      return json;
-    }
-
-    function deserialize(json) {
+    function addFrom(json) {
       var result = [];
 
       $log.debug('Loading widgets:', json);
@@ -205,6 +196,64 @@ angular.module('dashboard').factory('widgetsManager', [
       });
 
       return result;
+    }
+
+    return self;
+  }
+]);
+
+angular.module('dashboard').factory('widgetsStore', [
+  '$location',
+  '$cookies',
+  function($location, $cookies) {
+    var self = {
+      columns: 0,
+      widgets: [],
+
+      serialize: serialize,
+      deserialize: deserialize,
+      saveLayout: saveLayout,
+      loadLayout: loadLayout,
+    };
+
+    function serialize() {
+      var json = [];
+      self.widgets.forEach(function(w) {
+        json.push({
+          client: w.clientIdentifier,
+          type: w.type,
+
+          height: w.height,
+          width: w.width,
+          row: w.row,
+          col: w.col,
+        });
+      });
+      return {
+        columns: self.columns,
+        widgets: json,
+      };
+    }
+
+    function deserialize(json) {
+      self.columns = json.columns;
+      self.widgets = json.widgets;
+    }
+
+    function saveLayout() {
+      var data = serialize();
+      $cookies.put('layout', angular.toJson(data));
+    }
+
+    function loadLayout() {
+      var query = $location.search();
+      if('layout' in query) {
+        return query.layout;
+      }
+
+      var data = $cookies.get('layout');
+
+      return data ? data : null;
     }
 
     return self;

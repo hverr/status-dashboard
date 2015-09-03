@@ -47,6 +47,7 @@ gulp.task('buildjs', function() {
     'app/bower_components/bootstrap/dist/js/bootstrap.min.js',
     'app/bower_components/angular/angular.min.js',
     'app/bower_components/angular-route/angular-route.min.js',
+    'app/bower_components/angular-cookies/angular-cookies.min.js',
     'app/bower_components/javascript-detect-element-resize/jquery.resize.js',
     'app/bower_components/angular-gridster/dist/angular-gridster.min.js',
     'app/app.js',

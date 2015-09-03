@@ -6,10 +6,11 @@ angular.module('dashboard').controller('GridController', [
   '$window',
   '$location',
   'widgetsManager',
+  'widgetsStore',
   'LoadWidget',
   'UptimeWidget',
   '$log',
-  function($scope, $rootScope, $window, $location, widgetsManager, LoadWidget, UptimeWidget, $log) {
+  function($scope, $rootScope, $window, $location, widgetsManager, widgetsStore, LoadWidget, UptimeWidget, $log) {
     function findFreeTile(width) {
       var cols = $scope.gridsterOpts.columns;
       var row = 0;
@@ -64,13 +65,7 @@ angular.module('dashboard').controller('GridController', [
     };
 
     $scope.saveLayout = function() {
-      var widgetsData = widgetsManager.serialize();
-      var data = {
-        columns: $scope.gridsterOpts.columns,
-        widgets: widgetsData,
-
-      };
-
+      var data = widgetsStore.serialize();
       var pretty = angular.toJson(data, true);
       var urlEncoded = encodeURIComponent(angular.toJson(data));
 
@@ -99,6 +94,10 @@ angular.module('dashboard').controller('GridController', [
       columns: 4,
       margins: [16, 16],
     };
+    widgetsStore.columns = 4;
+    $scope.$watch('gridsterOpts.columns', function() {
+      widgetsStore.columns = $scope.gridsterOpts.columns;
+    });
 
     $scope.widgets = [];
 
@@ -112,19 +111,25 @@ angular.module('dashboard').controller('GridController', [
 
       $scope.widgets.push(w);
       widgetsManager.update(true);
+
+      widgetsStore.saveLayout();
     });
 
     widgetsManager.start();
 
-    var query = $location.search();
-    if("layout" in query) {
+    var data = widgetsStore.loadLayout();
+    if(data) {
       try {
-        var json = angular.fromJson(query.layout);
+        $log.debug('Using', data);
+        var json = angular.fromJson(data);
+        $log.debug('Got:', json);
         var columns = json.columns;
-        var loaded = widgetsManager.deserialize(json.widgets);
+        var loaded = widgetsManager.addFrom(json.widgets);
 
         $scope.gridsterOpts.columns = columns;
         $scope.widgets = loaded;
+
+        widgetsStore.saveLayout();
 
       } catch(error) {
         $log.error('Could not load layout: invalid JSON:', error);
