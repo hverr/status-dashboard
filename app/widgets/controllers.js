@@ -42,7 +42,6 @@ angular.module('dashboard').controller('GridController', [
       };
     }
 
-    $scope.hideMenu = true;
     $scope.hoverMenu = false;
 
     $scope.removeWidget = function(index) {
