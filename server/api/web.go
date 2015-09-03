@@ -12,10 +12,18 @@ import (
 )
 
 func availableClients(c *gin.Context) {
+	if !server.BasicAuthForUser(c) {
+		return
+	}
+
 	c.JSON(200, server.AllRegisteredClients())
 }
 
 func updateRequest(c *gin.Context) {
+	if !server.BasicAuthForUser(c) {
+		return
+	}
+
 	request := make(map[string][]string)
 
 	if err := c.BindJSON(&request); err != nil {
