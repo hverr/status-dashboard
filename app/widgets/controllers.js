@@ -42,6 +42,8 @@ angular.module('dashboard').controller('GridController', [
       };
     }
 
+    $scope.hoverMenu = false;
+
     $scope.removeWidget = function(index) {
       widgetsManager.remove($scope.widgets[index]);
       $scope.widgets.splice(index, 1);
