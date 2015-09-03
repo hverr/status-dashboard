@@ -5,6 +5,7 @@
 
  - [Features](#features)
  - [Installation](#installation)
+   - [User Authentication](#user-authentication)
  - [Building](#building)
    - [Using Docker](#using-docker)
    - [Locally](#locally)
@@ -36,6 +37,17 @@ Releases include 32-bit and 64-bit binaries for:
  - linux
  - darwin
  - windows
+
+### User Authentication
+You can protect the dashboard using HTTP basic authentication by adding a dictionary of login, password pairs to the configuration file.
+
+```json
+{
+    "users" : {
+        "mylogin" : "supersecretpass"
+    }
+}
+```
 
 ## Building
 Building a binary for your platform is easiest using Docker on a Linux machine, or locally using the [Makefile](Makefile).
