@@ -97,6 +97,8 @@ gulp.task('buildcss', function() {
 gulp.task('buildassets', function() {
   gulp.src(['app/bower_components/bootstrap/dist/fonts/**'])
     .pipe(gulp.dest('dist/fonts'));
+  gulp.src(['app/favicon.png'])
+    .pipe(gulp.dest('dist'));
 });
 
 gulp.task('build', ['buildcss', 'buildjs', 'buildhtml', 'buildassets']);
