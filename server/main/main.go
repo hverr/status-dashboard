@@ -15,9 +15,11 @@ import (
 func main() {
 	var configFile string
 	var listenAddr string
+	var debug bool
 
 	flag.StringVar(&configFile, "c", "", "Configuration file.")
 	flag.StringVar(&listenAddr, "listen", ":8050", "Listen address.")
+	flag.BoolVar(&debug, "debug", false, "Debug gin router.")
 	flag.Parse()
 
 	printHelp := func() {
@@ -37,6 +39,9 @@ func main() {
 		os.Exit(1)
 	}
 
+	if !debug {
+		gin.SetMode(gin.ReleaseMode)
+	}
 	router := gin.Default()
 
 	if err := static.Install(router); err != nil {

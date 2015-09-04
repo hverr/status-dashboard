@@ -38,7 +38,7 @@ dashboard-client:
 	GOOS=$(GOOS) GOARCH=$(GOARCH) go build -o dashboard-client client/main/*.go
 
 run-server:
-	HTML_ROOT=app go run server/main/*.go -c server/main/dev_config.json
+	HTML_ROOT=app go run server/main/*.go -c server/main/dev_config.json -debug
 
 docker:
 	docker build -t status-dashboard .

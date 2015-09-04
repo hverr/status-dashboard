@@ -90,7 +90,7 @@ npm install
 npm install -g bower
 bower install
 cd $GOPATH/src/github.com/hverr/status-dashboard/server/main
-go run *.go -c dev_config.json
+go run *.go -c dev_config.json -debug
 ```
 
 Point your browser to [http://localhost:8050/](http://localhost:8050)
@@ -101,7 +101,7 @@ Build and run the client(s)
 
 ```sh
 cd $GOPATH/src/github.com/hverr/status-dashboard/client/main
-go run *.go -c dev_config.json
+go run *.go -c dev_config.json -debug
 ```
 
 ### Adding Widgets
