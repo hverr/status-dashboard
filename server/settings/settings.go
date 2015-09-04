@@ -2,7 +2,6 @@ package settings
 
 import "time"
 
-var ListenAddress = ":8050"
 var StaticAppRoot = "../../app"
 
 var MinimumClientUpdateInterval = 3 * time.Second

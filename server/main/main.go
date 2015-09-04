@@ -9,14 +9,15 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/hverr/status-dashboard/server"
 	"github.com/hverr/status-dashboard/server/api"
-	"github.com/hverr/status-dashboard/server/settings"
 	"github.com/hverr/status-dashboard/server/static"
 )
 
 func main() {
 	var configFile string
+	var listenAddr string
 
 	flag.StringVar(&configFile, "c", "", "Configuration file.")
+	flag.StringVar(&listenAddr, "listen", ":8050", "Listen address.")
 	flag.Parse()
 
 	printHelp := func() {
@@ -49,5 +50,5 @@ func main() {
 		log.Fatal("fatal: could not serve API:", err)
 	}
 
-	router.Run(settings.ListenAddress)
+	router.Run(listenAddr)
 }

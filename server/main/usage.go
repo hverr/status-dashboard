@@ -1,6 +1,6 @@
 package main
 
-var usage = `Usage: dashboard-server -c config_file
+var usage = `Usage: dashboard-server -c config_file [-listen listen_addr]
 
 DESCRIPTION:
 	dashboard-server servers the server application
@@ -8,6 +8,8 @@ DESCRIPTION:
 OPTIONS:
 	-c config_file:
 		The configuration file (see CONFIGURAITON FILE)
+	-listen listen_addr:
+		The address to bind to
 
 CONFIGURATION FILE:
 	The configuration file is formatted in JSON and has the following layout:
