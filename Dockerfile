@@ -1,4 +1,4 @@
-FROM golang:1.4.2-cross
+FROM golang:1.5
 
 MAINTAINER Henri Verroken
 
@@ -8,6 +8,6 @@ RUN apt-get update && apt-get install -y \
     nodejs-legacy \
     zip
 
-RUN npm install -g gulp
+RUN npm install -g gulp bower
 
 EXPOSE 8050
