@@ -134,13 +134,13 @@ func GatherTCPConnections() (tcp4, tcp6 int, err error) {
 	}
 
 	for _, j := range infos4 {
-		if !isLocal(j.LocalIP) || !isLocal(j.RemoteIP) {
+		if j.State == TCPEstablished && (!isLocal(j.LocalIP) || !isLocal(j.RemoteIP)) {
 			tcp4 += 1
 		}
 	}
 
 	for _, j := range infos6 {
-		if !isLocal(j.LocalIP) || !isLocal(j.RemoteIP) {
+		if j.State == TCPEstablished && (!isLocal(j.LocalIP) || !isLocal(j.RemoteIP)) {
 			tcp6 += 1
 		}
 	}
