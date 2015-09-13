@@ -6,6 +6,7 @@
     "widgets" : [
         "uptime",
         "load",
-        "meminfo"
+        "meminfo",
+        "connections"
     ]
 }
