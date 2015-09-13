@@ -32,11 +32,13 @@ angular.module('dashboard').factory('widgetFactory', [
   'MeminfoWidget',
   'CurrentTimeWidget',
   'CurrentDateWidget',
+  'ConnectionsWidget',
   function(LoadWidget,
            UptimeWidget,
            MeminfoWidget,
            CurrentTimeWidget,
-           CurrentDateWidget)
+           CurrentDateWidget,
+           ConnectionsWidget)
   {
     return function(widgetType) {
       switch(widgetType) {
@@ -50,6 +52,8 @@ angular.module('dashboard').factory('widgetFactory', [
           return new CurrentTimeWidget();
         case 'current_date':
           return new CurrentDateWidget();
+        case 'connections':
+          return new ConnectionsWidget();
         default:
           return null;
       }

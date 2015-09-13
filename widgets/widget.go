@@ -22,9 +22,10 @@ type Widget interface {
 type WidgetInitiator func() Widget
 
 var AllWidgets = map[string]WidgetInitiator{
-	LoadWidgetType:    func() Widget { return &LoadWidget{} },
-	UptimeWidgetType:  func() Widget { return &UptimeWidget{} },
-	MeminfoWidgetType: func() Widget { return &MeminfoWidget{} },
+	LoadWidgetType:        func() Widget { return &LoadWidget{} },
+	UptimeWidgetType:      func() Widget { return &UptimeWidget{} },
+	MeminfoWidgetType:     func() Widget { return &MeminfoWidget{} },
+	ConnectionsWidgetType: func() Widget { return &ConnectionsWidget{} },
 }
 
 type BulkElement struct {
