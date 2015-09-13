@@ -1,7 +1,6 @@
 package server
 
 import (
-	"log"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -21,8 +20,6 @@ func BasicAuthForUser(c *gin.Context) bool {
 }
 
 func AuthenticateUser(username, password string) bool {
-	log.Println("Authenticating", username, ":", password)
-	log.Println("Users:", Configuration.Users)
 	if Configuration.Users == nil {
 		return true
 	}
