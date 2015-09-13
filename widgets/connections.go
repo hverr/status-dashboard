@@ -14,8 +14,8 @@ import (
 const ConnectionsWidgetType = "connections"
 
 type ConnectionsWidget struct {
-	TCP4 int
-	TCP6 int
+	TCP4 int `json:"tcp4"`
+	TCP6 int `json:"tcp6"`
 }
 
 func (widget *ConnectionsWidget) Name() string {
