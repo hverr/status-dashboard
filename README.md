@@ -29,6 +29,14 @@
    - Can refresh as often as every second.
  - **Persistent**
    - Bookmark a layout in your browser.
+ - **Linux Widgets**
+   - Number of established TCP connections
+   - Memory usage
+   - Load average
+   - Uptime
+ - **Client-less widgets**
+   - Current date
+   - Current time
 
 ## Installation
 Binaries (assets included) are available in the [release section](https://github.com/hverr/status-dashboard/releases), or can be [built manually](#building).
