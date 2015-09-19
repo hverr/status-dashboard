@@ -19,6 +19,16 @@ angular.module('dashboard').factory('Widget', [
         update: function(data) {
           self.data = data;
         },
+
+        watchValue: function() {
+          return {
+            directive: self.directive,
+            height: self.height, width: self.width,
+            row: self.row, col: self.col,
+            type: self.type, clientIdentifier: self.clientIdentifier,
+            client: self.client, name: self.name,
+          };
+        },
       };
 
       return self;
@@ -67,10 +77,9 @@ angular.module('dashboard').factory('widgetsManager', [
   '$rootScope',
   'api',
   'widgetFactory',
-  'widgetsStore',
   'oneSecondService',
   '$log',
-  function($timeout, $q, $rootScope, api, widgetFactory, widgetsStore, oneSecondService, $log) {
+  function($timeout, $q, $rootScope, api, widgetFactory, oneSecondService, $log) {
     var self = {
       start: start,
       update: update,
@@ -132,9 +141,6 @@ angular.module('dashboard').factory('widgetsManager', [
       w.widgetsManagerHandle = widgets.length;
       widgets.push(w);
 
-      widgetsStore.widgets = widgets;
-      widgetsStore.saveLayout();
-
       return w;
     }
 
@@ -147,9 +153,6 @@ angular.module('dashboard').factory('widgetsManager', [
           w.widgetsManagerHandle -= 1;
         });
       }
-
-      widgetsStore.widgets = widgets;
-      widgetsStore.saveLayout();
     }
 
     function update(force) {

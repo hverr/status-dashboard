@@ -102,9 +102,20 @@ angular.module('dashboard').controller('GridController', [
     widgetsStore.columns = 4;
     $scope.$watch('gridsterOpts.columns', function() {
       widgetsStore.columns = $scope.gridsterOpts.columns;
+      widgetsStore.saveLayout();
     });
 
     $scope.widgets = [];
+    $scope.$watch(function() {
+      var converted = [];
+      $scope.widgets.forEach(function(widget) {
+        converted.push(widget.watchValue());
+      });
+      return converted;
+    }, function(widgets) {
+      widgetsStore.widgets = widgets;
+      widgetsStore.saveLayout();
+    }, true);
 
     $rootScope.$on(widgetsManager.addWidgetRequestEvent, function(ev, client, type) {
       var w = widgetsManager.add(client, type);
@@ -116,8 +127,6 @@ angular.module('dashboard').controller('GridController', [
 
       $scope.widgets.push(w);
       widgetsManager.update(true);
-
-      widgetsStore.saveLayout();
     });
 
     widgetsManager.start();
