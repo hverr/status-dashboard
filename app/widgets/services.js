@@ -272,7 +272,11 @@ angular.module('dashboard').factory('widgetsStore', [
 
     function saveLayout() {
       var data = serialize();
-      $cookies.put('layout', angular.toJson(data));
+      var expires = new Date();
+      expires.setFullYear(expires.getFullYear() + 10);
+      $cookies.put('layout', angular.toJson(data), {
+        expires: expires,
+      });
     }
 
     function loadLayout() {
