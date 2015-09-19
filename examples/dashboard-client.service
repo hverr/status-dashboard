@@ -4,3 +4,6 @@ Description=Status Dashboard Client
 [Service]
 ExecStart=/usr/local/bin/dashboard-client -c /etc/status-dashboard/client.json -ca /etc/status-dashboard/ca.pem
 User=dashboard
+
+[Install]
+WantedBy=multi-user.target
