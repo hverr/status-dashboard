@@ -103,7 +103,9 @@ func update() error {
 
 		} else {
 			widget = initiator()
-			if err := widget.Update(); err != nil {
+			if widget.HasData() == false {
+				widget = nil
+			} else if err := widget.Update(); err != nil {
 				log.Printf("Can't update %v: %v", w, err)
 				widget = nil
 			}
