@@ -2,6 +2,7 @@ package widgets
 
 import (
 	"bufio"
+	"encoding/json"
 	"errors"
 	"io"
 	"os"
@@ -27,6 +28,18 @@ func (widget *LoadWidget) Type() string {
 
 func (widget *LoadWidget) HasData() bool {
 	return true
+}
+
+func (widget *LoadWidget) Configure(json.RawMessage) error {
+	return nil
+}
+
+func (widget *LoadWidget) Configuration() interface{} {
+	return nil
+}
+
+func (widget *LoadWidget) Start() error {
+	return nil
 }
 
 func (widget *LoadWidget) Update() error {

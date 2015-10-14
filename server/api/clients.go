@@ -13,19 +13,23 @@ import (
 )
 
 func registerClient(c *gin.Context) {
-	var client server.Client
+	var r server.ClientRegistration
 
-	if err := c.BindJSON(&client); err != nil {
+	if err := c.BindJSON(&r); err != nil {
 		c.AbortWithError(400, err)
 		return
 	}
 
-	if !server.AuthenticateClient(c, client.Identifier) {
+	if !server.AuthenticateClient(c, r.Identifier) {
 		return
 	}
 
-	server.RegisterClient(&client)
-	scheduler.RegisterClient(client.Identifier)
+	if err := server.RegisterClient(&r); err != nil {
+		c.AbortWithError(400, err)
+		return
+	}
+
+	scheduler.RegisterClient(r.Identifier)
 
 	c.JSON(200, gin.H{})
 }

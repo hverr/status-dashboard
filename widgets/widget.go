@@ -1,5 +1,7 @@
 package widgets
 
+import "encoding/json"
+
 // Widget defines the interface for a general widget.
 type Widget interface {
 	// Name should return a human-readable name for this widget describing what
@@ -17,6 +19,17 @@ type Widget interface {
 
 	// Update should update widget with the most recent information
 	Update() error
+
+	// Configure should configure a widget using data from the configuration
+	// file.
+	Configure(data json.RawMessage) error
+
+	// Configuration should return the widget configuration
+	Configuration() interface{}
+
+	// Start should start any background processes needed to e.g. gather data,
+	// if necessary.
+	Start() error
 }
 
 type WidgetInitiator func() Widget
@@ -26,6 +39,7 @@ var AllWidgets = map[string]WidgetInitiator{
 	UptimeWidgetType:      func() Widget { return &UptimeWidget{} },
 	MeminfoWidgetType:     func() Widget { return &MeminfoWidget{} },
 	ConnectionsWidgetType: func() Widget { return &ConnectionsWidget{} },
+	NetworkWidgetType:     func() Widget { return &NetworkWidget{} },
 }
 
 type BulkElement struct {

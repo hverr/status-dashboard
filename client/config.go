@@ -10,11 +10,11 @@ import (
 
 // Configuration holds the client configuration.
 var Configuration struct {
-	API        string   `json:"api"`
-	Identifier string   `json:"identifier"`
-	Name       string   `json:"name"`
-	Secret     string   `json:"secret"`
-	Widgets    []string `json:"widgets"`
+	API        string                     `json:"api"`
+	Identifier string                     `json:"identifier"`
+	Name       string                     `json:"name"`
+	Secret     string                     `json:"secret"`
+	Widgets    map[string]json.RawMessage `json:"widgets"`
 }
 
 // Validate a configuration. If it is invalid an error is returned.
@@ -25,7 +25,7 @@ func ValidateConfiguration() error {
 		return errors.New("No widgets are specified.")
 	}
 
-	for _, w := range Configuration.Widgets {
+	for w, _ := range Configuration.Widgets {
 		if widgets.AllWidgets[w] == nil {
 			return errors.New("Unsupported widget " + w)
 		}

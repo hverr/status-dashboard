@@ -31,6 +31,18 @@ func (widget *UptimeWidget) HasData() bool {
 	return true
 }
 
+func (widget *UptimeWidget) Configure(json.RawMessage) error {
+	return nil
+}
+
+func (widget *UptimeWidget) Configuration() interface{} {
+	return nil
+}
+
+func (widget *UptimeWidget) Start() error {
+	return nil
+}
+
 func (widget *UptimeWidget) UnmarshalJSON(data []byte) error {
 	var helper struct {
 		Days    int `json:"days"`

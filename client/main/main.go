@@ -3,6 +3,7 @@ package main
 import (
 	"crypto/tls"
 	"crypto/x509"
+	"errors"
 	"flag"
 	"fmt"
 	"io/ioutil"
@@ -60,8 +61,14 @@ func main() {
 		os.Exit(1)
 	}
 
+	all, err := initializeWidgets()
+	if err != nil {
+		fmt.Fprintln(os.Stderr, "fatal: could not initialize widgets:", err)
+		os.Exit(1)
+	}
+
 	for {
-		registerUpdateLoop()
+		registerUpdateLoop(all)
 
 		t := 5 * time.Second
 		log.Println("Reregistering in", t)
@@ -69,14 +76,36 @@ func main() {
 	}
 }
 
-func registerUpdateLoop() {
-	if err := client.Register(); err != nil {
+func initializeWidgets() ([]widgets.Widget, error) {
+	all := make([]widgets.Widget, 0)
+	for identifier, configuration := range client.Configuration.Widgets {
+		initiator := widgets.AllWidgets[identifier]
+		if initiator == nil {
+			return nil, errors.New("Unsupported widget " + identifier)
+		}
+
+		w := initiator()
+		if err := w.Configure(configuration); err != nil {
+			return nil, fmt.Errorf("Could not configure widget %s: %v", identifier, err)
+		}
+		if err := w.Start(); err != nil {
+			return nil, fmt.Errorf("Could not start widget %s: %v", identifier, err)
+		}
+
+		all = append(all, w)
+	}
+
+	return all, nil
+}
+
+func registerUpdateLoop(allWidgets []widgets.Widget) {
+	if err := client.Register(allWidgets); err != nil {
 		log.Println(err)
 		return
 	}
 
 	for {
-		if err := update(); err != nil {
+		if err := update(allWidgets); err != nil {
 			log.Println("Could not send updates:", err)
 			return
 		} else {
@@ -85,7 +114,7 @@ func registerUpdateLoop() {
 	}
 }
 
-func update() error {
+func update(allWidgets []widgets.Widget) error {
 	requested, err := client.GetRequestedWidgets()
 	if err != nil {
 		return err

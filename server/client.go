@@ -1,6 +1,8 @@
 package server
 
 import (
+	"encoding/json"
+	"fmt"
 	"log"
 	"net/http"
 	"time"
@@ -12,38 +14,72 @@ import (
 )
 
 type Client struct {
-	Name             string    `json:"name" binding:"required"`
-	Identifier       string    `json:"identifier" binding:"required"`
-	AvailableWidgets []string  `json:"availableWidgets" binding:"required"`
-	LastSeen         time.Time `json:"-"`
+	Name             string
+	Identifier       string
+	AvailableWidgets []widgets.Widget
+	LastSeen         time.Time
 
-	widgets *cache.Cache `json:"-"`
+	widgets *cache.Cache
 }
 
-var RegisteredClients = cache.New(cache.NoExpiration, cache.NoExpiration)
+type ClientRegistration struct {
+	Name             string               `json:"name" binding:"required"`
+	Identifier       string               `json:"identifier" binding:"required"`
+	AvailableWidgets []WidgetRegistration `json:"availableWidgets" binding:"required"`
+}
 
-func RegisterClient(client *Client) {
-	client.widgets = cache.New(cache.NoExpiration, cache.NoExpiration)
+type WidgetRegistration struct {
+	Type          string          `json:"type" binding:"required"`
+	Configuration json.RawMessage `json:"configuration" binding:"required"`
+}
+
+var (
+	RegisteredClients  = cache.New(cache.NoExpiration, cache.NoExpiration)
+	InitializedClients = cache.New(cache.NoExpiration, cache.NoExpiration)
+)
+
+func RegisterClient(r *ClientRegistration) error {
+	client := Client{
+		Name:       r.Name,
+		Identifier: r.Identifier,
+		LastSeen:   time.Now(),
+		widgets:    cache.New(cache.NoExpiration, cache.NoExpiration),
+	}
+	for _, widgetReg := range r.AvailableWidgets {
+		initiator := widgets.AllWidgets[widgetReg.Type]
+		if initiator == nil {
+			return fmt.Errorf("Unknown widget type: %s", widgetReg.Type)
+		}
+
+		w := initiator()
+		if err := w.Configure(widgetReg.Configuration); err != nil {
+			return fmt.Errorf("Could not configure %s: %v", widgetReg.Type, err)
+		}
+
+		client.AvailableWidgets = append(client.AvailableWidgets, w)
+	}
 
 	log.Printf("Client registration request %v (%v)", client.Name, client.Identifier)
 
 	// Actually register the client.
-	client.LastSeen = time.Now()
-	RegisteredClients.Set(client.Identifier, client, cache.DefaultExpiration)
+	RegisteredClients.Set(r.Identifier, r, cache.DefaultExpiration)
+	InitializedClients.Set(client.Identifier, &client, cache.DefaultExpiration)
+
+	return nil
 }
 
-func AllRegisteredClients() []*Client {
+func AllRegisteredClients() []*ClientRegistration {
 	items := RegisteredClients.Items()
-	result := make([]*Client, 0, len(items))
+	result := make([]*ClientRegistration, 0, len(items))
 	for _, item := range items {
-		result = append(result, item.Object.(*Client))
+		result = append(result, item.Object.(*ClientRegistration))
 	}
 
 	return result
 }
 
 func GetClient(identifier string) (*Client, bool) {
-	o, ok := RegisteredClients.Get(identifier)
+	o, ok := InitializedClients.Get(identifier)
 	if !ok {
 		return nil, false
 	}

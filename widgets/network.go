@@ -2,6 +2,7 @@ package widgets
 
 import (
 	"bufio"
+	"encoding/json"
 	"errors"
 	"io"
 	"os"
@@ -16,6 +17,10 @@ type NetworkWidget struct {
 	Interval    int    `json:"interval"`
 	Received    int    `json:"received"`
 	Transmitted int    `json:"transmitted"`
+
+	configuration struct {
+		Interface string `json:"interface"`
+	} `json:"configuration"`
 }
 
 func (widget *NetworkWidget) Name() string {
@@ -31,6 +36,18 @@ func (widget *NetworkWidget) Type() string {
 
 func (widget *NetworkWidget) HasData() bool {
 	return true
+}
+
+func (widget *NetworkWidget) Configure(c json.RawMessage) error {
+	return json.Unmarshal(c, &widget.configuration)
+}
+
+func (widget *NetworkWidget) Configuration() interface{} {
+	return widget.configuration
+}
+
+func (widget *NetworkWidget) Start() error {
+	return nil
 }
 
 func (widget *NetworkWidget) Update() error {

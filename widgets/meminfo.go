@@ -2,6 +2,7 @@ package widgets
 
 import (
 	"bufio"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"io"
@@ -27,6 +28,18 @@ func (widget *MeminfoWidget) Type() string {
 
 func (widget *MeminfoWidget) HasData() bool {
 	return true
+}
+
+func (widget *MeminfoWidget) Configure(json.RawMessage) error {
+	return nil
+}
+
+func (widget *MeminfoWidget) Configuration() interface{} {
+	return nil
+}
+
+func (widget *MeminfoWidget) Start() error {
+	return nil
 }
 
 func (widget *MeminfoWidget) Update() error {
