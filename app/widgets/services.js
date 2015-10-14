@@ -182,8 +182,8 @@ angular.module('dashboard').factory('widgetsManager', [
           request[w.clientIdentifier] = [];
         }
 
-        if(!(w.type in request[w.clientIdentifier])) {
-          request[w.clientIdentifier].push(w.type);
+        if(!(w.identifier() in request[w.clientIdentifier])) {
+          request[w.clientIdentifier].push(w.identifier());
         }
       });
 
