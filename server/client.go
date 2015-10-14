@@ -107,15 +107,15 @@ func AuthenticateClient(c *gin.Context, clientIdentifier string) bool {
 
 func (c *Client) SetWidget(w widgets.Widget) {
 	c.LastSeen = time.Now()
-	c.widgets.Set(w.Type(), w, cache.DefaultExpiration)
+	c.widgets.Set(w.Identifier(), w, cache.DefaultExpiration)
 }
 
-func (c *Client) DeleteWidget(widgetType string) {
-	c.widgets.Delete(widgetType)
+func (c *Client) DeleteWidget(widgetIdentifier string) {
+	c.widgets.Delete(widgetIdentifier)
 }
 
-func (c *Client) GetWidget(widgetType string) widgets.Widget {
-	o, ok := c.widgets.Get(widgetType)
+func (c *Client) GetWidget(widgetIdentifier string) widgets.Widget {
+	o, ok := c.widgets.Get(widgetIdentifier)
 	if !ok {
 		return nil
 	}
