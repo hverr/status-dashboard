@@ -179,8 +179,12 @@ angular.module('dashboard').controller('AddWidgetsDialogController', [
           name: 'Built-In',
           identifier: '',
           availableWidgets : [
-            'current_time',
-            'current_date',
+            {
+              type : 'current_time',
+            },
+            {
+              type : 'current_date',
+            },
           ],
         },
       ];
