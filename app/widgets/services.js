@@ -14,10 +14,17 @@ angular.module('dashboard').factory('Widget', [
         clientIdentifier: null,
         client: null,
         name: name,
+        configuration: null,
 
         data: null,
         update: function(data) {
           self.data = data;
+        },
+        configure: function(c) {
+          self.configuration = c;
+        },
+        identifier: function() {
+          return self.type;
         },
 
         watchValue: function() {
@@ -125,14 +132,18 @@ angular.module('dashboard').factory('widgetsManager', [
       });
     }
 
-    function add(clientIdentifier, widgetType) {
-      var w = widgetFactory(widgetType);
+    function add(clientIdentifier, widget) {
+      var w = widgetFactory(widget.type);
       if(w === null) {
-        throw 'Unknown widget type: ' + widgetType;
+        throw 'Unknown widget type: ' + widget.type;
+      }
+
+      if(widget.configuration) {
+        w.configure(widget.configuration);
       }
 
       w.clientIdentifier = clientIdentifier;
-      w.type = widgetType;
+      w.type = widget.type;
       if(clientIdentifier !== "") {
         // only change widgets for remote clients
         w.available = false;

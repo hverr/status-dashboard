@@ -117,8 +117,8 @@ angular.module('dashboard').controller('GridController', [
       widgetsStore.saveLayout();
     }, true);
 
-    $rootScope.$on(widgetsManager.addWidgetRequestEvent, function(ev, client, type) {
-      var w = widgetsManager.add(client, type);
+    $rootScope.$on(widgetsManager.addWidgetRequestEvent, function(ev, client, widget) {
+      var w = widgetsManager.add(client, widget);
       w.client = client;
 
       var position = findFreeTile(w.width);
@@ -197,8 +197,8 @@ angular.module('dashboard').controller('AddWidgetsDialogController', [
       update();
     });
 
-    $scope.addWidget = function(clientIdentifier, widgetType) {
-      $rootScope.$emit(widgetsManager.addWidgetRequestEvent, clientIdentifier, widgetType);
+    $scope.addWidget = function(clientIdentifier, widget) {
+      $rootScope.$emit(widgetsManager.addWidgetRequestEvent, clientIdentifier, widget);
     };
 
     $scope.refresh = function() {
