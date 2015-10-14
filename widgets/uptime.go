@@ -27,6 +27,10 @@ func (widget *UptimeWidget) Type() string {
 	return UptimeWidgetType
 }
 
+func (widget *UptimeWidget) Identifier() string {
+	return widget.Type()
+}
+
 func (widget *UptimeWidget) HasData() bool {
 	return true
 }

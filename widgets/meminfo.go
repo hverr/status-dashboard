@@ -26,6 +26,10 @@ func (widget *MeminfoWidget) Type() string {
 	return MeminfoWidgetType
 }
 
+func (widget *MeminfoWidget) Identifier() string {
+	return widget.Type()
+}
+
 func (widget *MeminfoWidget) HasData() bool {
 	return true
 }

@@ -26,6 +26,10 @@ func (widget *LoadWidget) Type() string {
 	return LoadWidgetType
 }
 
+func (widget *LoadWidget) Identifier() string {
+	return widget.Type()
+}
+
 func (widget *LoadWidget) HasData() bool {
 	return true
 }

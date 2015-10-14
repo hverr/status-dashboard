@@ -34,6 +34,10 @@ func (widget *NetworkWidget) Type() string {
 	return "network"
 }
 
+func (widget *NetworkWidget) Identifier() string {
+	return widget.Type() + "_" + widget.configuration.Interface
+}
+
 func (widget *NetworkWidget) HasData() bool {
 	return true
 }

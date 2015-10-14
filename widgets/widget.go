@@ -8,9 +8,13 @@ type Widget interface {
 	// it does.
 	Name() string
 
-	// Type should return an identifier for this type of widget. It should be
+	// Type should return the type of the widget.
 	// unique among other widgets.
 	Type() string
+
+	// Identifier should return an unique identifier for the widget. It should
+	// be based on its type and configuration.
+	Identifier() string
 
 	// HasData should return whether the widget has data to display. This should
 	// default to false and become true when the widget gets information from

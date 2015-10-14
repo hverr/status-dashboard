@@ -27,6 +27,10 @@ func (widget *ConnectionsWidget) Type() string {
 	return ConnectionsWidgetType
 }
 
+func (widget *ConnectionsWidget) Identifier() string {
+	return widget.Type()
+}
+
 func (widget *ConnectionsWidget) HasData() bool {
 	return true
 }
