@@ -149,8 +149,11 @@ func update(initialized, started map[string]widgets.Widget) error {
 		}
 
 		e := widgets.BulkElement{
-			Type:   widget.Type(),
-			Widget: widget,
+			Identifier: widgetIdentifier,
+			Widget:     widget,
+		}
+		if widget != nil {
+			e.Type = widget.Type()
 		}
 
 		results = append(results, e)

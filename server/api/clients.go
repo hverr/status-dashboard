@@ -55,13 +55,13 @@ func bulkUpdateClient(c *gin.Context) {
 	result := make([]widgets.Widget, 0, len(updates))
 	missing := make([]string, 0)
 	for _, u := range updates {
-		initiator := widgets.AllWidgets[u.Type]
-		if initiator == nil {
-			c.AbortWithError(404, errors.New("Widget not found: "+u.Type))
-			return
-		}
+		if u.Widget != nil && u.Type == "" {
+			initiator := widgets.AllWidgets[u.Type]
+			if initiator == nil {
+				c.AbortWithError(404, errors.New("Widget not found: "+u.Type))
+				return
+			}
 
-		if u.Widget != nil {
 			widget := initiator()
 			encoded, err := json.Marshal(u.Widget)
 			if err != nil {
@@ -80,7 +80,7 @@ func bulkUpdateClient(c *gin.Context) {
 			missing = append(missing, u.Type)
 		}
 
-		updated = append(updated, u.Type)
+		updated = append(updated, u.Identifier)
 	}
 
 	for _, w := range result {
