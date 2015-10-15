@@ -267,6 +267,7 @@ angular.module('dashboard').factory('widgetsStore', [
         json.push({
           client: w.clientIdentifier,
           type: w.type,
+          configuration: w.configuration,
 
           height: w.height,
           width: w.width,
