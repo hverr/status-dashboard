@@ -3,7 +3,6 @@ package main
 import (
 	"crypto/tls"
 	"crypto/x509"
-	"errors"
 	"flag"
 	"fmt"
 	"io/ioutil"
@@ -13,6 +12,7 @@ import (
 	"time"
 
 	"github.com/hverr/status-dashboard/client"
+	"github.com/hverr/status-dashboard/server"
 	"github.com/hverr/status-dashboard/widgets"
 )
 
@@ -61,60 +61,65 @@ func main() {
 		os.Exit(1)
 	}
 
-	all, err := initializeWidgets()
-	if err != nil {
-		fmt.Fprintln(os.Stderr, "fatal: could not initialize widgets:", err)
-		os.Exit(1)
-	}
-
 	for {
-		registerUpdateLoop(all)
+		// Register the client.
+		if initialized, err, recoverable := register(); err != nil {
+			if !recoverable {
+				log.Fatal("Could not register:", err)
+			} else {
+				log.Println("Could not register:", err)
+			}
+		} else {
+			// Registration was successful, constantly update now.
+			log.Println("Successfully registered:", initialized)
+			started := make(map[string]widgets.Widget)
+			for {
+				if err := update(initialized, started); err != nil {
+					log.Println("Could not update widgets:", err)
+					break
+				}
+			}
+		}
 
+		// Don't overload
 		t := 5 * time.Second
 		log.Println("Reregistering in", t)
 		<-time.After(t)
 	}
 }
 
-func initializeWidgets() ([]widgets.Widget, error) {
-	all := make([]widgets.Widget, 0)
-	for identifier, configuration := range client.Configuration.Widgets {
-		initiator := widgets.AllWidgets[identifier]
+func register() (initialized map[string]widgets.Widget, err error, recoverable bool) {
+	// Determine available widgets and initialize them.
+	initialized = make(map[string]widgets.Widget)
+	availableWidgets := make([]server.WidgetRegistration, 0)
+	for widgetType, config := range client.Configuration.Widgets {
+		initiator := widgets.AllWidgets[widgetType]
 		if initiator == nil {
-			return nil, errors.New("Unsupported widget " + identifier)
+			return nil, fmt.Errorf("Unsupported widget " + widgetType), false
 		}
 
 		w := initiator()
-		if err := w.Configure(configuration); err != nil {
-			return nil, fmt.Errorf("Could not configure widget %s: %v", identifier, err)
-		}
-		if err := w.Start(); err != nil {
-			return nil, fmt.Errorf("Could not start widget %s: %v", identifier, err)
+		if err := w.Configure(config); err != nil {
+			return nil, fmt.Errorf("Could not configure %s: %v", widgetType, err), false
 		}
 
-		all = append(all, w)
+		r := server.WidgetRegistration{
+			Type:          w.Type(),
+			Configuration: config,
+		}
+		availableWidgets = append(availableWidgets, r)
+		initialized[w.Identifier()] = w
 	}
 
-	return all, nil
+	// Register widgets.
+	if err := client.Register(availableWidgets); err != nil {
+		return nil, err, true
+	}
+
+	return initialized, nil, true
 }
 
-func registerUpdateLoop(allWidgets []widgets.Widget) {
-	if err := client.Register(allWidgets); err != nil {
-		log.Println(err)
-		return
-	}
-
-	for {
-		if err := update(allWidgets); err != nil {
-			log.Println("Could not send updates:", err)
-			return
-		} else {
-			log.Println("Sent widget information.")
-		}
-	}
-}
-
-func update(allWidgets []widgets.Widget) error {
+func update(initialized, started map[string]widgets.Widget) error {
 	requested, err := client.GetRequestedWidgets()
 	if err != nil {
 		return err
@@ -122,26 +127,29 @@ func update(allWidgets []widgets.Widget) error {
 
 	results := make([]widgets.BulkElement, 0, len(requested.Widgets))
 
-	for _, w := range requested.Widgets {
-		var widget widgets.Widget
+	for _, widgetIdentifier := range requested.Widgets {
+		widget, found := started[widgetIdentifier]
+		if !found {
+			widget, found = initialized[widgetIdentifier]
+			if !found {
+				log.Println("Unknown requested widget identifier: " + widgetIdentifier)
+				widget = nil
+			} else if err := widget.Start(); err != nil {
+				log.Println("Could not start widget", widgetIdentifier, ":", err)
+			}
+		}
 
-		initiator := widgets.AllWidgets[w]
-		if initiator == nil {
-			log.Print("Unknown requested widget type: " + w)
-			widget = nil
-
-		} else {
-			widget = initiator()
+		if widget != nil {
 			if widget.HasData() == false {
 				widget = nil
 			} else if err := widget.Update(); err != nil {
-				log.Printf("Can't update %v: %v", w, err)
+				log.Printf("Can't update %v: %v", widgetIdentifier, err)
 				widget = nil
 			}
 		}
 
 		e := widgets.BulkElement{
-			Type:   w,
+			Type:   widget.Type(),
 			Widget: widget,
 		}
 

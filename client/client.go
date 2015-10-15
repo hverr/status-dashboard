@@ -1,9 +1,7 @@
 package client
 
 import (
-	"encoding/json"
 	"errors"
-	"fmt"
 	"net/http"
 
 	"github.com/hverr/status-dashboard/server"
@@ -17,22 +15,7 @@ type RequestedWidgets struct {
 	Widgets []string `json:"widgets"`
 }
 
-func Register(allWidgets []widgets.Widget) error {
-	availableWidgets := make([]server.WidgetRegistration, len(allWidgets))
-	for i, w := range allWidgets {
-		c, err := json.Marshal(w.Configuration())
-		if err != nil {
-			fmt.Println(w)
-			fmt.Println("Cannot marshal:", w.Configuration(), ":", err)
-			return err
-		}
-
-		availableWidgets[i] = server.WidgetRegistration{
-			Type:          w.Type(),
-			Configuration: c,
-		}
-	}
-
+func Register(availableWidgets []server.WidgetRegistration) error {
 	payload := server.ClientRegistration{
 		Name:             Configuration.Name,
 		Identifier:       Configuration.Identifier,
