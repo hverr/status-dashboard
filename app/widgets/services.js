@@ -228,7 +228,7 @@ angular.module('dashboard').factory('widgetsManager', [
       $log.debug('Loading widgets:', json);
 
       json.forEach(function(data) {
-        var w = add(data.client, data.type);
+        var w = add(data.client, data);
         w.client = data.client;
 
         w.width = data.width;
