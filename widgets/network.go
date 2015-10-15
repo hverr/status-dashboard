@@ -3,24 +3,30 @@ package widgets
 import (
 	"bufio"
 	"encoding/json"
-	"errors"
 	"io"
+	"log"
 	"os"
 	"regexp"
 	"strconv"
+	"sync"
+	"time"
+
+	"github.com/pmylund/go-cache"
 )
 
 const NetworkWidgetType = "network"
 
 type NetworkWidget struct {
-	Interface   string `json:"interface"`
-	Interval    int    `json:"interval"`
-	Received    int    `json:"received"`
-	Transmitted int    `json:"transmitted"`
+	Interface   string  `json:"interface"`
+	Interval    float64 `json:"interval"`
+	Received    int     `json:"received"`
+	Transmitted int     `json:"transmitted"`
 
 	configuration struct {
 		Interface string `json:"interface"`
 	} `json:"configuration"`
+
+	hasData bool `json:"-"`
 }
 
 func (widget *NetworkWidget) Name() string {
@@ -39,23 +45,45 @@ func (widget *NetworkWidget) Identifier() string {
 }
 
 func (widget *NetworkWidget) HasData() bool {
-	return true
+	return widget.hasData
 }
 
 func (widget *NetworkWidget) Configure(c json.RawMessage) error {
-	return json.Unmarshal(c, &widget.configuration)
+	if err := json.Unmarshal(c, &widget.configuration); err != nil {
+		return err
+	}
+
+	widget.Interface = widget.configuration.Interface
+
+	return nil
 }
 
 func (widget *NetworkWidget) Configuration() interface{} {
 	return widget.configuration
 }
 
+var updateProcess = networkInformationProvider{}
+
 func (widget *NetworkWidget) Start() error {
+	updateProcess.Interval = 1 * time.Second
+	updateProcess.Start()
 	return nil
 }
 
 func (widget *NetworkWidget) Update() error {
-	return errors.New("Not implemented")
+	w, ok := updateProcess.WidgetForInterface(widget.Interface)
+	if !ok {
+		widget.hasData = false
+		return nil
+	}
+
+	widget.Interval = w.Interval
+	widget.Received = w.Received
+	widget.Transmitted = w.Transmitted
+
+	widget.hasData = true
+
+	return nil
 }
 
 type NetworkDevice struct {
@@ -124,4 +152,89 @@ func NewNetworkDevice(line string) *NetworkDevice {
 		ReceivedBytes:    recvd,
 		TransmittedBytes: trans,
 	}
+}
+
+// networkInformationProvider is a structure to hold information
+// about all interfaces of the system.
+type networkInformationProvider struct {
+	Interval time.Duration
+
+	dispatcher sync.Once
+	widgets    *cache.Cache
+	stopper    chan bool
+
+	previousTime    time.Time
+	previousDevices []NetworkDevice
+}
+
+func (p *networkInformationProvider) Start() {
+	p.dispatcher.Do(func() {
+		p.stopper = make(chan bool)
+		p.widgets = cache.New(cache.NoExpiration, cache.NoExpiration)
+
+		p.run()
+	})
+}
+
+func (p *networkInformationProvider) Stop() {
+	if p.stopper != nil {
+		p.stopper <- true
+	}
+}
+
+func (p *networkInformationProvider) WidgetForInterface(iface string) (NetworkWidget, bool) {
+	o, found := p.widgets.Get(iface)
+	if !found {
+		return NetworkWidget{}, false
+	}
+
+	return o.(NetworkWidget), true
+}
+
+func (p *networkInformationProvider) run() {
+	stopped := false
+	for !stopped {
+		select {
+		case <-time.After(p.Interval):
+			p.updateAll()
+		case <-p.stopper:
+			stopped = true
+		}
+	}
+}
+
+func (provider *networkInformationProvider) updateAll() {
+	now := time.Now()
+	devices, err := GatherNetDevInfo()
+	if err != nil {
+		log.Println("Could not gather network information:", err)
+		provider.widgets.Flush()
+		return
+	}
+
+	// Clear widgets.
+	provider.widgets.Flush()
+
+	// Calculate average
+	if provider.previousDevices != nil {
+		duration := now.Sub(provider.previousTime)
+
+		for _, p := range provider.previousDevices {
+			for _, d := range devices {
+				if p.Interface == d.Interface {
+					w := NetworkWidget{
+						Interface:   d.Interface,
+						Interval:    duration.Seconds(),
+						Received:    int(d.ReceivedBytes - p.ReceivedBytes),
+						Transmitted: int(d.TransmittedBytes - p.TransmittedBytes),
+					}
+					provider.widgets.Set(d.Interface, w, cache.DefaultExpiration)
+				}
+			}
+		}
+	}
+
+	// Set previous
+	provider.previousDevices = devices
+	provider.previousTime = now
 }
