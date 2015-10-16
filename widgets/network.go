@@ -168,7 +168,7 @@ type networkInformationProvider struct {
 }
 
 func (p *networkInformationProvider) Start() {
-	p.dispatcher.Do(func() {
+	go p.dispatcher.Do(func() {
 		p.stopper = make(chan bool)
 		p.widgets = cache.New(cache.NoExpiration, cache.NoExpiration)
 
