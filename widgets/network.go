@@ -3,6 +3,7 @@ package widgets
 import (
 	"bufio"
 	"encoding/json"
+	"errors"
 	"io"
 	"log"
 	"os"
@@ -71,6 +72,10 @@ func (widget *NetworkWidget) Start() error {
 }
 
 func (widget *NetworkWidget) Update() error {
+	if !updateProcess.Started() {
+		return errors.New("Network widget was not started")
+	}
+
 	w, ok := updateProcess.WidgetForInterface(widget.Interface)
 	if !ok {
 		widget.hasData = false
@@ -174,6 +179,10 @@ func (p *networkInformationProvider) Start() {
 
 		p.run()
 	})
+}
+
+func (p *networkInformationProvider) Started() bool {
+	return p.stopper != nil
 }
 
 func (p *networkInformationProvider) Stop() {
