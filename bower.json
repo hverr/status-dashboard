@@ -7,14 +7,15 @@
   "private": false,
   "dependencies": {
     "angular": "~1.4.5",
-    "angular-route": "~1.4.5",
     "angular-cookies": "~1.4.5",
+    "angular-gridster": "~0.13.5",
     "angular-loader": "~1.4.5",
     "angular-mocks": "~1.4.5",
+    "angular-route": "~1.4.5",
+    "bootstrap": "~3.3.5",
     "html5-boilerplate": "~5.2.0",
-    "angular-gridster": "~0.13.5",
     "jquery": "~2.1.4",
     "less": "~2.5.1",
-    "bootstrap": "~3.3.5"
+    "open-sans": "~1.1.0"
   }
 }
