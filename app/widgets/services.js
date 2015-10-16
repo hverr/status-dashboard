@@ -196,7 +196,7 @@ angular.module('dashboard').factory('widgetsManager', [
         if(lastUpdateCall === thisUpdateCall) {
           widgets.forEach(function(widget) {
             var clientIdentifier = widget.clientIdentifier;
-            var widgetType = widget.type;
+            var widgetIdentifier = widget.identifier();
 
             if(clientIdentifier === "") {
               return; // ignore built-in widgets
@@ -204,12 +204,12 @@ angular.module('dashboard').factory('widgetsManager', [
 
             if(!(clientIdentifier in result)) {
               widget.available = false;
-            } else if(!(widgetType in result[clientIdentifier])) {
+            } else if(!(widgetIdentifier in result[clientIdentifier])) {
               widget.available = false;
-            } else if(!result[clientIdentifier][widgetType]) {
+            } else if(!result[clientIdentifier][widgetIdentifier]) {
               widget.available = false;
             } else {
-              widget.update(result[clientIdentifier][widgetType]);
+              widget.update(result[clientIdentifier][widgetIdentifier]);
               widget.available = true;
             }
           });
