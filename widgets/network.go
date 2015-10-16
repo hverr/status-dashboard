@@ -42,7 +42,7 @@ func (widget *NetworkWidget) Type() string {
 }
 
 func (widget *NetworkWidget) Identifier() string {
-	return widget.Type() + "_" + widget.configuration.Interface
+	return widget.Type() + "_" + widget.Interface
 }
 
 func (widget *NetworkWidget) HasData() bool {
