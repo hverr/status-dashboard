@@ -34,6 +34,7 @@ angular.module('dashboard').factory('Widget', [
             row: self.row, col: self.col,
             type: self.type, clientIdentifier: self.clientIdentifier,
             client: self.client, name: self.name,
+            configuration: self.configuration,
           };
         },
       };
