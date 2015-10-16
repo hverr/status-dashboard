@@ -17,8 +17,14 @@ angular.module('dashboard').factory('NetworkWidget', [
         transmitted: null,
       };
 
+      self.configure = function(c) {
+        self.configuration = c;
+
+        self.interface = self.configuration.interface;
+      };
+
       self.identifier = function() {
-        return self.type + "_" + self.configuration.interface;
+        return self.type + "_" + self.interface;
       };
 
       return self;
