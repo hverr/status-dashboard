@@ -142,10 +142,10 @@ func update(initialized, started map[string]widgets.Widget) error {
 		if widget != nil {
 			started[widgetIdentifier] = widget
 
-			if widget.HasData() == false {
-				widget = nil
-			} else if err := widget.Update(); err != nil {
+			if err := widget.Update(); err != nil {
 				log.Printf("Can't update %v: %v", widgetIdentifier, err)
+				widget = nil
+			} else if widget.HasData() == false {
 				widget = nil
 			}
 		}
