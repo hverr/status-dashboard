@@ -63,13 +63,7 @@ func bulkUpdateClient(c *gin.Context) {
 			}
 
 			widget := initiator()
-			encoded, err := json.Marshal(u.Widget)
-			if err != nil {
-				c.AbortWithError(500, err)
-				return
-			}
-
-			if err := json.Unmarshal(encoded, &widget); err != nil {
+			if err := json.Unmarshal(u.Widget, &widget); err != nil {
 				c.AbortWithError(400, err)
 				return
 			}

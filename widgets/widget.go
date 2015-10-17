@@ -47,7 +47,7 @@ var AllWidgets = map[string]WidgetInitiator{
 }
 
 type BulkElement struct {
-	Type       string      `json:"type"`
-	Identifier string      `json:"identifier"`
-	Widget     interface{} `json:"widget"`
+	Type       string          `json:"type"`
+	Identifier string          `json:"identifier"`
+	Widget     json.RawMessage `json:"widget"`
 }

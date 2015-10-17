@@ -3,6 +3,7 @@ package main
 import (
 	"crypto/tls"
 	"crypto/x509"
+	"encoding/json"
 	"flag"
 	"fmt"
 	"io/ioutil"
@@ -150,9 +151,14 @@ func update(initialized, started map[string]widgets.Widget) error {
 			}
 		}
 
+		widgetRaw, err := json.Marshal(&widget)
+		if err != nil {
+			return fmt.Errorf("Can't marshal widget %s: %v", widget.Identifier(), err)
+		}
+
 		e := widgets.BulkElement{
 			Identifier: widgetIdentifier,
-			Widget:     widget,
+			Widget:     widgetRaw,
 		}
 		if widget != nil {
 			e.Type = widget.Type()
