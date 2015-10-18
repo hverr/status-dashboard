@@ -57,4 +57,29 @@ describe('network widget', function() {
       expect(w.identifier()).to.equal('network_lo');
     });
   });
+
+  describe('networkWidget', function() {
+    var element, scope;
+
+    beforeEach(inject(function($compile, $rootScope) {
+      scope = $rootScope.$new();
+      element = $compile('<div network-widget></div>')(scope);
+
+      scope.widget = {
+        data : {
+          interface: 'lo',
+          received: 2048,
+          transmitted: 6,
+        },
+      };
+      scope.data = scope.widget.data;
+      scope.$digest();
+    }));
+
+    it('should bind properly', function() {
+      expect(element.html()).to.contain('lo');
+      expect(element.html()).to.contain('2.0 kB/s');
+      expect(element.html()).to.contain('6.0 B/s');
+    });
+  });
 });
