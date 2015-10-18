@@ -22,7 +22,7 @@ angular.module('dashboard').factory('NetworkWidget', [
         self.configuration = c;
 
         self.interface = self.configuration.interface;
-        self.name = self.genericName + ' ' + self.interface;
+        self.name = self.genericName + ' (' + self.interface + ')';
       };
 
       self.identifier = function() {
