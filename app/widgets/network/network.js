@@ -11,6 +11,7 @@ angular.module('dashboard').factory('NetworkWidget', [
     return function() {
       var self = new Widget('network-widget', 'Network');
 
+      self.genericName = 'Network';
       self.data = {
         interface: null,
         received: null,
@@ -21,6 +22,7 @@ angular.module('dashboard').factory('NetworkWidget', [
         self.configuration = c;
 
         self.interface = self.configuration.interface;
+        self.name = self.genericName + ' ' + self.interface;
       };
 
       self.identifier = function() {

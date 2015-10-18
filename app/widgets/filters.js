@@ -4,9 +4,13 @@ angular.module('dashboard').filter('widgetName', [
   'widgetFactory',
   function(widgetFactory) {
     return function(input) {
-      var w = widgetFactory(input);
+      var w = widgetFactory(input.type);
       if(w === null) {
         return 'Unknown';
+      }
+
+      if(input.configuration) {
+        w.configure(input.configuration);
       }
 
       return w.name;
