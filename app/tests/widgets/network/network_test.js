@@ -5,6 +5,18 @@ describe('network widget', function() {
   beforeEach(module('dashboard'));
   beforeEach(module('testTemplates'));
 
+  describe('NetworkWidgetController', function() {
+    var NetworkWidgetController;
+
+    beforeEach(inject(function($controller) {
+      NetworkWidgetController = $controller('NetworkWidgetController');
+    }));
+
+    it('should construct properly', function() {
+      expect(NetworkWidgetController).to.not.equal(null);
+    });
+  });
+
   describe('NetworkWidget', function() {
     var NetworkWidget;
 
