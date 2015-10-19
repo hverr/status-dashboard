@@ -126,6 +126,47 @@ describe('widget services', function() {
         });
         expect(w.available).to.equal(true);
       });
+
+      it('should properly load json widgets', function() {
+        var json = [
+          {
+            client: 'webserver',
+            type: 'network',
+            width: 2,
+            height: 1,
+            row: 1,
+            col: 1,
+            configuration: {
+              interface: 'lo',
+            },
+          },
+          {
+            client: "",
+            type: 'current_time',
+            width: 2,
+            height: 2,
+            row: 1,
+            col: 3,
+          },
+        ];
+
+        var result = widgetsManager.addFrom(json);
+        expect(result.length).to.equal(2);
+        expect(result[0].client).to.equal('webserver');
+        expect(result[0].type).to.equal('network');
+        expect(result[0].name).to.equal('Network (lo)');
+        expect(result[0].width).to.equal(2);
+        expect(result[0].height).to.equal(1);
+        expect(result[0].row).to.equal(1);
+        expect(result[0].col).to.equal(1);
+
+        expect(result[1].client).to.equal("");
+        expect(result[1].type).to.equal('current_time');
+        expect(result[1].width).to.equal(2);
+        expect(result[1].height).to.equal(2);
+        expect(result[1].row).to.equal(1);
+        expect(result[1].col).to.equal(3);
+      });
     });
   });
 });
