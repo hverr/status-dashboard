@@ -99,6 +99,33 @@ describe('widget services', function() {
         };
         expect(fn).to.throw(/Unknown widget type/);
       });
+
+      it('should set the properties of the widget', function() {
+        var w = widgetsManager.add('client-name', {
+          type: 'load',
+        });
+        expect(w.clientIdentifier).to.equal('client-name');
+        expect(w.type).to.equal('load');
+        expect(w.available).to.equal(false);
+      });
+
+      it('should configure the widget', function() {
+        var c = {
+          'interface' : 'lo',
+        };
+        var w = widgetsManager.add('client-name', {
+          type: 'network',
+          configuration: c,
+        });
+        expect(w.configuration).to.equal(c);
+      });
+
+      it('should leave client-less widgets available', function() {
+        var w = widgetsManager.add("", {
+          type: 'current_time',
+        });
+        expect(w.available).to.equal(true);
+      });
     });
   });
 });
