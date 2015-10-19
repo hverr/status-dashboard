@@ -75,6 +75,11 @@ describe('widget services', function() {
     it('should create widgets', function() {
       expect(widgetFactory('load')).not.to.equal(null);
       expect(widgetFactory('uptime')).not.to.equal(null);
+      expect(widgetFactory('meminfo')).not.to.equal(null);
+      expect(widgetFactory('current_time')).not.to.equal(null);
+      expect(widgetFactory('current_date')).not.to.equal(null);
+      expect(widgetFactory('connections')).not.to.equal(null);
+      expect(widgetFactory('network')).not.to.equal(null);
     });
   });
 });
