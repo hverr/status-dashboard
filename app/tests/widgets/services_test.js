@@ -31,6 +31,15 @@ describe('widget services', function() {
       w.update(d);
       expect(w.data).to.equal(d);
     }));
+
+    it('should configure properly', inject(function(Widget) {
+      var w = new Widget('my-directive', 'Widget Name');
+
+      expect(w.configuration).to.equal(null);
+      var c = { 'key' : 'value' };
+      w.configure(c);
+      expect(w.configuration).to.equal(c);
+    }));
   });
 
   describe('widgetFactory', function() {
