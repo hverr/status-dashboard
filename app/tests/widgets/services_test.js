@@ -40,6 +40,15 @@ describe('widget services', function() {
       w.configure(c);
       expect(w.configuration).to.equal(c);
     }));
+
+    it('should use type as identifier', inject(function(Widget) {
+      var w = new Widget('my-directive', 'Widget Name');
+
+      expect(w.identifier()).to.equal(w.type);
+
+      w.type = 'widget-type';
+      expect(w.identifier()).to.equal(w.type);
+    }));
   });
 
   describe('widgetFactory', function() {
