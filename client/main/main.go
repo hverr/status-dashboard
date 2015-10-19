@@ -36,6 +36,8 @@ func main() {
 		os.Exit(1)
 	}
 
+	widgetsServer := &client.Server{}
+
 	if ca != "" {
 		var config tls.Config
 		pem, err := ioutil.ReadFile(ca)
@@ -49,7 +51,7 @@ func main() {
 			log.Println("warning: x509: could not use PEM in", ca)
 		}
 
-		client.Session.Client = &http.Client{
+		widgetsServer.Session.Client = &http.Client{
 			Transport: &http.Transport{
 				TLSClientConfig: &config,
 			},
@@ -64,7 +66,7 @@ func main() {
 
 	for {
 		// Register the client.
-		if initialized, err, recoverable := register(); err != nil {
+		if initialized, err, recoverable := register(widgetsServer); err != nil {
 			if !recoverable {
 				log.Fatal("Could not register:", err)
 			} else {
@@ -75,7 +77,7 @@ func main() {
 			log.Println("Successfully registered:", initialized)
 			started := make(map[string]widgets.Widget)
 			for {
-				if err := update(initialized, started); err != nil {
+				if err := update(widgetsServer, initialized, started); err != nil {
 					log.Println("Could not update widgets:", err)
 					break
 				}
@@ -89,7 +91,7 @@ func main() {
 	}
 }
 
-func register() (initialized map[string]widgets.Widget, err error, recoverable bool) {
+func register(widgetsServer *client.Server) (initialized map[string]widgets.Widget, err error, recoverable bool) {
 	// Determine available widgets and initialize them.
 	initialized = make(map[string]widgets.Widget)
 	availableWidgets := make([]server.WidgetRegistration, 0)
@@ -113,15 +115,15 @@ func register() (initialized map[string]widgets.Widget, err error, recoverable b
 	}
 
 	// Register widgets.
-	if err := client.Register(availableWidgets); err != nil {
+	if err := widgetsServer.Register(availableWidgets); err != nil {
 		return nil, err, true
 	}
 
 	return initialized, nil, true
 }
 
-func update(initialized, started map[string]widgets.Widget) error {
-	requested, err := client.GetRequestedWidgets()
+func update(widgetsServer *client.Server, initialized, started map[string]widgets.Widget) error {
+	requested, err := widgetsServer.GetRequestedWidgets()
 	if err != nil {
 		return err
 	}
@@ -167,7 +169,7 @@ func update(initialized, started map[string]widgets.Widget) error {
 		results = append(results, e)
 	}
 
-	if err := client.PostWidgetBulkUpdate(results); err != nil {
+	if err := widgetsServer.PostWidgetBulkUpdate(results); err != nil {
 		return err
 	}
 

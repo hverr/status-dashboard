@@ -9,13 +9,15 @@ import (
 	"github.com/jmcvetta/napping"
 )
 
-var Session napping.Session
+type Server struct {
+	Session napping.Session
+}
 
 type RequestedWidgets struct {
 	Widgets []string `json:"widgets"`
 }
 
-func Register(availableWidgets []server.WidgetRegistration) error {
+func (s *Server) Register(availableWidgets []server.WidgetRegistration) error {
 	payload := server.ClientRegistration{
 		Name:             Configuration.Name,
 		Identifier:       Configuration.Identifier,
@@ -23,7 +25,7 @@ func Register(availableWidgets []server.WidgetRegistration) error {
 	}
 
 	resource := "/clients/" + Configuration.Identifier + "/register"
-	resp, err := send("POST", resource, &payload, nil, nil)
+	resp, err := s.send("POST", resource, &payload, nil, nil)
 	if err != nil {
 		return err
 	} else if resp.HttpResponse().StatusCode != 200 {
@@ -33,11 +35,11 @@ func Register(availableWidgets []server.WidgetRegistration) error {
 	return nil
 }
 
-func GetRequestedWidgets() (RequestedWidgets, error) {
+func (s *Server) GetRequestedWidgets() (RequestedWidgets, error) {
 	widgets := RequestedWidgets{}
 
 	resource := "/clients/" + Configuration.Identifier + "/requested_widgets"
-	resp, err := send("GET", resource, nil, &widgets, nil)
+	resp, err := s.send("GET", resource, nil, &widgets, nil)
 	if err != nil {
 		return widgets, err
 	} else if resp.HttpResponse().StatusCode != 200 {
@@ -47,11 +49,11 @@ func GetRequestedWidgets() (RequestedWidgets, error) {
 	return widgets, nil
 }
 
-func PostWidgetUpdate(widget widgets.Widget) error {
+func (s *Server) PostWidgetUpdate(widget widgets.Widget) error {
 	t := widget.Type()
 
 	resource := "/clients/" + Configuration.Identifier + "/widgets/" + t + "/update"
-	resp, err := send("POST", resource, &widget, nil, nil)
+	resp, err := s.send("POST", resource, &widget, nil, nil)
 	if err != nil {
 		return err
 	} else if resp.HttpResponse().StatusCode != 200 {
@@ -61,9 +63,9 @@ func PostWidgetUpdate(widget widgets.Widget) error {
 	return nil
 }
 
-func PostWidgetBulkUpdate(updates []widgets.BulkElement) error {
+func (s *Server) PostWidgetBulkUpdate(updates []widgets.BulkElement) error {
 	resource := "/clients/" + Configuration.Identifier + "/bulk_update"
-	resp, err := send("POST", resource, updates, nil, nil)
+	resp, err := s.send("POST", resource, updates, nil, nil)
 	if err != nil {
 		return err
 	} else if resp.HttpResponse().StatusCode != 200 {
@@ -73,7 +75,7 @@ func PostWidgetBulkUpdate(updates []widgets.BulkElement) error {
 	return nil
 }
 
-func request(method, resource string, payload, result, errMsg interface{}) *napping.Request {
+func (s *Server) request(method, resource string, payload, result, errMsg interface{}) *napping.Request {
 	url := Configuration.API + resource
 
 	req := napping.Request{
@@ -92,6 +94,6 @@ func request(method, resource string, payload, result, errMsg interface{}) *napp
 	return &req
 }
 
-func send(method, resource string, payload, result, errMsg interface{}) (*napping.Response, error) {
-	return Session.Send(request(method, resource, payload, result, errMsg))
+func (s *Server) send(method, resource string, payload, result, errMsg interface{}) (*napping.Response, error) {
+	return s.Session.Send(s.request(method, resource, payload, result, errMsg))
 }
