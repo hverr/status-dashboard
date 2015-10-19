@@ -82,4 +82,23 @@ describe('widget services', function() {
       expect(widgetFactory('network')).not.to.equal(null);
     });
   });
+
+  describe('widgetsManager', function() {
+    var widgetsManager;
+
+    beforeEach(inject(function(_widgetsManager_) {
+      widgetsManager = _widgetsManager_;
+    }));
+
+    describe('adding widgets', function() {
+      it('should throw an exception for unknown widgets', function() {
+        var fn = function() {
+          widgetsManager.add('test-client', {
+            type: 'unknown-widget-type',
+          });
+        };
+        expect(fn).to.throw(/Unknown widget type/);
+      });
+    });
+  });
 });

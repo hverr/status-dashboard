@@ -140,7 +140,7 @@ angular.module('dashboard').factory('widgetsManager', [
     function add(clientIdentifier, widget) {
       var w = widgetFactory(widget.type);
       if(w === null) {
-        throw 'Unknown widget type: ' + widget.type;
+        throw new Error('Unknown widget type: ' + widget.type);
       }
 
       if(widget.configuration) {
