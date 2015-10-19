@@ -10,7 +10,8 @@ import (
 )
 
 type Server struct {
-	Session napping.Session
+	Session       napping.Session
+	Configuration Configuration
 }
 
 type RequestedWidgets struct {
@@ -19,12 +20,12 @@ type RequestedWidgets struct {
 
 func (s *Server) Register(availableWidgets []server.WidgetRegistration) error {
 	payload := server.ClientRegistration{
-		Name:             Configuration.Name,
-		Identifier:       Configuration.Identifier,
+		Name:             s.Configuration.Name,
+		Identifier:       s.Configuration.Identifier,
 		AvailableWidgets: availableWidgets,
 	}
 
-	resource := "/clients/" + Configuration.Identifier + "/register"
+	resource := "/clients/" + s.Configuration.Identifier + "/register"
 	resp, err := s.send("POST", resource, &payload, nil, nil)
 	if err != nil {
 		return err
@@ -38,7 +39,7 @@ func (s *Server) Register(availableWidgets []server.WidgetRegistration) error {
 func (s *Server) GetRequestedWidgets() (RequestedWidgets, error) {
 	widgets := RequestedWidgets{}
 
-	resource := "/clients/" + Configuration.Identifier + "/requested_widgets"
+	resource := "/clients/" + s.Configuration.Identifier + "/requested_widgets"
 	resp, err := s.send("GET", resource, nil, &widgets, nil)
 	if err != nil {
 		return widgets, err
@@ -52,7 +53,7 @@ func (s *Server) GetRequestedWidgets() (RequestedWidgets, error) {
 func (s *Server) PostWidgetUpdate(widget widgets.Widget) error {
 	t := widget.Type()
 
-	resource := "/clients/" + Configuration.Identifier + "/widgets/" + t + "/update"
+	resource := "/clients/" + s.Configuration.Identifier + "/widgets/" + t + "/update"
 	resp, err := s.send("POST", resource, &widget, nil, nil)
 	if err != nil {
 		return err
@@ -64,7 +65,7 @@ func (s *Server) PostWidgetUpdate(widget widgets.Widget) error {
 }
 
 func (s *Server) PostWidgetBulkUpdate(updates []widgets.BulkElement) error {
-	resource := "/clients/" + Configuration.Identifier + "/bulk_update"
+	resource := "/clients/" + s.Configuration.Identifier + "/bulk_update"
 	resp, err := s.send("POST", resource, updates, nil, nil)
 	if err != nil {
 		return err
@@ -76,7 +77,7 @@ func (s *Server) PostWidgetBulkUpdate(updates []widgets.BulkElement) error {
 }
 
 func (s *Server) request(method, resource string, payload, result, errMsg interface{}) *napping.Request {
-	url := Configuration.API + resource
+	url := s.Configuration.API + resource
 
 	req := napping.Request{
 		Url:     url,
@@ -86,9 +87,9 @@ func (s *Server) request(method, resource string, payload, result, errMsg interf
 		Error:   errMsg,
 	}
 
-	if Configuration.Secret != "" {
+	if s.Configuration.Secret != "" {
 		req.Header = &http.Header{}
-		req.Header.Set("X-Client-Secret", Configuration.Secret)
+		req.Header.Set("X-Client-Secret", s.Configuration.Secret)
 	}
 
 	return &req

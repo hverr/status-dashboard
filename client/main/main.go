@@ -17,6 +17,11 @@ import (
 	"github.com/hverr/status-dashboard/widgets"
 )
 
+type environment struct {
+	Server        client.Server
+	Configuration client.Configuration
+}
+
 func main() {
 	var configFile string
 	var ca string
@@ -36,7 +41,7 @@ func main() {
 		os.Exit(1)
 	}
 
-	widgetsServer := &client.Server{}
+	env := &environment{}
 
 	if ca != "" {
 		var config tls.Config
@@ -51,22 +56,25 @@ func main() {
 			log.Println("warning: x509: could not use PEM in", ca)
 		}
 
-		widgetsServer.Session.Client = &http.Client{
+		env.Server.Session.Client = &http.Client{
 			Transport: &http.Transport{
 				TLSClientConfig: &config,
 			},
 		}
 	}
 
-	if err := client.ParseConfiguration(configFile); err != nil {
+	if err := env.Configuration.ParseConfiguration(configFile); err != nil {
 		fmt.Fprintln(os.Stderr, "fatal: could not parse configuration file",
 			configFile+":", err)
 		os.Exit(1)
 	}
 
+	// Configure server behaviour
+	env.Server.Configuration = env.Configuration
+
 	for {
 		// Register the client.
-		if initialized, err, recoverable := register(widgetsServer); err != nil {
+		if initialized, err, recoverable := register(env); err != nil {
 			if !recoverable {
 				log.Fatal("Could not register:", err)
 			} else {
@@ -77,7 +85,7 @@ func main() {
 			log.Println("Successfully registered:", initialized)
 			started := make(map[string]widgets.Widget)
 			for {
-				if err := update(widgetsServer, initialized, started); err != nil {
+				if err := update(env, initialized, started); err != nil {
 					log.Println("Could not update widgets:", err)
 					break
 				}
@@ -91,11 +99,11 @@ func main() {
 	}
 }
 
-func register(widgetsServer *client.Server) (initialized map[string]widgets.Widget, err error, recoverable bool) {
+func register(env *environment) (initialized map[string]widgets.Widget, err error, recoverable bool) {
 	// Determine available widgets and initialize them.
 	initialized = make(map[string]widgets.Widget)
 	availableWidgets := make([]server.WidgetRegistration, 0)
-	for widgetType, config := range client.Configuration.Widgets {
+	for widgetType, config := range env.Configuration.Widgets {
 		initiator := widgets.AllWidgets[widgetType]
 		if initiator == nil {
 			return nil, fmt.Errorf("Unsupported widget " + widgetType), false
@@ -115,15 +123,15 @@ func register(widgetsServer *client.Server) (initialized map[string]widgets.Widg
 	}
 
 	// Register widgets.
-	if err := widgetsServer.Register(availableWidgets); err != nil {
+	if err := env.Server.Register(availableWidgets); err != nil {
 		return nil, err, true
 	}
 
 	return initialized, nil, true
 }
 
-func update(widgetsServer *client.Server, initialized, started map[string]widgets.Widget) error {
-	requested, err := widgetsServer.GetRequestedWidgets()
+func update(env *environment, initialized, started map[string]widgets.Widget) error {
+	requested, err := env.Server.GetRequestedWidgets()
 	if err != nil {
 		return err
 	}
@@ -169,7 +177,7 @@ func update(widgetsServer *client.Server, initialized, started map[string]widget
 		results = append(results, e)
 	}
 
-	if err := widgetsServer.PostWidgetBulkUpdate(results); err != nil {
+	if err := env.Server.PostWidgetBulkUpdate(results); err != nil {
 		return err
 	}
 
