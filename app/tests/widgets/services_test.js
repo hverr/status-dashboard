@@ -49,6 +49,16 @@ describe('widget services', function() {
       w.type = 'widget-type';
       expect(w.identifier()).to.equal(w.type);
     }));
+
+    it('should return a watch value', inject(function(Widget) {
+      var w = new Widget('my-directive', 'Widget Name');
+      w.type = 'widget-type';
+      w.configuration = { key: 'widget-configuration' };
+
+      var watchValue = w.watchValue();
+      expect(watchValue.type).to.equal(w.type);
+      expect(watchValue.configuration).to.equal(w.configuration);
+    }));
   });
 
   describe('widgetFactory', function() {
