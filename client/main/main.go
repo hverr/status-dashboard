@@ -63,7 +63,14 @@ func main() {
 		}
 	}
 
-	if err := env.Configuration.ParseConfiguration(configFile); err != nil {
+	// Parse configuration file.
+	fh, err := os.Open(configFile)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer fh.Close()
+
+	if err := env.Configuration.ParseConfiguration(fh); err != nil {
 		fmt.Fprintln(os.Stderr, "fatal: could not parse configuration file",
 			configFile+":", err)
 		os.Exit(1)

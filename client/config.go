@@ -3,7 +3,7 @@ package client
 import (
 	"encoding/json"
 	"errors"
-	"os"
+	"io"
 
 	"github.com/hverr/status-dashboard/widgets"
 )
@@ -38,13 +38,7 @@ func (c *Configuration) ValidateConfiguration() error {
 //
 // Returns an error if reading the configuration file failed or if the resulting
 // configuration could not be Validated.
-func (c *Configuration) ParseConfiguration(file string) error {
-	fh, err := os.Open(file)
-	if err != nil {
-		return err
-	}
-	defer fh.Close()
-
+func (c *Configuration) ParseConfiguration(fh io.Reader) error {
 	decoder := json.NewDecoder(fh)
 	if err := decoder.Decode(&c); err != nil {
 		return err
