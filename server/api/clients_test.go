@@ -25,10 +25,10 @@ func validApi() *API {
 		Users: map[string]string{},
 	}
 	serv := server.NewServer(conf)
-	sched := scheduler.New()
+	sched := scheduler.New(conf)
 	userAuth := server.UserAuthenticator{conf}
 
-	return &API{serv, userAuth, sched}
+	return &API{conf, serv, userAuth, sched}
 }
 
 func TestRegisterClient(t *testing.T) {
