@@ -6,7 +6,7 @@ import (
 )
 
 type API struct {
-	Server            *server.Server
+	Server            server.Server
 	UserAuthenticator server.UserAuthenticator
 }
 

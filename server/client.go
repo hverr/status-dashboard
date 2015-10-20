@@ -33,7 +33,7 @@ type WidgetRegistration struct {
 	Configuration json.RawMessage `json:"configuration" binding:"required"`
 }
 
-func (s *Server) RegisterClient(r *ClientRegistration) error {
+func (s *server) RegisterClient(r *ClientRegistration) error {
 	client := Client{
 		Name:       r.Name,
 		Identifier: r.Identifier,
@@ -63,7 +63,7 @@ func (s *Server) RegisterClient(r *ClientRegistration) error {
 	return nil
 }
 
-func (s *Server) AllRegisteredClients() []*ClientRegistration {
+func (s *server) AllRegisteredClients() []*ClientRegistration {
 	items := s.registeredClients.Items()
 	result := make([]*ClientRegistration, 0, len(items))
 	for _, item := range items {
@@ -73,7 +73,7 @@ func (s *Server) AllRegisteredClients() []*ClientRegistration {
 	return result
 }
 
-func (s *Server) GetClient(identifier string) (*Client, bool) {
+func (s *server) GetClient(identifier string) (*Client, bool) {
 	o, ok := s.initializedClients.Get(identifier)
 	if !ok {
 		return nil, false
@@ -87,7 +87,7 @@ func (s *Server) GetClient(identifier string) (*Client, bool) {
 	return c, true
 }
 
-func (s *Server) AuthenticateClient(c *gin.Context, clientIdentifier string) bool {
+func (s *server) AuthenticateClient(c *gin.Context, clientIdentifier string) bool {
 	clientSecret := c.Request.Header.Get("X-Client-Secret")
 	clientConfig, ok := s.Configuration.Clients[clientIdentifier]
 	if !ok || clientSecret != clientConfig.Secret {
