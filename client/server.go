@@ -75,7 +75,7 @@ func (s *Server) request(method, resource string, payload, result, errMsg interf
 
 	if s.Configuration.Secret != "" {
 		req.Header = &http.Header{}
-		req.Header.Set("X-Client-Secret", s.Configuration.Secret)
+		req.Header.Set(server.ClientSecretHeader, s.Configuration.Secret)
 	}
 
 	return &req

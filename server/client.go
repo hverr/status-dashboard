@@ -13,6 +13,8 @@ import (
 	"github.com/pmylund/go-cache"
 )
 
+const ClientSecretHeader = "X-Client-Secret"
+
 type Client struct {
 	Name             string
 	Identifier       string
@@ -88,7 +90,7 @@ func (s *server) GetClient(identifier string) (*Client, bool) {
 }
 
 func (s *server) AuthenticateClient(c *gin.Context, clientIdentifier string) bool {
-	clientSecret := c.Request.Header.Get("X-Client-Secret")
+	clientSecret := c.Request.Header.Get(ClientSecretHeader)
 	clientConfig, ok := s.Configuration.Clients[clientIdentifier]
 	if !ok || clientSecret != clientConfig.Secret {
 		c.JSON(http.StatusUnauthorized, gin.H{
