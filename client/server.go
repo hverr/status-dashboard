@@ -50,20 +50,6 @@ func (s *Server) GetRequestedWidgets() (RequestedWidgets, error) {
 	return widgets, nil
 }
 
-func (s *Server) PostWidgetUpdate(widget widgets.Widget) error {
-	t := widget.Type()
-
-	resource := "/clients/" + s.Configuration.Identifier + "/widgets/" + t + "/update"
-	resp, err := s.send("POST", resource, &widget, nil, nil)
-	if err != nil {
-		return err
-	} else if resp.HttpResponse().StatusCode != 200 {
-		return errors.New("Could not post widget update " + resp.HttpResponse().Status)
-	}
-
-	return nil
-}
-
 func (s *Server) PostWidgetBulkUpdate(updates []widgets.BulkElement) error {
 	resource := "/clients/" + s.Configuration.Identifier + "/bulk_update"
 	resp, err := s.send("POST", resource, updates, nil, nil)
