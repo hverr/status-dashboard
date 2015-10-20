@@ -7,7 +7,6 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/hverr/status-dashboard/server"
-	"github.com/hverr/status-dashboard/server/settings"
 	"github.com/hverr/status-dashboard/widgets"
 )
 
@@ -103,7 +102,7 @@ func (api *API) requestedClientWidgets(c *gin.Context) {
 	select {
 	case requested := <-api.Scheduler.RequestUpdateRequest(client.Identifier):
 		c.JSON(200, gin.H{"widgets": requested})
-	case <-time.After(settings.MaximumClientUpdateInterval):
+	case <-time.After(api.Configuration.MaximumClientUpdateInterval):
 		c.JSON(200, gin.H{"widgets": []string{}})
 	}
 }

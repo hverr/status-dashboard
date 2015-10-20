@@ -7,6 +7,7 @@ import (
 )
 
 type API struct {
+	Configuration     server.Configuration
 	Server            server.Server
 	UserAuthenticator server.UserAuthenticator
 

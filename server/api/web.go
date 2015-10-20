@@ -6,7 +6,6 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/hverr/status-dashboard/server/broadcaster"
-	"github.com/hverr/status-dashboard/server/settings"
 )
 
 func (api *API) availableClients(c *gin.Context) {
@@ -45,7 +44,7 @@ func (api *API) updateRequest(c *gin.Context) {
 			// to not overload the system.
 			r = make(chan bool, 1)
 			go func() {
-				<-time.After(settings.MinimumClientUpdateInterval)
+				<-time.After(api.Configuration.MinimumClientUpdateInterval)
 				r <- true
 			}()
 		}
@@ -69,7 +68,7 @@ func (api *API) updateRequest(c *gin.Context) {
 	}
 
 	go func() {
-		<-time.After(2 * settings.MinimumClientUpdateInterval)
+		<-time.After(2 * api.Configuration.MinimumClientUpdateInterval)
 		stopper.Emit()
 	}()
 

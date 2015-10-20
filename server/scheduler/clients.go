@@ -3,7 +3,6 @@ package scheduler
 import (
 	"time"
 
-	"github.com/hverr/status-dashboard/server/settings"
 	"github.com/pmylund/go-cache"
 )
 
@@ -27,7 +26,7 @@ func (s *scheduler) RequestUpdateRequest(client string) chan []string {
 
 	out := make(chan []string, 1)
 	go func() {
-		minAge := settings.MinimumClientUpdateInterval
+		minAge := s.configuration.MinimumClientUpdateInterval
 		age := time.Since(c.lastUpdated)
 
 		if age < minAge && !c.hasImmediateRequest() {

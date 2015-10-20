@@ -68,9 +68,10 @@ func main() {
 
 	// Install rest api
 	restApi := api.API{
+		Configuration:     config,
 		Server:            serv,
 		UserAuthenticator: userAuth,
-		Scheduler:         scheduler.New(),
+		Scheduler:         scheduler.New(config),
 	}
 	if err := restApi.Install(router); err != nil {
 		log.Fatal("fatal: could not serve API:", err)

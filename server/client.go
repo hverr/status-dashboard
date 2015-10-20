@@ -8,7 +8,6 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
-	"github.com/hverr/status-dashboard/server/settings"
 	"github.com/hverr/status-dashboard/widgets"
 	"github.com/pmylund/go-cache"
 )
@@ -82,7 +81,7 @@ func (s *server) GetClient(identifier string) (*Client, bool) {
 	}
 
 	c := o.(*Client)
-	if time.Since(c.LastSeen) > settings.MaximumWidgetAge {
+	if time.Since(c.LastSeen) > s.Configuration.MaximumWidgetAge {
 		return c, false
 	}
 

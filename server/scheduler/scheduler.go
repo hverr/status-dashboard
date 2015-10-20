@@ -1,6 +1,9 @@
 package scheduler
 
-import "github.com/pmylund/go-cache"
+import (
+	"github.com/hverr/status-dashboard/server"
+	"github.com/pmylund/go-cache"
+)
 
 type Scheduler interface {
 	// Methods used to manage clients.
@@ -14,11 +17,14 @@ type Scheduler interface {
 }
 
 type scheduler struct {
+	configuration server.Configuration
+
 	widgetRequests *cache.Cache
 }
 
-func New() Scheduler {
+func New(c server.Configuration) Scheduler {
 	return &scheduler{
+		configuration:  c,
 		widgetRequests: cache.New(cache.NoExpiration, cache.NoExpiration),
 	}
 }
