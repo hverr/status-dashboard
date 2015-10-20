@@ -9,6 +9,7 @@ import (
 	"testing"
 
 	"github.com/hverr/status-dashboard/server"
+	"github.com/hverr/status-dashboard/widgets"
 	"github.com/jmcvetta/napping"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -193,6 +194,90 @@ func TestGetRequestedWidgetsWithHttpError(t *testing.T) {
 	defer ts.Close()
 
 	_, err := s.GetRequestedWidgets()
+	assert.Error(t, err)
+	assert.Contains(t, err.Error(), "Internal Server Error")
+}
+
+func TestPostWidgetBulkUpdate(t *testing.T) {
+	// Setup
+	widget, err := json.Marshal(map[string]interface{}{
+		"key": "value",
+	})
+	require.Nil(t, err)
+
+	expectedUpdates := []widgets.BulkElement{
+		{
+			Type:       "load",
+			Identifier: "load",
+			Widget:     []byte("null"),
+		},
+		{
+			Type:       "meminfo",
+			Identifier: "meminfo",
+			Widget:     widget,
+		},
+	}
+
+	// Test
+	ts, s := newTestServer(func(w http.ResponseWriter, r *http.Request) {
+		assert.Equal(t, TestServerAPI+"/clients/"+TestServerIdentifier+"/bulk_update", r.URL.String())
+
+		var payload []widgets.BulkElement
+		err := json.NewDecoder(r.Body).Decode(&payload)
+		assert.Nil(t, err, "Could not decode body: %v", err)
+		assert.True(
+			t,
+			reflect.DeepEqual(expectedUpdates, payload),
+			"Payload did not match: %v == %v (expected).",
+			payload,
+			expectedUpdates,
+		)
+
+		w.WriteHeader(http.StatusOK)
+	})
+	defer ts.Close()
+
+	err = s.PostWidgetBulkUpdate(expectedUpdates)
+	assert.Nil(t, err, "Unexpected error: %v", err)
+}
+
+func TestPostWidgetBulkUpdateWithError(t *testing.T) {
+	// Simulate a JSON marshal error
+	expectedUpdates := []widgets.BulkElement{
+		{
+			Type:       "load",
+			Identifier: "load",
+			Widget:     nil,
+		},
+	}
+
+	// Test
+	ts, s := newTestServer(func(w http.ResponseWriter, r *http.Request) {
+		assert.True(t, false, "Should not make server request.")
+	})
+	defer ts.Close()
+
+	err := s.PostWidgetBulkUpdate(expectedUpdates)
+	assert.Error(t, err, "Expected a JSON marshal error.")
+}
+
+func TestPostWidgetBulkUpdateWithHttpError(t *testing.T) {
+	// Setup
+	expectedUpdates := []widgets.BulkElement{
+		{
+			Type:       "load",
+			Identifier: "load",
+			Widget:     []byte("null"),
+		},
+	}
+
+	// Test
+	ts, s := newTestServer(func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusInternalServerError)
+	})
+	defer ts.Close()
+
+	err := s.PostWidgetBulkUpdate(expectedUpdates)
 	assert.Error(t, err)
 	assert.Contains(t, err.Error(), "Internal Server Error")
 }
