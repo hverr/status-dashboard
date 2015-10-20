@@ -5,22 +5,21 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
-	"github.com/hverr/status-dashboard/server"
 	"github.com/hverr/status-dashboard/server/broadcaster"
 	"github.com/hverr/status-dashboard/server/scheduler"
 	"github.com/hverr/status-dashboard/server/settings"
 )
 
-func availableClients(c *gin.Context) {
-	if !server.BasicAuthForUser(c) {
+func (api *API) availableClients(c *gin.Context) {
+	if !api.UserAuthenticator.BasicAuthForUser(c) {
 		return
 	}
 
-	c.JSON(200, server.AllRegisteredClients())
+	c.JSON(200, api.Server.AllRegisteredClients())
 }
 
-func updateRequest(c *gin.Context) {
-	if !server.BasicAuthForUser(c) {
+func (api *API) updateRequest(c *gin.Context) {
+	if !api.UserAuthenticator.BasicAuthForUser(c) {
 		return
 	}
 
@@ -81,7 +80,7 @@ func updateRequest(c *gin.Context) {
 	for clientIdentifier, requestedWidgets := range request {
 		clientResult := make(map[string]interface{})
 
-		client, active := server.GetClient(clientIdentifier)
+		client, active := api.Server.GetClient(clientIdentifier)
 
 		for _, widgetType := range requestedWidgets {
 			if client == nil || !active {

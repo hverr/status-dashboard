@@ -33,12 +33,7 @@ type WidgetRegistration struct {
 	Configuration json.RawMessage `json:"configuration" binding:"required"`
 }
 
-var (
-	RegisteredClients  = cache.New(cache.NoExpiration, cache.NoExpiration)
-	InitializedClients = cache.New(cache.NoExpiration, cache.NoExpiration)
-)
-
-func RegisterClient(r *ClientRegistration) error {
+func (s *Server) RegisterClient(r *ClientRegistration) error {
 	client := Client{
 		Name:       r.Name,
 		Identifier: r.Identifier,
@@ -62,14 +57,14 @@ func RegisterClient(r *ClientRegistration) error {
 	log.Printf("Client registration request %v (%v)", client.Name, client.Identifier)
 
 	// Actually register the client.
-	RegisteredClients.Set(r.Identifier, r, cache.DefaultExpiration)
-	InitializedClients.Set(client.Identifier, &client, cache.DefaultExpiration)
+	s.registeredClients.Set(r.Identifier, r, cache.DefaultExpiration)
+	s.initializedClients.Set(client.Identifier, &client, cache.DefaultExpiration)
 
 	return nil
 }
 
-func AllRegisteredClients() []*ClientRegistration {
-	items := RegisteredClients.Items()
+func (s *Server) AllRegisteredClients() []*ClientRegistration {
+	items := s.registeredClients.Items()
 	result := make([]*ClientRegistration, 0, len(items))
 	for _, item := range items {
 		result = append(result, item.Object.(*ClientRegistration))
@@ -78,8 +73,8 @@ func AllRegisteredClients() []*ClientRegistration {
 	return result
 }
 
-func GetClient(identifier string) (*Client, bool) {
-	o, ok := InitializedClients.Get(identifier)
+func (s *Server) GetClient(identifier string) (*Client, bool) {
+	o, ok := s.initializedClients.Get(identifier)
 	if !ok {
 		return nil, false
 	}
@@ -92,9 +87,9 @@ func GetClient(identifier string) (*Client, bool) {
 	return c, true
 }
 
-func AuthenticateClient(c *gin.Context, clientIdentifier string) bool {
+func (s *Server) AuthenticateClient(c *gin.Context, clientIdentifier string) bool {
 	clientSecret := c.Request.Header.Get("X-Client-Secret")
-	clientConfig, ok := Configuration.Clients[clientIdentifier]
+	clientConfig, ok := s.Configuration.Clients[clientIdentifier]
 	if !ok || clientSecret != clientConfig.Secret {
 		c.JSON(http.StatusUnauthorized, gin.H{
 			"message": "Could not authenticate client.",

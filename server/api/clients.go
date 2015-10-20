@@ -12,7 +12,7 @@ import (
 	"github.com/hverr/status-dashboard/widgets"
 )
 
-func registerClient(c *gin.Context) {
+func (api *API) registerClient(c *gin.Context) {
 	var r server.ClientRegistration
 
 	if err := c.BindJSON(&r); err != nil {
@@ -20,11 +20,11 @@ func registerClient(c *gin.Context) {
 		return
 	}
 
-	if !server.AuthenticateClient(c, r.Identifier) {
+	if !api.Server.AuthenticateClient(c, r.Identifier) {
 		return
 	}
 
-	if err := server.RegisterClient(&r); err != nil {
+	if err := api.Server.RegisterClient(&r); err != nil {
 		c.AbortWithError(400, err)
 		return
 	}
@@ -34,14 +34,14 @@ func registerClient(c *gin.Context) {
 	c.JSON(200, gin.H{})
 }
 
-func bulkUpdateClient(c *gin.Context) {
-	client, _ := server.GetClient(c.Param("client"))
+func (api *API) bulkUpdateClient(c *gin.Context) {
+	client, _ := api.Server.GetClient(c.Param("client"))
 	if client == nil {
 		c.AbortWithError(404, errors.New("Client not found."))
 		return
 	}
 
-	if !server.AuthenticateClient(c, client.Identifier) {
+	if !api.Server.AuthenticateClient(c, client.Identifier) {
 		return
 	}
 
@@ -90,14 +90,14 @@ func bulkUpdateClient(c *gin.Context) {
 	c.JSON(200, gin.H{"status": "OK"})
 }
 
-func requestedClientWidgets(c *gin.Context) {
-	client, _ := server.GetClient(c.Param("client"))
+func (api *API) requestedClientWidgets(c *gin.Context) {
+	client, _ := api.Server.GetClient(c.Param("client"))
 	if client == nil {
 		c.AbortWithError(404, errors.New("Client not found."))
 		return
 	}
 
-	if !server.AuthenticateClient(c, client.Identifier) {
+	if !api.Server.AuthenticateClient(c, client.Identifier) {
 		return
 	}
 

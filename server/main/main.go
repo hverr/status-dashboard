@@ -33,7 +33,9 @@ func main() {
 		os.Exit(1)
 	}
 
-	if err := server.ParseConfiguration(configFile); err != nil {
+	// Setup configuration
+	config := server.Configuration{}
+	if err := config.ParseConfiguration(configFile); err != nil {
 		fmt.Fprintln(os.Stderr, "fatal: could not parse configuration file ",
 			configFile+":", err)
 		os.Exit(1)
@@ -44,14 +46,31 @@ func main() {
 	}
 	router := gin.Default()
 
-	if err := static.Install(router); err != nil {
+	// Setup user authenticatuer
+	userAuth := server.UserAuthenticator{
+		Configuration: config,
+	}
+
+	// Create a server
+	serv := server.NewServer(config)
+
+	// Install static api
+	staticApi := static.Static{
+		UserAuthenticator: userAuth,
+	}
+	if err := staticApi.Install(router); err != nil {
 		log.Println("We could not serve the static files. If not already")
 		log.Println("done, set the HTML_ROOT environment variable to the")
 		log.Println("of the static files.")
 		log.Fatal("fatal: could not serve static files:", err)
 	}
 
-	if err := api.Install(router); err != nil {
+	// Install rest api
+	restApi := api.API{
+		Server:            serv,
+		UserAuthenticator: userAuth,
+	}
+	if err := restApi.Install(router); err != nil {
 		log.Fatal("fatal: could not serve API:", err)
 	}
 
