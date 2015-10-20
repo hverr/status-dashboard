@@ -155,6 +155,7 @@ func TestGetRequestedWidgets(t *testing.T) {
 
 	// Test
 	ts, s := newTestServer(func(w http.ResponseWriter, r *http.Request) {
+		assert.Equal(t, TestServerAPI+"/clients/"+TestServerIdentifier+"/requested_widgets", r.URL.String())
 		err := json.NewEncoder(w).Encode(&expectedResponse)
 		require.Nil(t, err, "Unexpected error: %v", err)
 	})
