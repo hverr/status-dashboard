@@ -146,3 +146,52 @@ func TestRegisterWithHttpError(t *testing.T) {
 	assert.Error(t, err, "Expected a custom error.")
 	assert.Contains(t, err.Error(), "Internal Server Error")
 }
+
+func TestGetRequestedWidgets(t *testing.T) {
+	// Setup
+	expectedResponse := RequestedWidgets{
+		Widgets: []string{"load", "network_eth0"},
+	}
+
+	// Test
+	ts, s := newTestServer(func(w http.ResponseWriter, r *http.Request) {
+		err := json.NewEncoder(w).Encode(&expectedResponse)
+		require.Nil(t, err, "Unexpected error: %v", err)
+	})
+	defer ts.Close()
+
+	response, err := s.GetRequestedWidgets()
+	assert.Nil(t, err, "Unexpected error: %v", err)
+	assert.True(
+		t,
+		reflect.DeepEqual(expectedResponse, response),
+		"Response doesn't match: %v == %v (expected)",
+		response,
+		expectedResponse,
+	)
+}
+
+func TestGetRequestedWidgetsWithError(t *testing.T) {
+	// Simulate malformed server response
+	ts, s := newTestServer(func(w http.ResponseWriter, r *http.Request) {
+		_, err := w.Write([]byte("malformed body"))
+		require.Nil(t, err, "Unexpected error: %v", err)
+	})
+	defer ts.Close()
+
+	// Test
+	_, err := s.GetRequestedWidgets()
+	assert.Error(t, err)
+}
+
+func TestGetRequestedWidgetsWithHttpError(t *testing.T) {
+	// Test
+	ts, s := newTestServer(func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusInternalServerError)
+	})
+	defer ts.Close()
+
+	_, err := s.GetRequestedWidgets()
+	assert.Error(t, err)
+	assert.Contains(t, err.Error(), "Internal Server Error")
+}
