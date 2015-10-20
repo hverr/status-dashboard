@@ -5,16 +5,13 @@ import (
 	"time"
 
 	"github.com/hverr/status-dashboard/server/broadcaster"
-	"github.com/pmylund/go-cache"
 )
 
-var widgetRequests = cache.New(cache.NoExpiration, cache.NoExpiration)
-
-func RequestWidgets(client string, widgets []string, immediately bool) chan bool {
+func (s *scheduler) RequestWidgets(client string, widgets []string, immediately bool) chan bool {
 	r := newWidgetRequest(widgets)
 	r.immediately = immediately
 
-	o, ok := widgetRequests.Get(client)
+	o, ok := s.widgetRequests.Get(client)
 	if !ok {
 		return nil
 	}

@@ -7,7 +7,6 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/hverr/status-dashboard/server"
-	"github.com/hverr/status-dashboard/server/scheduler"
 	"github.com/hverr/status-dashboard/server/settings"
 	"github.com/hverr/status-dashboard/widgets"
 )
@@ -29,7 +28,7 @@ func (api *API) registerClient(c *gin.Context) {
 		return
 	}
 
-	scheduler.RegisterClient(r.Identifier)
+	api.Scheduler.RegisterClient(r.Identifier)
 
 	c.JSON(200, gin.H{})
 }
@@ -85,7 +84,7 @@ func (api *API) bulkUpdateClient(c *gin.Context) {
 		client.DeleteWidget(w)
 	}
 
-	scheduler.FulfillUpdateRequest(client.Identifier, updated)
+	api.Scheduler.FulfillUpdateRequest(client.Identifier, updated)
 
 	c.JSON(200, gin.H{"status": "OK"})
 }
@@ -102,7 +101,7 @@ func (api *API) requestedClientWidgets(c *gin.Context) {
 	}
 
 	select {
-	case requested := <-scheduler.RequestUpdateRequest(client.Identifier):
+	case requested := <-api.Scheduler.RequestUpdateRequest(client.Identifier):
 		c.JSON(200, gin.H{"widgets": requested})
 	case <-time.After(settings.MaximumClientUpdateInterval):
 		c.JSON(200, gin.H{"widgets": []string{}})

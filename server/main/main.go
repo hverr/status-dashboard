@@ -9,6 +9,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/hverr/status-dashboard/server"
 	"github.com/hverr/status-dashboard/server/api"
+	"github.com/hverr/status-dashboard/server/scheduler"
 	"github.com/hverr/status-dashboard/server/static"
 )
 
@@ -69,6 +70,7 @@ func main() {
 	restApi := api.API{
 		Server:            serv,
 		UserAuthenticator: userAuth,
+		Scheduler:         scheduler.New(),
 	}
 	if err := restApi.Install(router); err != nil {
 		log.Fatal("fatal: could not serve API:", err)

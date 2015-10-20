@@ -7,13 +7,13 @@ import (
 	"github.com/pmylund/go-cache"
 )
 
-func RegisterClient(client string) {
+func (s *scheduler) RegisterClient(client string) {
 	c := newWidgetRequestsContainer()
-	widgetRequests.Add(client, c, cache.DefaultExpiration)
+	s.widgetRequests.Add(client, c, cache.DefaultExpiration)
 }
 
-func RequestUpdateRequest(client string) chan []string {
-	o, ok := widgetRequests.Get(client)
+func (s *scheduler) RequestUpdateRequest(client string) chan []string {
+	o, ok := s.widgetRequests.Get(client)
 	if !ok {
 		return nil
 	}
@@ -44,8 +44,8 @@ func RequestUpdateRequest(client string) chan []string {
 	return out
 }
 
-func FulfillUpdateRequest(client string, updated []string) {
-	o, ok := widgetRequests.Get(client)
+func (s *scheduler) FulfillUpdateRequest(client string, updated []string) {
+	o, ok := s.widgetRequests.Get(client)
 	if !ok {
 		return
 	}

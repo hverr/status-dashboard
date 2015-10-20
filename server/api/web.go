@@ -6,7 +6,6 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/hverr/status-dashboard/server/broadcaster"
-	"github.com/hverr/status-dashboard/server/scheduler"
 	"github.com/hverr/status-dashboard/server/settings"
 )
 
@@ -39,7 +38,7 @@ func (api *API) updateRequest(c *gin.Context) {
 	// Inform the scheduler about all requested widgets
 	fulfilled := make([]chan bool, 0, len(request))
 	for client, widgets := range request {
-		r := scheduler.RequestWidgets(client, widgets, c.Query("force") == "true")
+		r := api.Scheduler.RequestWidgets(client, widgets, c.Query("force") == "true")
 
 		if r == nil {
 			// The client is unavailable. Pretend querying the client

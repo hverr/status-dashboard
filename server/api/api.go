@@ -3,11 +3,14 @@ package api
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/hverr/status-dashboard/server"
+	"github.com/hverr/status-dashboard/server/scheduler"
 )
 
 type API struct {
 	Server            server.Server
 	UserAuthenticator server.UserAuthenticator
+
+	Scheduler scheduler.Scheduler
 }
 
 // Install installs the API end points.
