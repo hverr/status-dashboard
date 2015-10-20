@@ -12,6 +12,11 @@ func (s *scheduler) RegisterClient(client string) {
 	s.widgetRequests.Add(client, c, cache.DefaultExpiration)
 }
 
+func (s *scheduler) HasClient(client string) bool {
+	_, ok := s.widgetRequests.Get(client)
+	return ok
+}
+
 func (s *scheduler) RequestUpdateRequest(client string) chan []string {
 	o, ok := s.widgetRequests.Get(client)
 	if !ok {

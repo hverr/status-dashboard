@@ -5,6 +5,7 @@ import "github.com/pmylund/go-cache"
 type Scheduler interface {
 	// Methods used to manage clients.
 	RegisterClient(client string)
+	HasClient(client string) bool
 	RequestUpdateRequest(client string) chan []string
 	FulfillUpdateRequest(client string, updated []string)
 
