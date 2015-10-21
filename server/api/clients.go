@@ -69,7 +69,7 @@ func (api *API) bulkUpdateClient(c *gin.Context) {
 			result = append(result, widget)
 
 		} else {
-			missing = append(missing, u.Type)
+			missing = append(missing, u.Identifier)
 		}
 
 		updated = append(updated, u.Identifier)
