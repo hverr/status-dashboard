@@ -2,6 +2,7 @@ package server
 
 import (
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/assert"
 )
@@ -89,5 +90,48 @@ func TestRegisterClient(t *testing.T) {
 		err := serv.RegisterClient(&ir)
 		assert.Error(t, err)
 		assert.Contains(t, err.Error(), "Could not configure")
+	}
+}
+
+func TestGetClient(t *testing.T) {
+	// Client not found
+	{
+		serv := NewServer(validConfig())
+		c, ok := serv.GetClient("unknown-client")
+		assert.Nil(t, c)
+		assert.False(t, ok)
+	}
+
+	// Valid query and expired client
+	{
+		r := ClientRegistration{
+			Name:       TestClientName,
+			Identifier: TestClientIdentifier,
+			AvailableWidgets: []WidgetRegistration{
+				{"load", []byte("null")},
+			},
+		}
+
+		config := validConfig()
+		config.MaximumWidgetAge = 10 * time.Second
+
+		serv := NewServer(config)
+		err := serv.RegisterClient(&r)
+		assert.Nil(t, err, "Unexpected error: %v", err)
+
+		c, _ := serv.GetClient(TestClientIdentifier)
+		assert.NotNil(t, c)
+
+		// Valid query
+		c.LastSeen = time.Now()
+		c, ok := serv.GetClient(TestClientIdentifier)
+		assert.NotNil(t, c)
+		assert.True(t, ok)
+
+		// Expired
+		c.LastSeen = time.Now().Add(-5 * time.Minute)
+		c, ok = serv.GetClient(TestClientIdentifier)
+		assert.NotNil(t, c)
+		assert.False(t, ok)
 	}
 }
