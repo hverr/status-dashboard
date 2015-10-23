@@ -47,8 +47,15 @@ Releases include 32-bit and 64-bit binaries for:
  - darwin
  - windows
 
+
+### Usage
+See the systemd-scripts in the [examples](examples) directory:
+
+    - `dashboard-server -c server_config.json`
+    - `dashboard-client -c client_config.json`
+
 ### User Authentication
-You can protect the dashboard using HTTP basic authentication by adding a dictionary of login, password pairs to the configuration file.
+You can protect the dashboard using HTTP basic authentication by adding a dictionary of login, password pairs to the configuration file of the server.
 
 ```json
 {
@@ -58,6 +65,20 @@ You can protect the dashboard using HTTP basic authentication by adding a dictio
 }
 ```
 
+### SSL
+You can protect the application with SSL by using a reverse proxy such as nginx. A sample configuration file can be found in [Dockerfile.nginx](Dockerfile.nginx) and [nginx.conf](examples/nginx.conf).
+
+If you're using a self-signed certificate or CA, specify the `-ca root_ca_certificate_file` option when starting the client. An example:
+
+```sh
+make docker # Docker that will run the dashboard
+make nginx # Docker that will host the nginx proxy
+make docker-run-server # Run the server in a docker
+make nginx-run # Run nginx proxy
+go client/main/*.go -c client/main/dev_ssl_config.json -ca examples/root_ca.pem
+```
+
+You can now browse to [https://localhost:12443](https://localhost:12443)
 ## Building
 Building a binary for your platform is easiest using Docker on a Linux machine, or locally using the [Makefile](Makefile).
 
@@ -131,17 +152,3 @@ To add widgets, you must implement several class in the following locations:
 ## Screenshot
 ![Screenshot](screenshot.png)
 
-## SSL
-You can protect the application with SSL by using a reverse proxy such as nginx. A sample configuration file can be found in [Dockerfile.nginx](Dockerfile.nginx) and [nginx.conf](examples/nginx.conf).
-
-If you're using a self-signed certificate or CA, specify the `-ca root_ca_certificate_file` option when starting the client. An example:
-
-```sh
-make docker # Docker that will run the dashboard
-make nginx # Docker that will host the nginx proxy
-make docker-run-server # Run the server in a docker
-make nginx-run # Run nginx proxy
-go client/main/*.go -c client/main/dev_ssl_config.json -ca examples/root_ca.pem
-```
-
-You can now browse to [https://localhost:12443](https://localhost:12443)
