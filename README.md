@@ -44,10 +44,9 @@
 Binaries (assets included) are available in the [release section](https://github.com/hverr/status-dashboard/releases), or can be [built manually](#building).
 
 Releases include 32-bit and 64-bit binaries for:
- - linux
- - darwin
- - windows
-
+ - linux (client/server)
+ - darwin (server)
+ - windows (server)
 
 ### Usage
 See the systemd-scripts in the [examples](examples) directory:
