@@ -14,5 +14,5 @@ script:
   - gulp lint
   - gulp build
   - make
-  - ./test_release.sh ./dasboard-server
-  - ./test_release.sh ./dasboard-client
+  - ./test_release.sh ./dashboard-server
+  - ./test_release.sh ./dashboard-client
