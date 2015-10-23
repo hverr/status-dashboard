@@ -17,14 +17,17 @@ CONFIGURATION FILE:
 		"identifier": "webserver",
 		"name": "Web Server",
 		"widgets" : [
-			"uptime",
-			"load",
-			"time"
+			"uptime" : {},
+			"load" : {},
+			"time" : {},
+			"network" : {
+				"interface" : "eth0"
+			}
 		]
 	}	
 
 	**api**: The dashboard server API end point.
 	**identifier**: Unique identifier for the client.
 	**name**: Human-readable name of the client.
-	**widgets**: Widgets for which to send information.
+	**widgets**: Widgets and configuration for which to send information.
 `
