@@ -1,5 +1,13 @@
 #!/bin/bash
 
+##############################################################################
+# Usage: ./test_release.sh executable1 [executable2 ...]                     #
+#                                                                            #
+# This script makes sure version information is available in an executable.  #
+# Furthermore it makes sure the executable was not built in a dirty          #
+# worktree.                                                                  #
+##############################################################################
+
 set -e
 
 run_tests() {
