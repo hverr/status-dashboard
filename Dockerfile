@@ -3,6 +3,7 @@ FROM golang:1.5
 MAINTAINER Henri Verroken
 
 RUN apt-get update && apt-get install -y \
+    git \
     npm \
     nodejs \
     nodejs-legacy \
