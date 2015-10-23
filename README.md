@@ -34,6 +34,7 @@
    - Memory usage
    - Load average
    - Uptime
+   - Network (up/down bandwidth)
  - **Client-less widgets**
    - Current date
    - Current time
