@@ -1,6 +1,8 @@
 package main
 
-var usage = `Usage: dashboard-server -c config_file [-listen listen_addr] [-debug]
+var usage = `Usage:
+	dashboard-server -c config_file [-listen listen_addr] [-debug]
+	dashboard-server -version
 
 DESCRIPTION:
 	dashboard-server servers the server application
@@ -12,6 +14,8 @@ OPTIONS:
 		The address to bind to
 	-debug:
 		Launch the HTTP router in debug mode
+	-version:
+		Show version information.
 
 CONFIGURATION FILE:
 	The configuration file is formatted in JSON and has the following layout:

@@ -14,6 +14,7 @@ import (
 
 	"github.com/hverr/status-dashboard/client"
 	"github.com/hverr/status-dashboard/server"
+	"github.com/hverr/status-dashboard/version"
 	"github.com/hverr/status-dashboard/widgets"
 )
 
@@ -25,13 +26,22 @@ type environment struct {
 func main() {
 	var configFile string
 	var ca string
+	var showVersion bool
 
 	flag.StringVar(&configFile, "c", "", "Configuration file.")
 	flag.StringVar(&ca, "ca", "", "Root CA certificate.")
+	flag.BoolVar(&showVersion, "version", false, "Show version information.")
 	flag.Parse()
 
 	printHelp := func() {
 		fmt.Fprint(os.Stderr, usage)
+	}
+
+	if showVersion {
+		if !version.PrintVersionInformation(os.Stdout) {
+			os.Exit(1)
+		}
+		return
 	}
 
 	if configFile == "" {
