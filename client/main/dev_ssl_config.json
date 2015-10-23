@@ -3,10 +3,13 @@
     "identifier" : "webserver",
     "name" : "Web Server",
     "secret" : "supersecretkey",
-    "widgets" : [
-        "uptime",
-        "load",
-        "meminfo",
-        "connections"
-    ]
+    "widgets" : {
+        "uptime" : {},
+        "load" : {},
+        "meminfo" : {},
+        "connections" : {},
+        "network" : {
+            "interface" : "eth0"
+        }
+    }
 }
