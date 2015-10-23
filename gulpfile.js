@@ -93,11 +93,19 @@ gulp.task('buildcss', function() {
     .pipe(concat('b.css'))
     .pipe(minify())
     .pipe(gulp.dest('dist'));
+
+  gulp.src('app/bower_components/open-sans/css/open-sans.min.css')
+    .pipe(gulp.dest('dist/css'));
 });
 
 gulp.task('buildassets', function() {
-  gulp.src(['app/bower_components/bootstrap/dist/fonts/**'])
+  var fonts = [
+    'app/bower_components/bootstrap/dist/fonts/**',
+    'app/bower_components/open-sans/fonts/**',
+  ];
+  gulp.src(fonts)
     .pipe(gulp.dest('dist/fonts'));
+
   gulp.src(['app/favicon.png'])
     .pipe(gulp.dest('dist'));
 });
