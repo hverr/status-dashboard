@@ -97,6 +97,7 @@ release:
 	gulp build
 	${GOPATH}/bin/gox \
 		-osarch="$(RELEASE_SERVER_OSARCH)" \
+		-ldflags="$(LDFLAGS)" \
 		-output="release/dashboard-server_{{.OS}}_{{.Arch}}" \
 		github.com/hverr/status-dashboard/server/main
 	rm -f assets.zip; zip -r assets dist
@@ -105,6 +106,7 @@ release:
 	#
 	${GOPATH}/bin/gox \
 		-osarch="$(RELEASE_CLIENT_OSARCH)" \
+		-ldflags="$(LDFLAGS)" \
 		-output="release/dashboard-client_{{.OS}}_{{.Arch}}" \
 		github.com/hverr/status-dashboard/client/main
 
