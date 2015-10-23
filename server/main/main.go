@@ -11,20 +11,30 @@ import (
 	"github.com/hverr/status-dashboard/server/api"
 	"github.com/hverr/status-dashboard/server/scheduler"
 	"github.com/hverr/status-dashboard/server/static"
+	"github.com/hverr/status-dashboard/version"
 )
 
 func main() {
 	var configFile string
 	var listenAddr string
 	var debug bool
+	var showVersion bool
 
 	flag.StringVar(&configFile, "c", "", "Configuration file.")
 	flag.StringVar(&listenAddr, "listen", ":8050", "Listen address.")
 	flag.BoolVar(&debug, "debug", false, "Debug gin router.")
+	flag.BoolVar(&showVersion, "version", false, "Show version information.")
 	flag.Parse()
 
 	printHelp := func() {
 		fmt.Fprint(os.Stderr, usage)
+	}
+
+	if showVersion {
+		if !version.PrintVersionInformation(os.Stdout) {
+			os.Exit(1)
+		}
+		return
 	}
 
 	if configFile == "" {

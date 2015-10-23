@@ -54,6 +54,11 @@ See the systemd-scripts in the [examples](examples) directory:
  - `dashboard-server -c server_config.json`
  - `dashboard-client -c client_config.json`
 
+To get version information, run:
+
+ - `dashboard-server -version`
+ - `dashboard-client -version`
+
 ### User Authentication
 You can protect the dashboard using HTTP basic authentication by adding a dictionary of login, password pairs to the configuration file of the server.
 

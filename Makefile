@@ -12,6 +12,23 @@ all: dashboard-server dashboard-client
 GOOS=
 GOARCH=
 
+# Setup version information
+ifneq (,$(wildcard .git))
+	COMMIT=$(shell git rev-parse --verify HEAD)
+	DIRTY=$(shell test -n "`git status --porcelain`" > /dev/null; echo $$?)
+	ifeq (0, $(DIRTY))
+		DIRTY=yes
+	else
+		DIRTY=
+	endif
+endif
+
+LDFLAGS=-X github.com/hverr/status-dashboard/version.Commit=$(COMMIT) -X github.com/hverr/status-dashboard/version.Dirty=$(DIRTY)
+
+print:
+	@echo $(COMMIT)
+	@echo $(DIRTY)
+
 RELEASE_SERVER_OSARCH=\
 	linux/amd64 \
 	linux/386 \
@@ -29,13 +46,13 @@ dashboard-server:
 	npm install
 	gulp build
 	bower install --allow-root
-	GOOS=$(GOOS) GOARCH=$(GOARCH) go build -o dashboard-server server/main/*.go
+	GOOS=$(GOOS) GOARCH=$(GOARCH) go build -ldflags "$(LDFLAGS)" -o dashboard-server server/main/*.go
 	rm -f assets; zip -r assets dist
 	cat assets.zip >> dashboard-server
 	rm assets.zip
 
 dashboard-client:
-	GOOS=$(GOOS) GOARCH=$(GOARCH) go build -o dashboard-client client/main/*.go
+	GOOS=$(GOOS) GOARCH=$(GOARCH) go build -ldflags "$(LDFLAGS)" -o dashboard-client client/main/*.go
 
 run-server:
 	HTML_ROOT=app go run server/main/*.go -c server/main/dev_config.json -debug
@@ -80,6 +97,7 @@ release:
 	gulp build
 	${GOPATH}/bin/gox \
 		-osarch="$(RELEASE_SERVER_OSARCH)" \
+		-ldflags="$(LDFLAGS)" \
 		-output="release/dashboard-server_{{.OS}}_{{.Arch}}" \
 		github.com/hverr/status-dashboard/server/main
 	rm -f assets.zip; zip -r assets dist
@@ -88,6 +106,7 @@ release:
 	#
 	${GOPATH}/bin/gox \
 		-osarch="$(RELEASE_CLIENT_OSARCH)" \
+		-ldflags="$(LDFLAGS)" \
 		-output="release/dashboard-client_{{.OS}}_{{.Arch}}" \
 		github.com/hverr/status-dashboard/client/main
 
