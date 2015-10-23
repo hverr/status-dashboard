@@ -5,7 +5,9 @@
 
  - [Features](#features)
  - [Installation](#installation)
+   - [Usage](#usage)
    - [User Authentication](#user-authentication)
+   - [SSL](#ssl)
  - [Building](#building)
    - [Using Docker](#using-docker)
    - [Locally](#locally)
@@ -14,7 +16,6 @@
    - [Client](#client)
    - [Adding Widgets](#adding-widgets)
  - [Screenshot](#screenshot)
- - [SSL](#ssl)
 
 ## Features
 
