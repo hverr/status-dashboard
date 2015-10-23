@@ -5,22 +5,19 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
-	"github.com/hverr/status-dashboard/server"
 	"github.com/hverr/status-dashboard/server/broadcaster"
-	"github.com/hverr/status-dashboard/server/scheduler"
-	"github.com/hverr/status-dashboard/server/settings"
 )
 
-func availableClients(c *gin.Context) {
-	if !server.BasicAuthForUser(c) {
+func (api *API) availableClients(c *gin.Context) {
+	if !api.UserAuthenticator.BasicAuthForUser(c) {
 		return
 	}
 
-	c.JSON(200, server.AllRegisteredClients())
+	c.JSON(200, api.Server.AllRegisteredClients())
 }
 
-func updateRequest(c *gin.Context) {
-	if !server.BasicAuthForUser(c) {
+func (api *API) updateRequest(c *gin.Context) {
+	if !api.UserAuthenticator.BasicAuthForUser(c) {
 		return
 	}
 
@@ -40,14 +37,14 @@ func updateRequest(c *gin.Context) {
 	// Inform the scheduler about all requested widgets
 	fulfilled := make([]chan bool, 0, len(request))
 	for client, widgets := range request {
-		r := scheduler.RequestWidgets(client, widgets, c.Query("force") == "true")
+		r := api.Scheduler.RequestWidgets(client, widgets, c.Query("force") == "true")
 
 		if r == nil {
 			// The client is unavailable. Pretend querying the client
 			// to not overload the system.
 			r = make(chan bool, 1)
 			go func() {
-				<-time.After(settings.MinimumClientUpdateInterval)
+				<-time.After(api.Configuration.MinimumClientUpdateInterval)
 				r <- true
 			}()
 		}
@@ -71,7 +68,7 @@ func updateRequest(c *gin.Context) {
 	}
 
 	go func() {
-		<-time.After(2 * settings.MinimumClientUpdateInterval)
+		<-time.After(2 * api.Configuration.MinimumClientUpdateInterval)
 		stopper.Emit()
 	}()
 
@@ -81,7 +78,7 @@ func updateRequest(c *gin.Context) {
 	for clientIdentifier, requestedWidgets := range request {
 		clientResult := make(map[string]interface{})
 
-		client, active := server.GetClient(clientIdentifier)
+		client, active := api.Server.GetClient(clientIdentifier)
 
 		for _, widgetType := range requestedWidgets {
 			if client == nil || !active {

@@ -6,9 +6,13 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func BasicAuthForUser(c *gin.Context) bool {
+type UserAuthenticator struct {
+	Configuration Configuration
+}
+
+func (auth *UserAuthenticator) BasicAuthForUser(c *gin.Context) bool {
 	u, p, _ := c.Request.BasicAuth()
-	if AuthenticateUser(u, p) {
+	if auth.AuthenticateUser(u, p) {
 		return true
 	}
 
@@ -19,12 +23,12 @@ func BasicAuthForUser(c *gin.Context) bool {
 	return false
 }
 
-func AuthenticateUser(username, password string) bool {
-	if Configuration.Users == nil {
+func (auth *UserAuthenticator) AuthenticateUser(username, password string) bool {
+	if auth.Configuration.Users == nil {
 		return true
 	}
 
-	pwd, ok := Configuration.Users[username]
+	pwd, ok := auth.Configuration.Users[username]
 	if ok && pwd == password {
 		return true
 	}

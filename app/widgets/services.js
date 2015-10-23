@@ -14,10 +14,17 @@ angular.module('dashboard').factory('Widget', [
         clientIdentifier: null,
         client: null,
         name: name,
+        configuration: null,
 
         data: null,
         update: function(data) {
           self.data = data;
+        },
+        configure: function(c) {
+          self.configuration = c;
+        },
+        identifier: function() {
+          return self.type;
         },
 
         watchValue: function() {
@@ -27,6 +34,7 @@ angular.module('dashboard').factory('Widget', [
             row: self.row, col: self.col,
             type: self.type, clientIdentifier: self.clientIdentifier,
             client: self.client, name: self.name,
+            configuration: self.configuration,
           };
         },
       };
@@ -43,12 +51,14 @@ angular.module('dashboard').factory('widgetFactory', [
   'CurrentTimeWidget',
   'CurrentDateWidget',
   'ConnectionsWidget',
+  'NetworkWidget',
   function(LoadWidget,
            UptimeWidget,
            MeminfoWidget,
            CurrentTimeWidget,
            CurrentDateWidget,
-           ConnectionsWidget)
+           ConnectionsWidget,
+           NetworkWidget)
   {
     return function(widgetType) {
       switch(widgetType) {
@@ -64,6 +74,8 @@ angular.module('dashboard').factory('widgetFactory', [
           return new CurrentDateWidget();
         case 'connections':
           return new ConnectionsWidget();
+        case 'network':
+          return new NetworkWidget();
         default:
           return null;
       }
@@ -125,14 +137,18 @@ angular.module('dashboard').factory('widgetsManager', [
       });
     }
 
-    function add(clientIdentifier, widgetType) {
-      var w = widgetFactory(widgetType);
+    function add(clientIdentifier, widget) {
+      var w = widgetFactory(widget.type);
       if(w === null) {
-        throw 'Unknown widget type: ' + widgetType;
+        throw new Error('Unknown widget type: ' + widget.type);
+      }
+
+      if(widget.configuration) {
+        w.configure(widget.configuration);
       }
 
       w.clientIdentifier = clientIdentifier;
-      w.type = widgetType;
+      w.type = widget.type;
       if(clientIdentifier !== "") {
         // only change widgets for remote clients
         w.available = false;
@@ -171,8 +187,8 @@ angular.module('dashboard').factory('widgetsManager', [
           request[w.clientIdentifier] = [];
         }
 
-        if(!(w.type in request[w.clientIdentifier])) {
-          request[w.clientIdentifier].push(w.type);
+        if(!(w.identifier() in request[w.clientIdentifier])) {
+          request[w.clientIdentifier].push(w.identifier());
         }
       });
 
@@ -180,7 +196,7 @@ angular.module('dashboard').factory('widgetsManager', [
         if(lastUpdateCall === thisUpdateCall) {
           widgets.forEach(function(widget) {
             var clientIdentifier = widget.clientIdentifier;
-            var widgetType = widget.type;
+            var widgetIdentifier = widget.identifier();
 
             if(clientIdentifier === "") {
               return; // ignore built-in widgets
@@ -188,12 +204,12 @@ angular.module('dashboard').factory('widgetsManager', [
 
             if(!(clientIdentifier in result)) {
               widget.available = false;
-            } else if(!(widgetType in result[clientIdentifier])) {
+            } else if(!(widgetIdentifier in result[clientIdentifier])) {
               widget.available = false;
-            } else if(!result[clientIdentifier][widgetType]) {
+            } else if(!result[clientIdentifier][widgetIdentifier]) {
               widget.available = false;
             } else {
-              widget.update(result[clientIdentifier][widgetType]);
+              widget.update(result[clientIdentifier][widgetIdentifier]);
               widget.available = true;
             }
           });
@@ -213,7 +229,7 @@ angular.module('dashboard').factory('widgetsManager', [
       $log.debug('Loading widgets:', json);
 
       json.forEach(function(data) {
-        var w = add(data.client, data.type);
+        var w = add(data.client, data);
         w.client = data.client;
 
         w.width = data.width;
@@ -252,6 +268,7 @@ angular.module('dashboard').factory('widgetsStore', [
         json.push({
           client: w.clientIdentifier,
           type: w.type,
+          configuration: w.configuration,
 
           height: w.height,
           width: w.width,

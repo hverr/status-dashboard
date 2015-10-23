@@ -7,37 +7,39 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/hverr/status-dashboard/server"
-	"github.com/hverr/status-dashboard/server/scheduler"
-	"github.com/hverr/status-dashboard/server/settings"
 	"github.com/hverr/status-dashboard/widgets"
 )
 
-func registerClient(c *gin.Context) {
-	var client server.Client
+func (api *API) registerClient(c *gin.Context) {
+	var r server.ClientRegistration
 
-	if err := c.BindJSON(&client); err != nil {
+	if err := c.BindJSON(&r); err != nil {
 		c.AbortWithError(400, err)
 		return
 	}
 
-	if !server.AuthenticateClient(c, client.Identifier) {
+	if !api.Server.AuthenticateClient(c, r.Identifier) {
 		return
 	}
 
-	server.RegisterClient(&client)
-	scheduler.RegisterClient(client.Identifier)
+	if err := api.Server.RegisterClient(&r); err != nil {
+		c.AbortWithError(400, err)
+		return
+	}
+
+	api.Scheduler.RegisterClient(r.Identifier)
 
 	c.JSON(200, gin.H{})
 }
 
-func bulkUpdateClient(c *gin.Context) {
-	client, _ := server.GetClient(c.Param("client"))
+func (api *API) bulkUpdateClient(c *gin.Context) {
+	client, _ := api.Server.GetClient(c.Param("client"))
 	if client == nil {
 		c.AbortWithError(404, errors.New("Client not found."))
 		return
 	}
 
-	if !server.AuthenticateClient(c, client.Identifier) {
+	if !api.Server.AuthenticateClient(c, client.Identifier) {
 		return
 	}
 
@@ -51,21 +53,15 @@ func bulkUpdateClient(c *gin.Context) {
 	result := make([]widgets.Widget, 0, len(updates))
 	missing := make([]string, 0)
 	for _, u := range updates {
-		initiator := widgets.AllWidgets[u.Type]
-		if initiator == nil {
-			c.AbortWithError(404, errors.New("Widget not found: "+u.Type))
-			return
-		}
-
-		if u.Widget != nil {
-			widget := initiator()
-			encoded, err := json.Marshal(u.Widget)
-			if err != nil {
-				c.AbortWithError(500, err)
+		if u.Widget != nil && u.Type != "" {
+			initiator := widgets.AllWidgets[u.Type]
+			if initiator == nil {
+				c.AbortWithError(404, errors.New("Widget not found: "+u.Type))
 				return
 			}
 
-			if err := json.Unmarshal(encoded, &widget); err != nil {
+			widget := initiator()
+			if err := json.Unmarshal(u.Widget, &widget); err != nil {
 				c.AbortWithError(400, err)
 				return
 			}
@@ -73,10 +69,10 @@ func bulkUpdateClient(c *gin.Context) {
 			result = append(result, widget)
 
 		} else {
-			missing = append(missing, u.Type)
+			missing = append(missing, u.Identifier)
 		}
 
-		updated = append(updated, u.Type)
+		updated = append(updated, u.Identifier)
 	}
 
 	for _, w := range result {
@@ -87,26 +83,26 @@ func bulkUpdateClient(c *gin.Context) {
 		client.DeleteWidget(w)
 	}
 
-	scheduler.FulfillUpdateRequest(client.Identifier, updated)
+	api.Scheduler.FulfillUpdateRequest(client.Identifier, updated)
 
 	c.JSON(200, gin.H{"status": "OK"})
 }
 
-func requestedClientWidgets(c *gin.Context) {
-	client, _ := server.GetClient(c.Param("client"))
+func (api *API) requestedClientWidgets(c *gin.Context) {
+	client, _ := api.Server.GetClient(c.Param("client"))
 	if client == nil {
 		c.AbortWithError(404, errors.New("Client not found."))
 		return
 	}
 
-	if !server.AuthenticateClient(c, client.Identifier) {
+	if !api.Server.AuthenticateClient(c, client.Identifier) {
 		return
 	}
 
 	select {
-	case requested := <-scheduler.RequestUpdateRequest(client.Identifier):
+	case requested := <-api.Scheduler.RequestUpdateRequest(client.Identifier):
 		c.JSON(200, gin.H{"widgets": requested})
-	case <-time.After(settings.MaximumClientUpdateInterval):
+	case <-time.After(api.Configuration.MaximumClientUpdateInterval):
 		c.JSON(200, gin.H{"widgets": []string{}})
 	}
 }

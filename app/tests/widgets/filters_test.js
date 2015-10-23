@@ -11,7 +11,24 @@ describe('widget filters', function() {
     }));
 
     it('should get the name', function() {
-      expect(widgetName('load')).to.equal('Load');
+      expect(widgetName({type:'load'})).to.equal('Load');
+    });
+
+    it('should handle configuration', function() {
+      var c;
+
+      c = {
+        type : 'network',
+      };
+      expect(widgetName(c)).to.equal('Network');
+
+      c = {
+        type : 'network',
+        configuration : {
+          'interface' : 'eth0',
+        },
+      };
+      expect(widgetName(c)).to.equal('Network (eth0)');
     });
 
     it('should handle unknown widgets', function() {

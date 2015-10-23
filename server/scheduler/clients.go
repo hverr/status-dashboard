@@ -3,17 +3,21 @@ package scheduler
 import (
 	"time"
 
-	"github.com/hverr/status-dashboard/server/settings"
 	"github.com/pmylund/go-cache"
 )
 
-func RegisterClient(client string) {
+func (s *scheduler) RegisterClient(client string) {
 	c := newWidgetRequestsContainer()
-	widgetRequests.Add(client, c, cache.DefaultExpiration)
+	s.widgetRequests.Add(client, c, cache.DefaultExpiration)
 }
 
-func RequestUpdateRequest(client string) chan []string {
-	o, ok := widgetRequests.Get(client)
+func (s *scheduler) HasClient(client string) bool {
+	_, ok := s.widgetRequests.Get(client)
+	return ok
+}
+
+func (s *scheduler) RequestUpdateRequest(client string) chan []string {
+	o, ok := s.widgetRequests.Get(client)
 	if !ok {
 		return nil
 	}
@@ -22,7 +26,7 @@ func RequestUpdateRequest(client string) chan []string {
 
 	out := make(chan []string, 1)
 	go func() {
-		minAge := settings.MinimumClientUpdateInterval
+		minAge := s.configuration.MinimumClientUpdateInterval
 		age := time.Since(c.lastUpdated)
 
 		if age < minAge && !c.hasImmediateRequest() {
@@ -44,8 +48,8 @@ func RequestUpdateRequest(client string) chan []string {
 	return out
 }
 
-func FulfillUpdateRequest(client string, updated []string) {
-	o, ok := widgetRequests.Get(client)
+func (s *scheduler) FulfillUpdateRequest(client string, updated []string) {
+	o, ok := s.widgetRequests.Get(client)
 	if !ok {
 		return
 	}

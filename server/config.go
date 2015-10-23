@@ -4,8 +4,6 @@ import (
 	"encoding/json"
 	"os"
 	"time"
-
-	"github.com/hverr/status-dashboard/server/settings"
 )
 
 type ClientConfiguration struct {
@@ -13,14 +11,18 @@ type ClientConfiguration struct {
 }
 
 // Configuration holds the server configuration
-var Configuration struct {
+type Configuration struct {
 	UpdateInterval int                            `json:"updateInterval"`
 	Clients        map[string]ClientConfiguration `json:"clients"`
 	Users          map[string]string              `json:"users"`
+
+	MinimumClientUpdateInterval time.Duration `json:"-"`
+	MaximumClientUpdateInterval time.Duration `json:"-"`
+	MaximumWidgetAge            time.Duration `json:"-"`
 }
 
 // Validate a configuration if it is invalid an error is returned.
-func ValidateConfiguration() error {
+func (c *Configuration) ValidateConfiguration() error {
 	return nil
 }
 
@@ -28,7 +30,7 @@ func ValidateConfiguration() error {
 //
 // Returns an error if reading the configuration file failed or if the resulting
 // configuration could not be Validated.
-func ParseConfiguration(file string) error {
+func (c *Configuration) ParseConfiguration(file string) error {
 	fh, err := os.Open(file)
 	if err != nil {
 		return err
@@ -36,14 +38,19 @@ func ParseConfiguration(file string) error {
 	defer fh.Close()
 
 	decoder := json.NewDecoder(fh)
-	if err := decoder.Decode(&Configuration); err != nil {
+	if err := decoder.Decode(&c); err != nil {
 		return err
 	}
 
-	if v := Configuration.UpdateInterval; v > 0 {
-		settings.MinimumClientUpdateInterval = time.Duration(v) * time.Second
-		settings.MaximumClientUpdateInterval = time.Duration(3*v/2) * time.Second
+	// Set defaults
+	c.MinimumClientUpdateInterval = 3 * time.Second
+	c.MaximumClientUpdateInterval = 5 * time.Second
+	c.MaximumWidgetAge = 30 * time.Second
+
+	if v := c.UpdateInterval; v > 0 {
+		c.MinimumClientUpdateInterval = time.Duration(v) * time.Second
+		c.MaximumClientUpdateInterval = time.Duration(3*v/2) * time.Second
 	}
 
-	return ValidateConfiguration()
+	return c.ValidateConfiguration()
 }

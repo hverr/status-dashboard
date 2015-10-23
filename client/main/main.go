@@ -3,6 +3,7 @@ package main
 import (
 	"crypto/tls"
 	"crypto/x509"
+	"encoding/json"
 	"flag"
 	"fmt"
 	"io/ioutil"
@@ -12,8 +13,14 @@ import (
 	"time"
 
 	"github.com/hverr/status-dashboard/client"
+	"github.com/hverr/status-dashboard/server"
 	"github.com/hverr/status-dashboard/widgets"
 )
+
+type environment struct {
+	Server        client.Server
+	Configuration client.Configuration
+}
 
 func main() {
 	var configFile string
@@ -34,6 +41,8 @@ func main() {
 		os.Exit(1)
 	}
 
+	env := &environment{}
+
 	if ca != "" {
 		var config tls.Config
 		pem, err := ioutil.ReadFile(ca)
@@ -47,77 +56,135 @@ func main() {
 			log.Println("warning: x509: could not use PEM in", ca)
 		}
 
-		client.Session.Client = &http.Client{
+		env.Server.Session.Client = &http.Client{
 			Transport: &http.Transport{
 				TLSClientConfig: &config,
 			},
 		}
 	}
 
-	if err := client.ParseConfiguration(configFile); err != nil {
+	// Parse configuration file.
+	fh, err := os.Open(configFile)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer fh.Close()
+
+	if err := env.Configuration.ParseConfiguration(fh); err != nil {
 		fmt.Fprintln(os.Stderr, "fatal: could not parse configuration file",
 			configFile+":", err)
 		os.Exit(1)
 	}
 
-	for {
-		registerUpdateLoop()
+	// Configure server behaviour
+	env.Server.Configuration = env.Configuration
 
+	for {
+		// Register the client.
+		if initialized, err, recoverable := register(env); err != nil {
+			if !recoverable {
+				log.Fatal("Could not register:", err)
+			} else {
+				log.Println("Could not register:", err)
+			}
+		} else {
+			// Registration was successful, constantly update now.
+			log.Println("Successfully registered:", initialized)
+			started := make(map[string]widgets.Widget)
+			for {
+				if err := update(env, initialized, started); err != nil {
+					log.Println("Could not update widgets:", err)
+					break
+				}
+			}
+		}
+
+		// Don't overload
 		t := 5 * time.Second
 		log.Println("Reregistering in", t)
 		<-time.After(t)
 	}
 }
 
-func registerUpdateLoop() {
-	if err := client.Register(); err != nil {
-		log.Println(err)
-		return
+func register(env *environment) (initialized map[string]widgets.Widget, err error, recoverable bool) {
+	// Determine available widgets and initialize them.
+	initialized = make(map[string]widgets.Widget)
+	availableWidgets := make([]server.WidgetRegistration, 0)
+	for widgetType, config := range env.Configuration.Widgets {
+		initiator := widgets.AllWidgets[widgetType]
+		if initiator == nil {
+			return nil, fmt.Errorf("Unsupported widget " + widgetType), false
+		}
+
+		w := initiator()
+		if err := w.Configure(config); err != nil {
+			return nil, fmt.Errorf("Could not configure %s: %v", widgetType, err), false
+		}
+
+		r := server.WidgetRegistration{
+			Type:          w.Type(),
+			Configuration: config,
+		}
+		availableWidgets = append(availableWidgets, r)
+		initialized[w.Identifier()] = w
 	}
 
-	for {
-		if err := update(); err != nil {
-			log.Println("Could not send updates:", err)
-			return
-		} else {
-			log.Println("Sent widget information.")
-		}
+	// Register widgets.
+	if err := env.Server.Register(availableWidgets); err != nil {
+		return nil, err, true
 	}
+
+	return initialized, nil, true
 }
 
-func update() error {
-	requested, err := client.GetRequestedWidgets()
+func update(env *environment, initialized, started map[string]widgets.Widget) error {
+	requested, err := env.Server.GetRequestedWidgets()
 	if err != nil {
 		return err
 	}
 
 	results := make([]widgets.BulkElement, 0, len(requested.Widgets))
 
-	for _, w := range requested.Widgets {
-		var widget widgets.Widget
+	for _, widgetIdentifier := range requested.Widgets {
+		widget, found := started[widgetIdentifier]
+		if !found {
+			widget, found = initialized[widgetIdentifier]
+			if !found {
+				log.Println("Unknown requested widget identifier: " + widgetIdentifier)
+				widget = nil
+			} else if err := widget.Start(); err != nil {
+				log.Println("Could not start widget", widgetIdentifier, ":", err)
+			}
+		}
 
-		initiator := widgets.AllWidgets[w]
-		if initiator == nil {
-			log.Print("Unknown requested widget type: " + w)
-			widget = nil
+		if widget != nil {
+			started[widgetIdentifier] = widget
 
-		} else {
-			widget = initiator()
 			if err := widget.Update(); err != nil {
-				log.Printf("Can't update %v: %v", w, err)
+				log.Printf("Can't update %v: %v", widgetIdentifier, err)
+				widget = nil
+			} else if widget.HasData() == false {
 				widget = nil
 			}
 		}
 
+		widgetRaw, err := json.Marshal(&widget)
+		if err != nil {
+			return fmt.Errorf("Can't marshal widget %s: %v", widget.Identifier(), err)
+		}
+
 		e := widgets.BulkElement{
-			Type:   w,
-			Widget: widget,
+			Identifier: widgetIdentifier,
+			Widget:     widgetRaw,
+		}
+		if widget != nil {
+			e.Type = widget.Type()
 		}
 
 		results = append(results, e)
 	}
 
-	if err := client.PostWidgetBulkUpdate(results); err != nil {
+	if err := env.Server.PostWidgetBulkUpdate(results); err != nil {
 		return err
 	}
 

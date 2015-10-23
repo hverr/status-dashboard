@@ -3,29 +3,29 @@ package client
 import (
 	"encoding/json"
 	"errors"
-	"os"
+	"io"
 
 	"github.com/hverr/status-dashboard/widgets"
 )
 
 // Configuration holds the client configuration.
-var Configuration struct {
-	API        string   `json:"api"`
-	Identifier string   `json:"identifier"`
-	Name       string   `json:"name"`
-	Secret     string   `json:"secret"`
-	Widgets    []string `json:"widgets"`
+type Configuration struct {
+	API        string                     `json:"api"`
+	Identifier string                     `json:"identifier"`
+	Name       string                     `json:"name"`
+	Secret     string                     `json:"secret"`
+	Widgets    map[string]json.RawMessage `json:"widgets"`
 }
 
 // Validate a configuration. If it is invalid an error is returned.
-func ValidateConfiguration() error {
-	if Configuration.API == "" {
+func (c *Configuration) ValidateConfiguration() error {
+	if c.API == "" {
 		return errors.New("No API is specified.")
-	} else if Configuration.Widgets == nil {
+	} else if c.Widgets == nil {
 		return errors.New("No widgets are specified.")
 	}
 
-	for _, w := range Configuration.Widgets {
+	for w, _ := range c.Widgets {
 		if widgets.AllWidgets[w] == nil {
 			return errors.New("Unsupported widget " + w)
 		}
@@ -38,17 +38,11 @@ func ValidateConfiguration() error {
 //
 // Returns an error if reading the configuration file failed or if the resulting
 // configuration could not be Validated.
-func ParseConfiguration(file string) error {
-	fh, err := os.Open(file)
-	if err != nil {
-		return err
-	}
-	defer fh.Close()
-
+func (c *Configuration) ParseConfiguration(fh io.Reader) error {
 	decoder := json.NewDecoder(fh)
-	if err := decoder.Decode(&Configuration); err != nil {
+	if err := decoder.Decode(&c); err != nil {
 		return err
 	}
 
-	return ValidateConfiguration()
+	return c.ValidateConfiguration()
 }

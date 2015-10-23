@@ -3,6 +3,7 @@ package widgets
 import (
 	"bufio"
 	"encoding/hex"
+	"encoding/json"
 	"errors"
 	"io"
 	"net"
@@ -26,8 +27,24 @@ func (widget *ConnectionsWidget) Type() string {
 	return ConnectionsWidgetType
 }
 
+func (widget *ConnectionsWidget) Identifier() string {
+	return widget.Type()
+}
+
 func (widget *ConnectionsWidget) HasData() bool {
 	return true
+}
+
+func (widget *ConnectionsWidget) Configure(json.RawMessage) error {
+	return nil
+}
+
+func (widget *ConnectionsWidget) Configuration() interface{} {
+	return nil
+}
+
+func (widget *ConnectionsWidget) Start() error {
+	return nil
 }
 
 func (widget *ConnectionsWidget) Update() error {

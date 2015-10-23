@@ -11,7 +11,11 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func Install(engine *gin.Engine) error {
+type Static struct {
+	UserAuthenticator server.UserAuthenticator
+}
+
+func (s *Static) Install(engine *gin.Engine) error {
 	var err error
 	var root string
 
@@ -51,7 +55,7 @@ func Install(engine *gin.Engine) error {
 		staticHandler := static.Serve(prefix, fs)
 		engine.Use(func(c *gin.Context) {
 			if fs.Exists(prefix, c.Request.URL.Path) {
-				if server.BasicAuthForUser(c) {
+				if s.UserAuthenticator.BasicAuthForUser(c) {
 					staticHandler(c)
 				}
 			}
