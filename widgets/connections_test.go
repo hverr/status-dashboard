@@ -6,6 +6,18 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+func TestConnectionsWidget(t *testing.T) {
+	w := &ConnectionsWidget{20, 30}
+	assert.NotEqual(t, "", w.Name())
+	assert.NotEqual(t, "", w.Type())
+	assert.Equal(t, w.Type(), w.Identifier())
+	assert.True(t, w.HasData())
+	assert.Nil(t, w.Configure([]byte{}))
+	assert.Nil(t, w.Configuration())
+	assert.Nil(t, w.Start())
+	assert.Nil(t, w.Update())
+}
+
 func TestNewTCPInfo(t *testing.T) {
 	{
 		tcp6 := " 1: 00000000000000000000000001000000:0277 00000000000000000000000000000000:0000 0A 00000000:00000000 00:00000000 00000000     0        0 13365 1 0000000000000000 100 0 0 10 0"

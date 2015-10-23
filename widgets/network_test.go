@@ -6,6 +6,24 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+func TestNetworkWidget(t *testing.T) {
+	w := &NetworkWidget{
+		Interface:   "eth0",
+		Interval:    10.0,
+		Received:    100,
+		Transmitted: 50,
+	}
+
+	assert.NotEqual(t, "", w.Name())
+	assert.NotEqual(t, "", w.Type())
+	assert.Equal(t, "network_eth0", w.Identifier())
+	assert.False(t, w.HasData())
+
+	c := []byte(`{"interface":"lo"}`)
+	assert.Nil(t, w.Configure(c))
+	assert.Equal(t, w.configuration, w.Configuration())
+}
+
 func TestNewNetworkDevice(t *testing.T) {
 	{
 		line := "  lo:   22104     236    0    0    0     0          0         0    22104     236    0    0    0     0       0          0"
