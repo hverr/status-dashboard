@@ -11,19 +11,26 @@ import (
 	"github.com/hverr/status-dashboard/server/api"
 	"github.com/hverr/status-dashboard/server/scheduler"
 	"github.com/hverr/status-dashboard/server/static"
+	"github.com/hverr/status-dashboard/updates"
 	"github.com/hverr/status-dashboard/version"
 )
+
+const BinaryBaseName = "dashboard-server"
 
 func main() {
 	var configFile string
 	var listenAddr string
 	var debug bool
 	var showVersion bool
+	var shouldUpdate bool
+	var checkUpdate bool
 
 	flag.StringVar(&configFile, "c", "", "Configuration file.")
 	flag.StringVar(&listenAddr, "listen", ":8050", "Listen address.")
 	flag.BoolVar(&debug, "debug", false, "Debug gin router.")
 	flag.BoolVar(&showVersion, "version", false, "Show version information.")
+	flag.BoolVar(&shouldUpdate, "update", false, "Update the binary.")
+	flag.BoolVar(&checkUpdate, "checkupdate", false, "Check for updates.")
 	flag.Parse()
 
 	printHelp := func() {
@@ -34,6 +41,16 @@ func main() {
 		if !version.PrintVersionInformation(os.Stdout) {
 			os.Exit(1)
 		}
+		return
+	}
+
+	if checkUpdate {
+		updates.CheckForUpdates(BinaryBaseName)
+		return
+	}
+
+	if shouldUpdate {
+		updates.UpdateApp(BinaryBaseName)
 		return
 	}
 

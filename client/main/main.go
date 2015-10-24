@@ -14,9 +14,12 @@ import (
 
 	"github.com/hverr/status-dashboard/client"
 	"github.com/hverr/status-dashboard/server"
+	"github.com/hverr/status-dashboard/updates"
 	"github.com/hverr/status-dashboard/version"
 	"github.com/hverr/status-dashboard/widgets"
 )
+
+const BinaryBaseName = "dashboard-client"
 
 type environment struct {
 	Server        client.Server
@@ -27,10 +30,14 @@ func main() {
 	var configFile string
 	var ca string
 	var showVersion bool
+	var shouldUpdate bool
+	var checkUpdate bool
 
 	flag.StringVar(&configFile, "c", "", "Configuration file.")
 	flag.StringVar(&ca, "ca", "", "Root CA certificate.")
 	flag.BoolVar(&showVersion, "version", false, "Show version information.")
+	flag.BoolVar(&shouldUpdate, "update", false, "Update the binary.")
+	flag.BoolVar(&checkUpdate, "checkupdate", false, "Check for updates.")
 	flag.Parse()
 
 	printHelp := func() {
@@ -41,6 +48,16 @@ func main() {
 		if !version.PrintVersionInformation(os.Stdout) {
 			os.Exit(1)
 		}
+		return
+	}
+
+	if checkUpdate {
+		updates.CheckForUpdates(BinaryBaseName)
+		return
+	}
+
+	if shouldUpdate {
+		updates.UpdateApp(BinaryBaseName)
 		return
 	}
 
