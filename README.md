@@ -8,6 +8,7 @@
    - [Usage](#usage)
    - [User Authentication](#user-authentication)
    - [SSL](#ssl)
+ - [Updating](#updating)
  - [Building](#building)
    - [Using Docker](#using-docker)
    - [Locally](#locally)
@@ -84,6 +85,15 @@ go client/main/*.go -c client/main/dev_ssl_config.json -ca examples/root_ca.pem
 ```
 
 You can now browse to [https://localhost:12443](https://localhost:12443)
+
+## Updating
+You can automatically update the application using the `-update` flag. It will update the executable to the latest GitHub release.
+
+```sh
+$ dashboard-server -checkupdate
+$ dashboard-server -update
+```
+
 ## Building
 Building a binary for your platform is easiest using Docker on a Linux machine, or locally using the [Makefile](Makefile).
 
