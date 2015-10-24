@@ -3,6 +3,7 @@ package main
 var usage = `Usage:
 	dashboard-client -c config_file
 	dashboard-client -version
+	dashbaord-client {-update|-checkupdate}
 
 DESCRIPTION:
 	dashboard-client periodically sends information to an API end point.
@@ -10,9 +11,15 @@ DESCRIPTION:
 OPTIONS:
 	-c config_file:
 		The configuration file (see CONFIGURAITON FILE)
-	
+
 	-version:
 		Display version information
+
+	-update:
+		Update the binary
+
+	-checkupdate
+		Check if updates are available for the binary
 
 CONFIGURATION FILE:
 	The configuration file is formatted in JSON and has the following layout:
