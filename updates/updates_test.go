@@ -5,6 +5,7 @@ import (
 	"runtime"
 	"testing"
 
+	"github.com/hverr/go-updater"
 	"github.com/hverr/status-dashboard/version"
 	"github.com/stretchr/testify/assert"
 )
@@ -12,7 +13,7 @@ import (
 func TestUpdater(t *testing.T) {
 	version.Commit = "da39a3ee5e6b4b0d3255bfef95601890afd80709"
 
-	u := appUpdater("dashboard-client")
+	u := appUpdater("dashboard-client", nil)
 	assert.NotNil(t, u.App)
 	assert.Equal(t, version.Commit, u.CurrentReleaseIdentifier)
 	assert.NotNil(t, u.WriterForAsset)
@@ -21,16 +22,17 @@ func TestUpdater(t *testing.T) {
 func TestAssetWriter(t *testing.T) {
 	{
 		a := &testAsset{name: "not an asset"}
-		f := assetWriter("dashboard-client")
+		f := assetWriter("dashboard-client", nil)
 		u, err := f(a)
 		assert.Nil(t, u)
 		assert.Nil(t, err)
 	}
 	{
+		file := updater.NewDelayedFile("")
 		a := &testAsset{name: assetName("dashboard-client")}
-		f := assetWriter("dashboard-client")
+		f := assetWriter("dashboard-client", file)
 		u, err := f(a)
-		assert.NotNil(t, u)
+		assert.Equal(t, file, u)
 		assert.Nil(t, err)
 	}
 }

@@ -18,7 +18,7 @@ const (
 )
 
 func CheckForUpdates(baseName string) {
-	u := appUpdater(baseName)
+	u := appUpdater(baseName, nil)
 
 	fmt.Println("Checking for updates...")
 	latest, err := u.Check()
@@ -46,7 +46,8 @@ func CheckForUpdates(baseName string) {
 }
 
 func UpdateApp(baseName string) {
-	u := appUpdater(baseName)
+	f := updater.NewDelayedFile(os.Args[0])
+	u := appUpdater(baseName, f)
 
 	fmt.Println("Checking for updates...")
 	latest, err := u.Check()
@@ -60,6 +61,8 @@ func UpdateApp(baseName string) {
 		fmt.Println("This version is up to date.")
 		os.Exit(0)
 	}
+
+	defer f.Close()
 
 	fmt.Printf("Updating to: %v (%v):\n", latest.Name(), latest.Identifier())
 	fmt.Println(latest.Information())
@@ -75,20 +78,20 @@ func UpdateApp(baseName string) {
 	fmt.Printf("Successfully updated the binary at %v\n", os.Args[0])
 }
 
-func appUpdater(baseName string) updater.Updater {
+func appUpdater(baseName string, f updater.AbortWriter) updater.Updater {
 	return updater.Updater{
 		App: updater.NewGitHub("hverr", "status-dashboard", nil),
 		CurrentReleaseIdentifier: version.Commit,
-		WriterForAsset:           assetWriter(baseName),
+		WriterForAsset:           assetWriter(baseName, f),
 	}
 }
 
-func assetWriter(baseName string) func(updater.Asset) (updater.AbortWriter, error) {
+func assetWriter(baseName string, f updater.AbortWriter) func(updater.Asset) (updater.AbortWriter, error) {
 	return func(a updater.Asset) (updater.AbortWriter, error) {
 		if a.Name() != assetName(baseName) {
 			return nil, nil
 		}
-		return updater.NewDelayedFile(os.Args[0]), nil
+		return f, nil
 	}
 }
 
