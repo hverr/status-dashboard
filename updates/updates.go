@@ -62,13 +62,18 @@ func UpdateApp(baseName string) {
 		os.Exit(0)
 	}
 
-	defer f.Close()
-
 	fmt.Printf("Updating to: %v (%v):\n", latest.Name(), latest.Identifier())
 	fmt.Println(latest.Information())
 	fmt.Println("")
 
 	err = u.UpdateTo(latest)
+	if err != nil {
+		fmt.Fprintln(os.Stderr, "Error:", err)
+		fmt.Println("An error ocurred while updating.")
+		os.Exit(1)
+	}
+
+	err = f.Close()
 	if err != nil {
 		fmt.Fprintln(os.Stderr, "Error:", err)
 		fmt.Println("An error ocurred while updating.")
