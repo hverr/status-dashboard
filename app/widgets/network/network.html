@@ -1,7 +1,9 @@
 <div text-widget ng-controller="NetworkWidgetController">
   <div class="text">
     <span class="grey">{{ data.interface }}</span><br>
-    <span>{{ data.received | bandwidth:data.interval }}</span><br>
-    <span>{{ data.transmitted | bandwidth:data.interval }}</span>
+    <table border="0" style="margin:auto;">
+      <tr><td>{{ data.transmitted | bandwidth:data.interval }}<td>&#x25B2;
+      <tr><td>{{ data.received | bandwidth:data.interval }}<td>&#x25BC;
+    </table>
   </div>
 </div>
