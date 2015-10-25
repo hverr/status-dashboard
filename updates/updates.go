@@ -9,6 +9,7 @@ import (
 
 	"github.com/hverr/go-updater"
 	"github.com/hverr/status-dashboard/version"
+	"github.com/kardianos/osext"
 )
 
 const (
@@ -46,7 +47,15 @@ func CheckForUpdates(baseName string) {
 }
 
 func UpdateApp(baseName string) {
-	f := updater.NewDelayedFile(os.Args[0])
+	path, err := osext.Executable()
+	if err != nil || path == "" {
+		if err != nil {
+			fmt.Fprintln(os.Stderr, "Erorr:", err)
+		}
+		fmt.Println("Failed to get the executable location.")
+		os.Exit(1)
+	}
+	f := updater.NewDelayedFile(path)
 	u := appUpdater(baseName, f)
 
 	fmt.Println("Checking for updates...")
@@ -62,7 +71,7 @@ func UpdateApp(baseName string) {
 		os.Exit(0)
 	}
 
-	fmt.Printf("Updating to: %v (%v):\n", latest.Name(), latest.Identifier())
+	fmt.Printf("Downloading %v (%v):\n", latest.Name(), latest.Identifier())
 	fmt.Println(latest.Information())
 	fmt.Println("")
 
@@ -73,6 +82,7 @@ func UpdateApp(baseName string) {
 		os.Exit(1)
 	}
 
+	fmt.Println("Replacing", path)
 	err = f.Close()
 	if err != nil {
 		fmt.Fprintln(os.Stderr, "Error:", err)
@@ -80,7 +90,7 @@ func UpdateApp(baseName string) {
 		os.Exit(1)
 	}
 
-	fmt.Printf("Successfully updated the binary at %v\n", os.Args[0])
+	fmt.Println("Successfully updated the binary.")
 }
 
 func appUpdater(baseName string, f updater.AbortWriter) updater.Updater {
